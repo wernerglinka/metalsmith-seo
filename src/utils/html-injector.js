@@ -2,7 +2,7 @@
  * @fileoverview HTML injection utilities for strategic head element placement.
  */
 
-import { load } from 'cheerio';
+import { load } from "cheerio";
 
 /**
  * @typedef {Object} InjectionOptions
@@ -19,30 +19,26 @@ import { load } from 'cheerio';
  * @returns {string} Modified HTML content
  */
 export function injectIntoHead(html, content, options = {}) {
-  const {
-    createHead = true,
-    ensureTitle = true,
-    position = 'end'
-  } = options;
+  const { createHead = true, ensureTitle = true, position = "end" } = options;
 
   // Load HTML with Cheerio
   const $ = load(html, {
     decodeEntities: false,
-    lowerCaseAttributeNames: false
+    lowerCaseAttributeNames: false,
   });
 
   // Ensure head element exists
-  let $head = $('head');
+  let $head = $("head");
   if ($head.length === 0 && createHead) {
     // Create head if it doesn't exist
-    if ($('html').length === 0) {
+    if ($("html").length === 0) {
       // No html element, wrap everything
-      $('body').before('<head></head>');
+      $("body").before("<head></head>");
     } else {
       // Add head to existing html element
-      $('html').prepend('<head></head>');
+      $("html").prepend("<head></head>");
     }
-    $head = $('head');
+    $head = $("head");
   }
 
   if ($head.length === 0) {
@@ -51,35 +47,37 @@ export function injectIntoHead(html, content, options = {}) {
   }
 
   // Ensure title exists if requested
-  if (ensureTitle && $head.find('title').length === 0) {
-    $head.prepend('<title></title>');
+  if (ensureTitle && $head.find("title").length === 0) {
+    $head.prepend("<title></title>");
   }
 
   // Inject content based on position
   switch (position) {
-    case 'start':
+    case "start":
       $head.prepend(content);
       break;
-      
-    case 'before-title':
-      const $title = $head.find('title').first();
+
+    case "before-title": {
+      const $title = $head.find("title").first();
       if ($title.length > 0) {
         $title.before(content);
       } else {
         $head.prepend(content);
       }
       break;
-      
-    case 'after-title':
-      const $titleAfter = $head.find('title').first();
+    }
+
+    case "after-title": {
+      const $titleAfter = $head.find("title").first();
       if ($titleAfter.length > 0) {
         $titleAfter.after(content);
       } else {
         $head.append(content);
       }
       break;
-      
-    case 'end':
+    }
+
+    case "end":
     default:
       $head.append(content);
       break;
@@ -97,16 +95,16 @@ export function injectIntoHead(html, content, options = {}) {
 export function updateTitle(html, title) {
   const $ = load(html, {
     decodeEntities: false,
-    lowerCaseAttributeNames: false
+    lowerCaseAttributeNames: false,
   });
 
-  let $head = $('head');
+  let $head = $("head");
   if ($head.length === 0) {
-    $('body').before('<head></head>');
-    $head = $('head');
+    $("body").before("<head></head>");
+    $head = $("head");
   }
 
-  const $title = $head.find('title');
+  const $title = $head.find("title");
   if ($title.length > 0) {
     $title.text(title);
   } else {
@@ -124,16 +122,16 @@ export function updateTitle(html, title) {
  * @param {string} [type='name'] - The attribute type: 'name', 'property', 'http-equiv'
  * @returns {string} Modified HTML content
  */
-export function updateMetaTag(html, name, content, type = 'name') {
+export function updateMetaTag(html, name, content, type = "name") {
   const $ = load(html, {
     decodeEntities: false,
-    lowerCaseAttributeNames: false
+    lowerCaseAttributeNames: false,
   });
 
-  let $head = $('head');
+  let $head = $("head");
   if ($head.length === 0) {
-    $('body').before('<head></head>');
-    $head = $('head');
+    $("body").before("<head></head>");
+    $head = $("head");
   }
 
   // Find existing meta tag
@@ -142,18 +140,18 @@ export function updateMetaTag(html, name, content, type = 'name') {
 
   if ($existing.length > 0) {
     // Update existing meta tag
-    $existing.attr('content', content);
+    $existing.attr("content", content);
   } else {
     // Create new meta tag
     const metaTag = `<meta ${type}="${escapeHtml(name)}" content="${escapeHtml(content)}">`;
-    
+
     // Insert after existing meta tags but before other elements
-    const $lastMeta = $head.find('meta').last();
+    const $lastMeta = $head.find("meta").last();
     if ($lastMeta.length > 0) {
       $lastMeta.after(metaTag);
     } else {
       // Insert after title if it exists, otherwise at the start
-      const $title = $head.find('title');
+      const $title = $head.find("title");
       if ($title.length > 0) {
         $title.after(metaTag);
       } else {
@@ -176,13 +174,13 @@ export function updateMetaTag(html, name, content, type = 'name') {
 export function updateLinkTag(html, rel, href, attributes = {}) {
   const $ = load(html, {
     decodeEntities: false,
-    lowerCaseAttributeNames: false
+    lowerCaseAttributeNames: false,
   });
 
-  let $head = $('head');
+  let $head = $("head");
   if ($head.length === 0) {
-    $('body').before('<head></head>');
-    $head = $('head');
+    $("body").before("<head></head>");
+    $head = $("head");
   }
 
   // Find existing link tag
@@ -191,21 +189,21 @@ export function updateLinkTag(html, rel, href, attributes = {}) {
   // Build attributes string
   const attrs = Object.entries(attributes)
     .map(([key, value]) => `${key}="${escapeHtml(value)}"`)
-    .join(' ');
+    .join(" ");
 
-  const linkTag = `<link rel="${escapeHtml(rel)}" href="${escapeHtml(href)}"${attrs ? ' ' + attrs : ''}>`;
+  const linkTag = `<link rel="${escapeHtml(rel)}" href="${escapeHtml(href)}"${attrs ? ` ${attrs}` : ""}>`;
 
   if ($existing.length > 0) {
     // Replace existing link tag
     $existing.replaceWith(linkTag);
   } else {
     // Add new link tag after other links
-    const $lastLink = $head.find('link').last();
+    const $lastLink = $head.find("link").last();
     if ($lastLink.length > 0) {
       $lastLink.after(linkTag);
     } else {
       // Insert after meta tags
-      const $lastMeta = $head.find('meta').last();
+      const $lastMeta = $head.find("meta").last();
       if ($lastMeta.length > 0) {
         $lastMeta.after(linkTag);
       } else {
@@ -225,21 +223,26 @@ export function updateLinkTag(html, rel, href, attributes = {}) {
  * @param {string} [position='end'] - Where to place the script
  * @returns {string} Modified HTML content
  */
-export function addScript(html, scriptContent, type = 'application/ld+json', position = 'end') {
+export function addScript(
+  html,
+  scriptContent,
+  type = "application/ld+json",
+  position = "end",
+) {
   const $ = load(html, {
     decodeEntities: false,
-    lowerCaseAttributeNames: false
+    lowerCaseAttributeNames: false,
   });
 
-  let $head = $('head');
+  let $head = $("head");
   if ($head.length === 0) {
-    $('body').before('<head></head>');
-    $head = $('head');
+    $("body").before("<head></head>");
+    $head = $("head");
   }
 
   const scriptTag = `<script type="${escapeHtml(type)}">${scriptContent}</script>`;
 
-  if (position === 'end') {
+  if (position === "end") {
     $head.append(scriptTag);
   } else {
     $head.prepend(scriptTag);
@@ -254,16 +257,16 @@ export function addScript(html, scriptContent, type = 'application/ld+json', pos
  * @returns {string} Escaped string
  */
 function escapeHtml(str) {
-  if (typeof str !== 'string') {
+  if (typeof str !== "string") {
     return String(str);
   }
-  
+
   return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 /**
@@ -275,37 +278,33 @@ function escapeHtml(str) {
 export function removeExistingMetaTags(html, tags = []) {
   const $ = load(html, {
     decodeEntities: false,
-    lowerCaseAttributeNames: false
+    lowerCaseAttributeNames: false,
   });
 
-  const defaultTags = [
-    'description',
-    'keywords',
-    'robots',
-    'canonical'
-  ];
+  const defaultTags = ["description", "keywords", "robots", "canonical"];
 
   const ogTags = [
-    'og:title',
-    'og:description', 
-    'og:image',
-    'og:url',
-    'og:type',
-    'og:site_name'
+    "og:title",
+    "og:description",
+    "og:image",
+    "og:url",
+    "og:type",
+    "og:site_name",
   ];
 
   const twitterTags = [
-    'twitter:card',
-    'twitter:title',
-    'twitter:description',
-    'twitter:image',
-    'twitter:site',
-    'twitter:creator'
+    "twitter:card",
+    "twitter:title",
+    "twitter:description",
+    "twitter:image",
+    "twitter:site",
+    "twitter:creator",
   ];
 
-  const tagsToRemove = tags.length > 0 ? tags : [...defaultTags, ...ogTags, ...twitterTags];
+  const tagsToRemove =
+    tags.length > 0 ? tags : [...defaultTags, ...ogTags, ...twitterTags];
 
-  tagsToRemove.forEach(tag => {
+  tagsToRemove.forEach((tag) => {
     $(`meta[name="${tag}"]`).remove();
     $(`meta[property="${tag}"]`).remove();
   });

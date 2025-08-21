@@ -2,7 +2,6 @@ import { describe, it, beforeEach } from 'mocha';
 import assert from 'assert';
 import Metalsmith from 'metalsmith';
 import seo from '../../lib/index.js';
-import { resetCache } from '../test-utils.js';
 describe('Edge Branch Coverage Tests', function() {
   this.timeout(5000);
   
@@ -41,7 +40,7 @@ describe('Edge Branch Coverage Tests', function() {
           hostname: 'http://www.website.com/'
         }))
         .build(function(err, files) {
-          if (err) return done(err);
+          if (err) {return done(err);}
           
           // Should process all files despite structure issues
           assert(files['no-html-element.html'], 'Should process HTML without html element');
@@ -75,7 +74,7 @@ describe('Edge Branch Coverage Tests', function() {
           hostname: 'http://www.website.com/'
         }))
         .build(function(err, files) {
-          if (err) return done(err);
+          if (err) {return done(err);}
           
           const withTitleHtml = files['with-title.html'].contents.toString();
           const noTitleHtml = files['no-title.html'].contents.toString();
@@ -127,7 +126,7 @@ describe('Edge Branch Coverage Tests', function() {
           hostname: 'http://www.website.com/'
         }))
         .build(function(err, files) {
-          if (err) return done(err);
+          if (err) {return done(err);}
           
           const robotsHtml = files['robots-config.html'].contents.toString();
           const metaHtml = files['meta-tags.html'].contents.toString();
@@ -180,7 +179,7 @@ describe('Edge Branch Coverage Tests', function() {
           seoProperty: 'seo'
         }))
         .build(function(err, files) {
-          if (err) return done(err);
+          if (err) {return done(err);}
           
           const nestedHtml = files['nested-seo.html'].contents.toString();
           const arrayHtml = files['array-values.html'].contents.toString();
@@ -240,7 +239,7 @@ describe('Edge Branch Coverage Tests', function() {
           }
         }))
         .build(function(err, files) {
-          if (err) return done(err);
+          if (err) {return done(err);}
           
           const socialHtml = files['social-comprehensive.html'].contents.toString();
           
@@ -292,7 +291,7 @@ describe('Edge Branch Coverage Tests', function() {
           }
         }))
         .build(function(err, files) {
-          if (err) return done(err);
+          if (err) {return done(err);}
           
           const edgeHtml = files['multi-generator-edge.html'].contents.toString();
           

@@ -1,10 +1,9 @@
 import Metalsmith from 'metalsmith';
 import seo from '../lib/index.js';
 import assert from 'assert';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+// import { fileURLToPath } from 'url';
+// import { dirname } from 'path';
+// const __dirname = dirname(fileURLToPath(import.meta.url)); // Unused in current tests
 
 describe('metalsmith-seo robots.txt functionality', function() {
   this.timeout(5000);
@@ -19,7 +18,7 @@ describe('metalsmith-seo robots.txt functionality', function() {
         hostname: 'https://example.com'
       }))
       .build(function(err, files) {
-        if (err) return done(err);
+        if (err) {return done(err);}
         
         // Should generate robots.txt
         assert(files['robots.txt'], 'Should generate robots.txt');
@@ -49,7 +48,7 @@ describe('metalsmith-seo robots.txt functionality', function() {
         hostname: 'https://example.com'
       }))
       .build(function(err, files) {
-        if (err) return done(err);
+        if (err) {return done(err);}
         
         const robotsContent = files['robots.txt'].contents.toString();
         
@@ -79,7 +78,7 @@ describe('metalsmith-seo robots.txt functionality', function() {
         hostname: 'https://example.com'
       }))
       .build(function(err, files) {
-        if (err) return done(err);
+        if (err) {return done(err);}
         
         const robotsContent = files['robots.txt'].contents.toString();
         
@@ -104,7 +103,7 @@ describe('metalsmith-seo robots.txt functionality', function() {
         }
       }))
       .build(function(err, files) {
-        if (err) return done(err);
+        if (err) {return done(err);}
         
         const robotsContent = files['robots.txt'].contents.toString();
         
@@ -124,7 +123,7 @@ describe('metalsmith-seo robots.txt functionality', function() {
         enableRobots: false
       }))
       .build(function(err, files) {
-        if (err) return done(err);
+        if (err) {return done(err);}
         
         // Should not generate robots.txt
         assert(!files['robots.txt'], 'Should not generate robots.txt when disabled');
@@ -145,7 +144,7 @@ describe('metalsmith-seo robots.txt functionality', function() {
         }
       }))
       .build(function(err, files) {
-        if (err) return done(err);
+        if (err) {return done(err);}
         
         const robotsContent = files['robots.txt'].contents.toString();
         

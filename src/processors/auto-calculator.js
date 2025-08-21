@@ -31,26 +31,31 @@ export function calculatePriority(file, frontmatter, options) {
 
   // Content type analysis based on path patterns
   const lowerFile = file.toLowerCase();
-  if (lowerFile.includes('/blog/') || lowerFile.includes('/news/') || lowerFile.includes('/articles/')) {
+  if (
+    lowerFile.includes("/blog/") ||
+    lowerFile.includes("/news/") ||
+    lowerFile.includes("/articles/")
+  ) {
     calculatedPriority += 0.1; // Blog content gets boost
   }
-  if (lowerFile.includes('/services/') || lowerFile.includes('/products/')) {
+  if (lowerFile.includes("/services/") || lowerFile.includes("/products/")) {
     calculatedPriority += 0.2; // Service/product pages get higher boost
   }
-  if (lowerFile.includes('index.html') && pathDepth <= 2) {
+  if (lowerFile.includes("index.html") && pathDepth <= 2) {
     calculatedPriority += 0.2; // Index pages are important
   }
-  if (lowerFile.includes('/about') || lowerFile.includes('/contact')) {
+  if (lowerFile.includes("/about") || lowerFile.includes("/contact")) {
     calculatedPriority += 0.15; // About/contact pages
   }
 
   // Content age analysis (if lastmod is available)
   const fileLastmod = get(frontmatter, modifiedProperty) || lastmod;
   if (fileLastmod) {
-    const modDate = fileLastmod instanceof Date ? fileLastmod : new Date(fileLastmod);
+    const modDate =
+      fileLastmod instanceof Date ? fileLastmod : new Date(fileLastmod);
     const now = new Date();
     const daysSinceModified = (now - modDate) / (1000 * 60 * 60 * 24);
-    
+
     if (daysSinceModified < 30) {
       calculatedPriority += 0.1; // Recently modified content
     } else if (daysSinceModified < 90) {
@@ -85,50 +90,59 @@ export function calculateChangefreq(file, frontmatter, options) {
   const lowerFile = file.toLowerCase();
 
   // Blog and news content changes frequently
-  if (lowerFile.includes('/blog/') || lowerFile.includes('/news/') || lowerFile.includes('/articles/')) {
-    return 'weekly';
+  if (
+    lowerFile.includes("/blog/") ||
+    lowerFile.includes("/news/") ||
+    lowerFile.includes("/articles/")
+  ) {
+    return "weekly";
   }
 
   // Index pages and category pages update when new content is added
-  if (lowerFile.includes('index.html')) {
-    if (lowerFile.includes('/blog/') || lowerFile.includes('/news/')) {
-      return 'weekly'; // Blog index updates frequently
+  if (lowerFile.includes("index.html")) {
+    if (lowerFile.includes("/blog/") || lowerFile.includes("/news/")) {
+      return "weekly"; // Blog index updates frequently
     }
-    return 'monthly'; // Other index pages update less frequently
+    return "monthly"; // Other index pages update less frequently
   }
 
   // Service and product pages update occasionally
-  if (lowerFile.includes('/services/') || lowerFile.includes('/products/')) {
-    return 'monthly';
+  if (lowerFile.includes("/services/") || lowerFile.includes("/products/")) {
+    return "monthly";
   }
 
   // About, contact, and policy pages rarely change
-  if (lowerFile.includes('/about') || lowerFile.includes('/contact') || 
-      lowerFile.includes('/privacy') || lowerFile.includes('/terms')) {
-    return 'yearly';
+  if (
+    lowerFile.includes("/about") ||
+    lowerFile.includes("/contact") ||
+    lowerFile.includes("/privacy") ||
+    lowerFile.includes("/terms")
+  ) {
+    return "yearly";
   }
 
   // Documentation might update occasionally
-  if (lowerFile.includes('/docs/') || lowerFile.includes('/documentation/')) {
-    return 'monthly';
+  if (lowerFile.includes("/docs/") || lowerFile.includes("/documentation/")) {
+    return "monthly";
   }
 
   // Check content age if available
   const fileLastmod = get(frontmatter, modifiedProperty) || lastmod;
   if (fileLastmod) {
-    const modDate = fileLastmod instanceof Date ? fileLastmod : new Date(fileLastmod);
+    const modDate =
+      fileLastmod instanceof Date ? fileLastmod : new Date(fileLastmod);
     const now = new Date();
     const daysSinceModified = (now - modDate) / (1000 * 60 * 60 * 24);
-    
+
     if (daysSinceModified < 7) {
-      return 'weekly'; // Recently modified
+      return "weekly"; // Recently modified
     } else if (daysSinceModified < 30) {
-      return 'monthly'; // Modified in last month
+      return "monthly"; // Modified in last month
     } else if (daysSinceModified < 365) {
-      return 'yearly'; // Modified in last year
+      return "yearly"; // Modified in last year
     }
   }
 
   // Default for unclassified content
-  return 'monthly';
+  return "monthly";
 }

@@ -22,17 +22,17 @@ export function generateMetaTags(metadata, siteConfig = {}) {
   // Basic meta tags
   if (metadata.description) {
     metaTags.push({
-      name: 'description',
-      content: metadata.description
+      name: "description",
+      content: metadata.description,
     });
   }
 
   if (metadata.keywords && metadata.keywords.length > 0) {
     metaTags.push({
-      name: 'keywords',
-      content: Array.isArray(metadata.keywords) 
-        ? metadata.keywords.join(', ')
-        : metadata.keywords
+      name: "keywords",
+      content: Array.isArray(metadata.keywords)
+        ? metadata.keywords.join(", ")
+        : metadata.keywords,
     });
   }
 
@@ -40,38 +40,38 @@ export function generateMetaTags(metadata, siteConfig = {}) {
   const robots = generateRobotsDirective(metadata, siteConfig);
   if (robots) {
     metaTags.push({
-      name: 'robots',
-      content: robots
+      name: "robots",
+      content: robots,
     });
   }
 
   // Author
   if (metadata.author) {
     metaTags.push({
-      name: 'author',
-      content: metadata.author
+      name: "author",
+      content: metadata.author,
     });
   }
 
   // Viewport (always include for mobile optimization)
   metaTags.push({
-    name: 'viewport',
-    content: 'width=device-width, initial-scale=1.0'
+    name: "viewport",
+    content: "width=device-width, initial-scale=1.0",
   });
 
   // Canonical URL
   if (metadata.canonicalURL) {
     linkTags.push({
-      rel: 'canonical',
-      href: metadata.canonicalURL
+      rel: "canonical",
+      href: metadata.canonicalURL,
     });
   }
 
   // Theme color (if specified in site config)
   if (siteConfig.themeColor) {
     metaTags.push({
-      name: 'theme-color',
-      content: siteConfig.themeColor
+      name: "theme-color",
+      content: siteConfig.themeColor,
     });
   }
 
@@ -81,7 +81,7 @@ export function generateMetaTags(metadata, siteConfig = {}) {
   return {
     title: metadata.title,
     metaTags,
-    linkTags
+    linkTags,
   };
 }
 
@@ -93,7 +93,7 @@ export function generateMetaTags(metadata, siteConfig = {}) {
  */
 function generateRobotsDirective(metadata, siteConfig) {
   if (metadata.noIndex) {
-    return 'noindex,nofollow';
+    return "noindex,nofollow";
   }
 
   if (metadata.robots) {
@@ -102,14 +102,14 @@ function generateRobotsDirective(metadata, siteConfig) {
 
   // Default based on content type
   switch (metadata.type) {
-    case 'article':
-      return 'index,follow';
-    case 'page':
-      return 'index,follow';
-    case 'product':
-      return 'index,follow';
+    case "article":
+      return "index,follow";
+    case "page":
+      return "index,follow";
+    case "product":
+      return "index,follow";
     default:
-      return siteConfig.defaultRobots || 'index,follow';
+      return siteConfig.defaultRobots || "index,follow";
   }
 }
 
@@ -123,51 +123,51 @@ function addTechnicalMetaTags(metaTags, metadata, siteConfig) {
   // Content language
   if (siteConfig.language) {
     metaTags.push({
-      httpEquiv: 'content-language',
-      content: siteConfig.language
+      httpEquiv: "content-language",
+      content: siteConfig.language,
     });
   }
 
   // Publisher
   if (siteConfig.publisher) {
     metaTags.push({
-      name: 'publisher',
-      content: siteConfig.publisher
+      name: "publisher",
+      content: siteConfig.publisher,
     });
   }
 
   // Copyright
   if (siteConfig.copyright) {
     metaTags.push({
-      name: 'copyright',
-      content: siteConfig.copyright
+      name: "copyright",
+      content: siteConfig.copyright,
     });
   }
 
   // Googlebot specific directives
   const googlebotDirectives = [];
-  
+
   if (siteConfig.maxSnippet) {
     googlebotDirectives.push(`max-snippet:${siteConfig.maxSnippet}`);
   }
-  
+
   if (siteConfig.maxImagePreview) {
     googlebotDirectives.push(`max-image-preview:${siteConfig.maxImagePreview}`);
   }
-  
+
   if (siteConfig.maxVideoPreview) {
     googlebotDirectives.push(`max-video-preview:${siteConfig.maxVideoPreview}`);
   }
 
   if (googlebotDirectives.length > 0) {
     metaTags.push({
-      name: 'googlebot',
-      content: googlebotDirectives.join(',')
+      name: "googlebot",
+      content: googlebotDirectives.join(","),
     });
   }
 
   // Article-specific meta tags
-  if (metadata.type === 'article') {
+  if (metadata.type === "article") {
     addArticleMetaTags(metaTags, metadata);
   }
 }
@@ -181,31 +181,31 @@ function addArticleMetaTags(metaTags, metadata) {
   if (metadata.publishDate) {
     const date = new Date(metadata.publishDate);
     metaTags.push({
-      name: 'article:published_time',
-      content: date.toISOString()
+      name: "article:published_time",
+      content: date.toISOString(),
     });
   }
 
   if (metadata.modifiedDate) {
     const date = new Date(metadata.modifiedDate);
     metaTags.push({
-      name: 'article:modified_time',
-      content: date.toISOString()
+      name: "article:modified_time",
+      content: date.toISOString(),
     });
   }
 
   if (metadata.author) {
     metaTags.push({
-      name: 'article:author',
-      content: metadata.author
+      name: "article:author",
+      content: metadata.author,
     });
   }
 
   if (metadata.keywords && metadata.keywords.length > 0) {
-    metadata.keywords.forEach(keyword => {
+    metadata.keywords.forEach((keyword) => {
       metaTags.push({
-        name: 'article:tag',
-        content: keyword
+        name: "article:tag",
+        content: keyword,
       });
     });
   }
@@ -217,16 +217,26 @@ function addArticleMetaTags(metaTags, metadata) {
  * @returns {string} HTML meta tags
  */
 export function metaTagsToHtml(metaTags) {
-  return metaTags.map(tag => {
-    const attributes = [];
-    
-    if (tag.name) attributes.push(`name="${escapeHtml(tag.name)}"`);
-    if (tag.property) attributes.push(`property="${escapeHtml(tag.property)}"`);
-    if (tag.httpEquiv) attributes.push(`http-equiv="${escapeHtml(tag.httpEquiv)}"`);
-    if (tag.content) attributes.push(`content="${escapeHtml(tag.content)}"`);
-    
-    return `<meta ${attributes.join(' ')}>`;
-  }).join('\n');
+  return metaTags
+    .map((tag) => {
+      const attributes = [];
+
+      if (tag.name) {
+        attributes.push(`name="${escapeHtml(tag.name)}"`);
+      }
+      if (tag.property) {
+        attributes.push(`property="${escapeHtml(tag.property)}"`);
+      }
+      if (tag.httpEquiv) {
+        attributes.push(`http-equiv="${escapeHtml(tag.httpEquiv)}"`);
+      }
+      if (tag.content) {
+        attributes.push(`content="${escapeHtml(tag.content)}"`);
+      }
+
+      return `<meta ${attributes.join(" ")}>`;
+    })
+    .join("\n");
 }
 
 /**
@@ -235,23 +245,33 @@ export function metaTagsToHtml(metaTags) {
  * @returns {string} HTML link tags
  */
 export function linkTagsToHtml(linkTags) {
-  return linkTags.map(tag => {
-    const attributes = [];
-    
-    if (tag.rel) attributes.push(`rel="${escapeHtml(tag.rel)}"`);
-    if (tag.href) attributes.push(`href="${escapeHtml(tag.href)}"`);
-    if (tag.type) attributes.push(`type="${escapeHtml(tag.type)}"`);
-    if (tag.sizes) attributes.push(`sizes="${escapeHtml(tag.sizes)}"`);
-    
-    // Add any other attributes
-    Object.entries(tag).forEach(([key, value]) => {
-      if (!['rel', 'href', 'type', 'sizes'].includes(key)) {
-        attributes.push(`${key}="${escapeHtml(value)}"`);
+  return linkTags
+    .map((tag) => {
+      const attributes = [];
+
+      if (tag.rel) {
+        attributes.push(`rel="${escapeHtml(tag.rel)}"`);
       }
-    });
-    
-    return `<link ${attributes.join(' ')}>`;
-  }).join('\n');
+      if (tag.href) {
+        attributes.push(`href="${escapeHtml(tag.href)}"`);
+      }
+      if (tag.type) {
+        attributes.push(`type="${escapeHtml(tag.type)}"`);
+      }
+      if (tag.sizes) {
+        attributes.push(`sizes="${escapeHtml(tag.sizes)}"`);
+      }
+
+      // Add any other attributes
+      Object.entries(tag).forEach(([key, value]) => {
+        if (!["rel", "href", "type", "sizes"].includes(key)) {
+          attributes.push(`${key}="${escapeHtml(value)}"`);
+        }
+      });
+
+      return `<link ${attributes.join(" ")}>`;
+    })
+    .join("\n");
 }
 
 /**
@@ -260,14 +280,14 @@ export function linkTagsToHtml(linkTags) {
  * @returns {string} Escaped string
  */
 function escapeHtml(str) {
-  if (typeof str !== 'string') {
+  if (typeof str !== "string") {
     return String(str);
   }
-  
+
   return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }

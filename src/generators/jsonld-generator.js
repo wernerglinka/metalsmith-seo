@@ -15,7 +15,7 @@
  * @param {string} filePath - File path for context
  * @returns {JsonLdResult} Generated JSON-LD schemas
  */
-export function generateJsonLd(metadata, siteConfig = {}, filePath = '') {
+export function generateJsonLd(metadata, siteConfig = {}, filePath = "") {
   const schemas = [];
 
   // Generate schemas based on content type and configuration
@@ -25,9 +25,9 @@ export function generateJsonLd(metadata, siteConfig = {}, filePath = '') {
   generateOrganizationSchema(schemas, siteConfig);
 
   // Convert schemas to JSON-LD context
-  const jsonLdSchemas = schemas.map(schema => ({
+  const jsonLdSchemas = schemas.map((schema) => ({
     "@context": "https://schema.org",
-    ...schema
+    ...schema,
   }));
 
   // Generate HTML script tag
@@ -35,7 +35,7 @@ export function generateJsonLd(metadata, siteConfig = {}, filePath = '') {
 
   return {
     schemas: jsonLdSchemas,
-    html
+    html,
   };
 }
 
@@ -51,26 +51,26 @@ function generateWebSiteSchema(schemas, siteConfig) {
 
   const webSiteSchema = {
     "@type": "WebSite",
-    "name": siteConfig.siteName || siteConfig.name,
-    "url": siteConfig.hostname || siteConfig.url
+    name: siteConfig.siteName || siteConfig.name,
+    url: siteConfig.hostname || siteConfig.url,
   };
 
   // Add search action if configured
   if (siteConfig.searchUrl) {
     webSiteSchema.potentialAction = {
       "@type": "SearchAction",
-      "target": {
+      target: {
         "@type": "EntryPoint",
-        "urlTemplate": `${siteConfig.searchUrl}?q={search_term_string}`
+        urlTemplate: `${siteConfig.searchUrl}?q={search_term_string}`,
       },
-      "query-input": "required name=search_term_string"
+      "query-input": "required name=search_term_string",
     };
   }
 
   // Add alternate name
   if (siteConfig.alternateNames) {
-    webSiteSchema.alternateName = Array.isArray(siteConfig.alternateNames) 
-      ? siteConfig.alternateNames 
+    webSiteSchema.alternateName = Array.isArray(siteConfig.alternateNames)
+      ? siteConfig.alternateNames
       : [siteConfig.alternateNames];
   }
 
@@ -85,16 +85,16 @@ function generateWebSiteSchema(schemas, siteConfig) {
  */
 function generateContentSchema(schemas, metadata, siteConfig) {
   switch (metadata.type) {
-    case 'article':
+    case "article":
       generateArticleSchema(schemas, metadata, siteConfig);
       break;
-    case 'product':
+    case "product":
       generateProductSchema(schemas, metadata, siteConfig);
       break;
-    case 'local-business':
+    case "local-business":
       generateLocalBusinessSchema(schemas, metadata, siteConfig);
       break;
-    case 'page':
+    case "page":
     default:
       generateWebPageSchema(schemas, metadata, siteConfig);
       break;
@@ -110,8 +110,8 @@ function generateContentSchema(schemas, metadata, siteConfig) {
 function generateArticleSchema(schemas, metadata, siteConfig) {
   const articleSchema = {
     "@type": "Article",
-    "headline": metadata.title,
-    "url": metadata.canonicalURL
+    headline: metadata.title,
+    url: metadata.canonicalURL,
   };
 
   // Description
@@ -123,7 +123,7 @@ function generateArticleSchema(schemas, metadata, siteConfig) {
   if (metadata.image) {
     articleSchema.image = {
       "@type": "ImageObject",
-      "url": metadata.image
+      url: metadata.image,
     };
   }
 
@@ -131,7 +131,7 @@ function generateArticleSchema(schemas, metadata, siteConfig) {
   if (metadata.publishDate) {
     articleSchema.datePublished = new Date(metadata.publishDate).toISOString();
   }
-  
+
   if (metadata.modifiedDate) {
     articleSchema.dateModified = new Date(metadata.modifiedDate).toISOString();
   }
@@ -140,7 +140,7 @@ function generateArticleSchema(schemas, metadata, siteConfig) {
   if (metadata.author) {
     articleSchema.author = {
       "@type": "Person",
-      "name": metadata.author
+      name: metadata.author,
     };
   }
 
@@ -178,11 +178,11 @@ function generateArticleSchema(schemas, metadata, siteConfig) {
  * @param {Object} metadata - Extracted metadata
  * @param {Object} siteConfig - Site configuration
  */
-function generateProductSchema(schemas, metadata, siteConfig) {
+function generateProductSchema(schemas, metadata) {
   const productSchema = {
     "@type": "Product",
-    "name": metadata.title,
-    "description": metadata.description
+    name: metadata.title,
+    description: metadata.description,
   };
 
   // Image
@@ -194,7 +194,7 @@ function generateProductSchema(schemas, metadata, siteConfig) {
   if (metadata.brand) {
     productSchema.brand = {
       "@type": "Brand",
-      "name": metadata.brand
+      name: metadata.brand,
     };
   }
 
@@ -207,10 +207,10 @@ function generateProductSchema(schemas, metadata, siteConfig) {
   if (metadata.price) {
     productSchema.offers = {
       "@type": "Offer",
-      "price": metadata.price,
-      "priceCurrency": metadata.currency || "USD",
-      "availability": `https://schema.org/${metadata.availability || "InStock"}`,
-      "condition": `https://schema.org/${metadata.condition || "NewCondition"}`
+      price: metadata.price,
+      priceCurrency: metadata.currency || "USD",
+      availability: `https://schema.org/${metadata.availability || "InStock"}`,
+      condition: `https://schema.org/${metadata.condition || "NewCondition"}`,
     };
   }
 
@@ -218,8 +218,8 @@ function generateProductSchema(schemas, metadata, siteConfig) {
   if (metadata.rating) {
     productSchema.aggregateRating = {
       "@type": "AggregateRating",
-      "ratingValue": metadata.rating,
-      "ratingCount": metadata.ratingCount || 1
+      ratingValue: metadata.rating,
+      ratingCount: metadata.ratingCount || 1,
     };
   }
 
@@ -235,8 +235,8 @@ function generateProductSchema(schemas, metadata, siteConfig) {
 function generateLocalBusinessSchema(schemas, metadata, siteConfig) {
   const businessSchema = {
     "@type": "LocalBusiness",
-    "name": metadata.title || siteConfig.businessName,
-    "description": metadata.description
+    name: metadata.title || siteConfig.businessName,
+    description: metadata.description,
   };
 
   // Address
@@ -244,11 +244,11 @@ function generateLocalBusinessSchema(schemas, metadata, siteConfig) {
     const address = metadata.address || siteConfig.address;
     businessSchema.address = {
       "@type": "PostalAddress",
-      "streetAddress": address.streetAddress,
-      "addressLocality": address.city,
-      "addressRegion": address.state,
-      "postalCode": address.postalCode,
-      "addressCountry": address.country
+      streetAddress: address.streetAddress,
+      addressLocality: address.city,
+      addressRegion: address.state,
+      postalCode: address.postalCode,
+      addressCountry: address.country,
     };
   }
 
@@ -256,8 +256,8 @@ function generateLocalBusinessSchema(schemas, metadata, siteConfig) {
   if (metadata.latitude && metadata.longitude) {
     businessSchema.geo = {
       "@type": "GeoCoordinates",
-      "latitude": metadata.latitude,
-      "longitude": metadata.longitude
+      latitude: metadata.latitude,
+      longitude: metadata.longitude,
     };
   }
 
@@ -272,7 +272,8 @@ function generateLocalBusinessSchema(schemas, metadata, siteConfig) {
 
   // Opening hours
   if (metadata.openingHours || siteConfig.openingHours) {
-    businessSchema.openingHours = metadata.openingHours || siteConfig.openingHours;
+    businessSchema.openingHours =
+      metadata.openingHours || siteConfig.openingHours;
   }
 
   // Image
@@ -292,8 +293,8 @@ function generateLocalBusinessSchema(schemas, metadata, siteConfig) {
 function generateWebPageSchema(schemas, metadata, siteConfig) {
   const webPageSchema = {
     "@type": "WebPage",
-    "name": metadata.title,
-    "url": metadata.canonicalURL
+    name: metadata.title,
+    url: metadata.canonicalURL,
   };
 
   if (metadata.description) {
@@ -308,8 +309,8 @@ function generateWebPageSchema(schemas, metadata, siteConfig) {
   if (siteConfig.siteName) {
     webPageSchema.isPartOf = {
       "@type": "WebSite",
-      "name": siteConfig.siteName,
-      "url": siteConfig.hostname
+      name: siteConfig.siteName,
+      url: siteConfig.hostname,
     };
   }
 
@@ -328,42 +329,44 @@ function generateBreadcrumbSchema(schemas, filePath, siteConfig) {
   }
 
   const pathSegments = filePath
-    .replace(/\.html?$/, '')
-    .replace(/\/index$/, '')
-    .split('/')
-    .filter(segment => segment.length > 0);
+    .replace(/\.html?$/, "")
+    .replace(/\/index$/, "")
+    .split("/")
+    .filter((segment) => segment.length > 0);
 
   if (pathSegments.length === 0) {
     return;
   }
 
   const breadcrumbItems = [];
-  let currentPath = '';
+  let currentPath = "";
 
   // Add home
   breadcrumbItems.push({
     "@type": "ListItem",
-    "position": 1,
-    "name": "Home",
-    "item": siteConfig.hostname
+    position: 1,
+    name: "Home",
+    item: siteConfig.hostname,
   });
 
   // Add path segments
   pathSegments.forEach((segment, index) => {
     currentPath += `/${segment}`;
-    const name = segment.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-    
+    const name = segment
+      .replace(/-/g, " ")
+      .replace(/\b\w/g, (l) => l.toUpperCase());
+
     breadcrumbItems.push({
       "@type": "ListItem",
-      "position": index + 2,
-      "name": name,
-      "item": `${siteConfig.hostname}${currentPath}`
+      position: index + 2,
+      name: name,
+      item: `${siteConfig.hostname}${currentPath}`,
     });
   });
 
   const breadcrumbSchema = {
     "@type": "BreadcrumbList",
-    "itemListElement": breadcrumbItems
+    itemListElement: breadcrumbItems,
   };
 
   schemas.push(breadcrumbSchema);
@@ -382,14 +385,14 @@ function generateOrganizationSchema(schemas, siteConfig) {
   const org = siteConfig.organization;
   const organizationSchema = {
     "@type": "Organization",
-    "name": org.name,
-    "url": org.url || siteConfig.hostname
+    name: org.name,
+    url: org.url || siteConfig.hostname,
   };
 
   if (org.logo) {
     organizationSchema.logo = {
       "@type": "ImageObject",
-      "url": org.logo
+      url: org.logo,
     };
   }
 
@@ -398,14 +401,16 @@ function generateOrganizationSchema(schemas, siteConfig) {
   }
 
   if (org.sameAs) {
-    organizationSchema.sameAs = Array.isArray(org.sameAs) ? org.sameAs : [org.sameAs];
+    organizationSchema.sameAs = Array.isArray(org.sameAs)
+      ? org.sameAs
+      : [org.sameAs];
   }
 
   if (org.contactPoint) {
     organizationSchema.contactPoint = {
       "@type": "ContactPoint",
-      "telephone": org.contactPoint.telephone,
-      "contactType": org.contactPoint.contactType || "customer service"
+      telephone: org.contactPoint.telephone,
+      contactType: org.contactPoint.contactType || "customer service",
     };
   }
 
@@ -420,13 +425,13 @@ function generateOrganizationSchema(schemas, siteConfig) {
 function generatePublisherSchema(organization) {
   const publisher = {
     "@type": "Organization",
-    "name": organization.name
+    name: organization.name,
   };
 
   if (organization.logo) {
     publisher.logo = {
       "@type": "ImageObject",
-      "url": organization.logo
+      url: organization.logo,
     };
   }
 
@@ -440,19 +445,21 @@ function generatePublisherSchema(organization) {
  */
 function generateJsonLdHtml(schemas) {
   if (schemas.length === 0) {
-    return '';
+    return "";
   }
 
   // If multiple schemas, use @graph
-  const jsonLd = schemas.length === 1 
-    ? schemas[0]
-    : {
-        "@context": "https://schema.org",
-        "@graph": schemas.map(schema => {
-          const { "@context": context, ...rest } = schema;
-          return rest;
-        })
-      };
+  const jsonLd =
+    schemas.length === 1
+      ? schemas[0]
+      : {
+          "@context": "https://schema.org",
+          "@graph": schemas.map((schema) => {
+            // eslint-disable-next-line no-unused-vars
+            const { "@context": _, ...rest } = schema;
+            return rest;
+          }),
+        };
 
   const jsonString = JSON.stringify(jsonLd, null, 2);
   return `<script type="application/ld+json">\n${jsonString}\n</script>`;
@@ -464,28 +471,28 @@ function generateJsonLdHtml(schemas) {
  * @returns {boolean} Whether the schema is valid
  */
 export function validateJsonLd(schema) {
-  if (!schema || typeof schema !== 'object') {
+  if (!schema || typeof schema !== "object") {
     return false;
   }
 
   // Must have @type
-  if (!schema['@type']) {
+  if (!schema["@type"]) {
     return false;
   }
 
   // Basic validation for common required properties
-  switch (schema['@type']) {
-    case 'Article':
+  switch (schema["@type"]) {
+    case "Article":
       return !!(schema.headline && schema.author);
-    case 'Product':
-      return !!(schema.name);
-    case 'Organization':
-      return !!(schema.name);
-    case 'LocalBusiness':
-      return !!(schema.name);
-    case 'WebSite':
+    case "Product":
+      return !!schema.name;
+    case "Organization":
+      return !!schema.name;
+    case "LocalBusiness":
+      return !!schema.name;
+    case "WebSite":
       return !!(schema.name && schema.url);
-    case 'WebPage':
+    case "WebPage":
       return !!(schema.name && schema.url);
     default:
       return true; // Allow unknown types

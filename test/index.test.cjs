@@ -25,7 +25,7 @@ describe('metalsmith-seo (CommonJS)', function(){
         auto: false
       }))
       .build(function(err, files){
-        if (err) return done(err);
+        if (err) {return done(err);}
         
         // Basic assertions - just verify it processed files
         assert(files['index.html'], 'Should process HTML files');
