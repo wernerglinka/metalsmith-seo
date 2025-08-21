@@ -1,0 +1,12 @@
+{
+  "all": true,
+  "include": ["lib/**/*.{js,cjs}"],
+  "exclude": ["**/*.test.js", "test/**", "**/*.map"],
+  "reporter": ["text", "lcov", "html"],
+  "report-dir": "./coverage",
+  "check-coverage": true,
+  "branches": 75,
+  "lines": 75,
+  "functions": 75,
+  "statements": 75
+}
