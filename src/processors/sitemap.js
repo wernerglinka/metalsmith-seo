@@ -67,7 +67,7 @@ export async function processSitemap(files, metalsmith, options) {
   sortedFiles.forEach(function (file) {
     // Get the current file's frontmatter
     const frontmatter = files[file];
-    
+
     // Validate file.contents is a Buffer before processing
     if (!Buffer.isBuffer(frontmatter.contents)) {
       return;
@@ -83,21 +83,24 @@ export async function processSitemap(files, metalsmith, options) {
     if (lastmodValue instanceof Date) {
       // Format date as YYYY-MM-DD to match old library behavior
       lastmodValue = lastmodValue.toISOString().split("T")[0];
-    } else if (
-      typeof lastmodValue === "string" &&
-      lastmodValue.includes("T")
-    ) {
+    } else if (typeof lastmodValue === "string" && lastmodValue.includes("T")) {
       // Handle ISO string dates by extracting just the date part
       lastmodValue = lastmodValue.split("T")[0];
     }
 
     // Create the sitemap entry (reject keys with falsy values)
     let entryChangefreq, entryPriority;
-    
+
     if (auto) {
       // Auto mode: calculate values, ignore global and frontmatter settings
-      entryChangefreq = calculateChangefreq(file, frontmatter, { modifiedProperty, lastmod });
-      entryPriority = calculatePriority(file, frontmatter, { modifiedProperty, lastmod });
+      entryChangefreq = calculateChangefreq(file, frontmatter, {
+        modifiedProperty,
+        lastmod,
+      });
+      entryPriority = calculatePriority(file, frontmatter, {
+        modifiedProperty,
+        lastmod,
+      });
     } else {
       // Manual mode: use global defaults, allow frontmatter overrides
       entryChangefreq = frontmatter.changefreq || changefreq;
@@ -115,7 +118,11 @@ export async function processSitemap(files, metalsmith, options) {
     );
 
     // Add the url (which is allowed to be falsy)
-    entry.url = buildUrl(file, frontmatter, { urlProperty, omitIndex, omitExtension });
+    entry.url = buildUrl(file, frontmatter, {
+      urlProperty,
+      omitIndex,
+      omitExtension,
+    });
 
     // Add the entry to the links array
     links.push(entry);

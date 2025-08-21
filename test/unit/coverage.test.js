@@ -1,8 +1,7 @@
 import { describe, it, beforeEach } from 'mocha';
 import assert from 'assert';
 import Metalsmith from 'metalsmith';
-import seo from '../../lib/index.js';
-import { resetCache } from '../test-utils.js';
+import seo from '../../src/index.js';
 describe('Coverage Tests - Missing Functionality', function() {
   this.timeout(5000);
   
@@ -42,7 +41,7 @@ describe('Coverage Tests - Missing Functionality', function() {
       };
 
       plugin(files, mockMetalsmith, function(err) {
-        if (err) return done(err);
+        if (err) {return done(err);}
         
         assert(files['sitemap.xml'], 'Should generate sitemap');
         const sitemapContent = files['sitemap.xml'].contents.toString();
@@ -96,7 +95,7 @@ describe('Coverage Tests - Missing Functionality', function() {
       };
 
       plugin(files, mockMetalsmith, function(err) {
-        if (err) return done(err);
+        if (err) {return done(err);}
         
         const htmlContent = files['social-test.html'].contents.toString();
         
@@ -130,7 +129,7 @@ describe('Coverage Tests - Missing Functionality', function() {
       };
 
       plugin(files, mockMetalsmith, function(err) {
-        if (err) return done(err);
+        if (err) {return done(err);}
         
         const htmlContent = files['minimal.html'].contents.toString();
         assert(htmlContent.includes('<head>'), 'Should still process HTML');
@@ -142,22 +141,13 @@ describe('Coverage Tests - Missing Functionality', function() {
 
   describe('Edge cases and error handling', function() {
     it('should handle files without proper HTML structure', function(done) {
-      const files = {
-        'broken.html': {
-          contents: Buffer.from('This is not proper HTML')
-        },
-        'empty.html': {
-          contents: Buffer.from('')
-        }
-      };
-
       Metalsmith('test/fixtures/hostname')
         .destination('build')
         .use(seo({
           hostname: 'http://www.website.com/'
         }))
         .build(function(err, result) {
-          if (err) return done(err);
+          if (err) {return done(err);}
           
           // Should not crash and should still generate sitemap/robots
           assert(result['sitemap.xml'], 'Should generate sitemap');
@@ -205,7 +195,7 @@ describe('Coverage Tests - Missing Functionality', function() {
       };
 
       plugin(files, mockMetalsmith, function(err) {
-        if (err) return done(err);
+        if (err) {return done(err);}
         
         const htmlContent = files['complex.html'].contents.toString();
         assert(htmlContent.includes('Custom SEO Title'), 'Should use custom SEO title');
@@ -243,7 +233,7 @@ describe('Coverage Tests - Missing Functionality', function() {
       };
 
       plugin(files, mockMetalsmith, function(err) {
-        if (err) return done(err);
+        if (err) {return done(err);}
         
         // Should not generate sitemap or robots
         assert(!files['sitemap.xml'], 'Should not generate sitemap');
@@ -260,22 +250,13 @@ describe('Coverage Tests - Missing Functionality', function() {
 
   describe('Robots.txt edge cases', function() {
     it('should handle existing robots.txt with sitemap reference', function(done) {
-      const files = {
-        'robots.txt': {
-          contents: Buffer.from('User-agent: *\nDisallow: /admin/\n\nSitemap: http://example.com/sitemap.xml')
-        },
-        'test.html': {
-          contents: Buffer.from('<html><head><title>Test</title></head><body>Content</body></html>')
-        }
-      };
-
       Metalsmith('test/fixtures/hostname')
         .destination('build')
         .use(seo({
           hostname: 'http://www.website.com/'
         }))
         .build(function(err, result) {
-          if (err) return done(err);
+          if (err) {return done(err);}
           
           const robotsContent = result['robots.txt'].contents.toString();
           // Should not duplicate sitemap reference
@@ -287,12 +268,6 @@ describe('Coverage Tests - Missing Functionality', function() {
     });
 
     it('should add custom disallow paths', function(done) {
-      const files = {
-        'test.html': {
-          contents: Buffer.from('<html><head><title>Test</title></head><body>Content</body></html>')
-        }
-      };
-
       Metalsmith('test/fixtures/hostname')
         .destination('build')
         .use(seo({
@@ -303,7 +278,7 @@ describe('Coverage Tests - Missing Functionality', function() {
           }
         }))
         .build(function(err, result) {
-          if (err) return done(err);
+          if (err) {return done(err);}
           
           const robotsContent = result['robots.txt'].contents.toString();
           assert(robotsContent.includes('User-agent: Googlebot'), 'Should use custom user agent');
@@ -338,7 +313,7 @@ describe('Coverage Tests - Missing Functionality', function() {
       };
 
       plugin(files, mockMetalsmith, function(err) {
-        if (err) return done(err);
+        if (err) {return done(err);}
         
         // Should process all files regardless of batch size
         assert.strictEqual(Object.keys(files).filter(f => f.endsWith('.html')).length, 15, 'Should process all HTML files');

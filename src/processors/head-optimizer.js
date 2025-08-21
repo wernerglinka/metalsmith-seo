@@ -2,19 +2,18 @@
  * @fileoverview Unified head optimizer that orchestrates all SEO metadata generation.
  */
 
-import { extractMetadata } from './metadata-extractor.js';
-import { generateMetaTags, metaTagsToHtml, linkTagsToHtml } from '../generators/meta-generator.js';
-import { generateOpenGraphTags, openGraphTagsToHtml } from '../generators/opengraph-generator.js';
-import { generateTwitterCardTags, twitterCardTagsToHtml } from '../generators/twitter-generator.js';
-import { generateJsonLd } from '../generators/jsonld-generator.js';
-import { 
-  injectIntoHead, 
-  updateTitle, 
-  updateMetaTag, 
-  updateLinkTag, 
+import { extractMetadata } from "./metadata-extractor.js";
+import { generateMetaTags } from "../generators/meta-generator.js";
+import { generateOpenGraphTags } from "../generators/opengraph-generator.js";
+import { generateTwitterCardTags } from "../generators/twitter-generator.js";
+import { generateJsonLd } from "../generators/jsonld-generator.js";
+import {
+  updateTitle,
+  updateMetaTag,
+  updateLinkTag,
   addScript,
-  removeExistingMetaTags 
-} from '../utils/html-injector.js';
+  removeExistingMetaTags,
+} from "../utils/html-injector.js";
 
 /**
  * @typedef {Object} HeadOptimizationOptions
@@ -45,13 +44,13 @@ import {
 export async function optimizeHead(filePath, frontmatter, options) {
   const {
     hostname,
-    seoProperty = 'seo',
+    seoProperty = "seo",
     defaults = {},
     fallbacks = {},
     social = {},
     jsonLd = {},
     cleanExisting = true,
-    generateSitemap = true
+    generateSitemap = true,
   } = options;
 
   // Skip non-HTML files
@@ -59,7 +58,7 @@ export async function optimizeHead(filePath, frontmatter, options) {
     return {
       html: frontmatter.contents.toString(),
       metadata: null,
-      generated: null
+      generated: null,
     };
   }
 
@@ -68,7 +67,7 @@ export async function optimizeHead(filePath, frontmatter, options) {
     hostname,
     seoProperty,
     defaults,
-    fallbacks
+    fallbacks,
   });
 
   // Check if file should be excluded from SEO processing
@@ -76,7 +75,7 @@ export async function optimizeHead(filePath, frontmatter, options) {
     return {
       html: frontmatter.contents.toString(),
       metadata,
-      generated: null
+      generated: null,
     };
   }
 
@@ -85,7 +84,7 @@ export async function optimizeHead(filePath, frontmatter, options) {
     hostname,
     social,
     jsonLd,
-    filePath
+    filePath,
   });
 
   // Inject SEO content into HTML
@@ -95,7 +94,7 @@ export async function optimizeHead(filePath, frontmatter, options) {
   return {
     html,
     metadata,
-    generated
+    generated,
   };
 }
 
@@ -105,25 +104,25 @@ export async function optimizeHead(filePath, frontmatter, options) {
  * @param {Object} config - Generation configuration
  * @returns {Object} Generated SEO content
  */
-async function generateAllSeoContent(metadata, config) {
+function generateAllSeoContent(metadata, config) {
   const { hostname, social, jsonLd, filePath } = config;
 
   // Site configuration combining hostname with social/jsonLd configs
   const siteConfig = {
     hostname,
     ...social,
-    ...jsonLd
+    ...jsonLd,
   };
 
   // Generate meta tags
   const metaResult = generateMetaTags(metadata, siteConfig);
-  
+
   // Generate Open Graph tags
   const ogResult = generateOpenGraphTags(metadata, siteConfig);
-  
+
   // Generate Twitter Card tags
   const twitterResult = generateTwitterCardTags(metadata, siteConfig);
-  
+
   // Generate JSON-LD structured data
   const jsonLdResult = generateJsonLd(metadata, siteConfig, filePath);
 
@@ -131,7 +130,7 @@ async function generateAllSeoContent(metadata, config) {
     meta: metaResult,
     openGraph: ogResult,
     twitter: twitterResult,
-    jsonLd: jsonLdResult
+    jsonLd: jsonLdResult,
   };
 }
 
@@ -143,9 +142,9 @@ async function generateAllSeoContent(metadata, config) {
  * @param {Object} options - Injection options
  * @returns {string} Modified HTML content
  */
-async function injectSeoContent(html, metadata, generated, options = {}) {
+function injectSeoContent(html, metadata, generated, options = {}) {
   const { cleanExisting = true } = options;
-  
+
   let modifiedHtml = html;
 
   // Clean existing SEO tags if requested
@@ -165,40 +164,63 @@ async function injectSeoContent(html, metadata, generated, options = {}) {
   // Inject critical meta tags early
   for (const tag of criticalMetaTags) {
     if (tag.name) {
-      modifiedHtml = updateMetaTag(modifiedHtml, tag.name, tag.content, 'name');
+      modifiedHtml = updateMetaTag(modifiedHtml, tag.name, tag.content, "name");
     } else if (tag.httpEquiv) {
-      modifiedHtml = updateMetaTag(modifiedHtml, tag.httpEquiv, tag.content, 'http-equiv');
+      modifiedHtml = updateMetaTag(
+        modifiedHtml,
+        tag.httpEquiv,
+        tag.content,
+        "http-equiv",
+      );
     }
   }
 
   // Inject link tags (after critical meta tags)
   for (const link of generated.meta.linkTags) {
-    modifiedHtml = updateLinkTag(modifiedHtml, link.rel, link.href, 
-      Object.fromEntries(Object.entries(link).filter(([key]) => !['rel', 'href'].includes(key)))
+    modifiedHtml = updateLinkTag(
+      modifiedHtml,
+      link.rel,
+      link.href,
+      Object.fromEntries(
+        Object.entries(link).filter(([key]) => !["rel", "href"].includes(key)),
+      ),
     );
   }
 
   // Inject remaining meta tags
   for (const tag of otherMetaTags) {
     if (tag.name) {
-      modifiedHtml = updateMetaTag(modifiedHtml, tag.name, tag.content, 'name');
+      modifiedHtml = updateMetaTag(modifiedHtml, tag.name, tag.content, "name");
     }
   }
 
   // Inject Open Graph tags
   for (const tag of generated.openGraph.metaTags) {
-    modifiedHtml = updateMetaTag(modifiedHtml, tag.property, tag.content, 'property');
+    modifiedHtml = updateMetaTag(
+      modifiedHtml,
+      tag.property,
+      tag.content,
+      "property",
+    );
   }
 
   // Inject Twitter Card tags
   for (const tag of generated.twitter.metaTags) {
-    modifiedHtml = updateMetaTag(modifiedHtml, tag.name, tag.content, 'name');
+    modifiedHtml = updateMetaTag(modifiedHtml, tag.name, tag.content, "name");
   }
 
   // Inject JSON-LD structured data (at the end for optimal loading)
   if (generated.jsonLd.html) {
-    const jsonLdContent = generated.jsonLd.html.replace(/<script[^>]*>|<\/script>/g, '');
-    modifiedHtml = addScript(modifiedHtml, jsonLdContent, 'application/ld+json', 'end');
+    const jsonLdContent = generated.jsonLd.html.replace(
+      /<script[^>]*>|<\/script>/g,
+      "",
+    );
+    modifiedHtml = addScript(
+      modifiedHtml,
+      jsonLdContent,
+      "application/ld+json",
+      "end",
+    );
   }
 
   return modifiedHtml;
@@ -210,11 +232,11 @@ async function injectSeoContent(html, metadata, generated, options = {}) {
  * @returns {Array} Critical meta tags
  */
 function getCriticalMetaTags(metaTags) {
-  const criticalTags = ['viewport', 'charset', 'description', 'robots'];
-  
-  return metaTags.filter(tag => 
-    criticalTags.includes(tag.name) || 
-    criticalTags.includes(tag.httpEquiv)
+  const criticalTags = ["viewport", "charset", "description", "robots"];
+
+  return metaTags.filter(
+    (tag) =>
+      criticalTags.includes(tag.name) || criticalTags.includes(tag.httpEquiv),
   );
 }
 
@@ -224,11 +246,11 @@ function getCriticalMetaTags(metaTags) {
  * @returns {Array} Non-critical meta tags
  */
 function getOtherMetaTags(metaTags) {
-  const criticalTags = ['viewport', 'charset', 'description', 'robots'];
-  
-  return metaTags.filter(tag => 
-    !criticalTags.includes(tag.name) && 
-    !criticalTags.includes(tag.httpEquiv)
+  const criticalTags = ["viewport", "charset", "description", "robots"];
+
+  return metaTags.filter(
+    (tag) =>
+      !criticalTags.includes(tag.name) && !criticalTags.includes(tag.httpEquiv),
   );
 }
 
@@ -253,24 +275,24 @@ export async function batchOptimizeHeads(files, options) {
 
   // Process files in parallel batches
   const batchSize = options.batchSize || 10;
-  
+
   for (let i = 0; i < fileList.length; i += batchSize) {
     const batch = fileList.slice(i, i + batchSize);
-    
+
     const batchPromises = batch.map(async (filePath) => {
       try {
         const result = await optimizeHead(filePath, files[filePath], options);
-        
+
         // Update file contents if HTML was modified
         if (result.html !== files[filePath].contents.toString()) {
           files[filePath].contents = Buffer.from(result.html);
         }
-        
+
         // Store metadata for potential use by other plugins
         if (result.metadata) {
           files[filePath].seoMetadata = result.metadata;
         }
-        
+
         return { filePath, result };
       } catch (error) {
         console.error(`SEO optimization failed for ${filePath}:`, error);
@@ -279,7 +301,7 @@ export async function batchOptimizeHeads(files, options) {
     });
 
     const batchResults = await Promise.all(batchPromises);
-    
+
     // Collect results
     batchResults.forEach(({ filePath, result, error }) => {
       results[filePath] = error ? { error } : result;
@@ -297,8 +319,8 @@ export async function batchOptimizeHeads(files, options) {
  */
 export function extractAllMetadata(files, options) {
   const metadata = {};
-  
-  Object.keys(files).forEach(filePath => {
+
+  Object.keys(files).forEach((filePath) => {
     try {
       const extracted = extractMetadata(filePath, files[filePath], options);
       metadata[filePath] = extracted;
@@ -320,19 +342,24 @@ export function validateSeoConfig(options) {
   const errors = [];
 
   if (!options.hostname) {
-    errors.push('hostname is required');
+    errors.push("hostname is required");
   }
 
   if (options.hostname && !isValidUrl(options.hostname)) {
-    errors.push('hostname must be a valid URL');
+    errors.push("hostname must be a valid URL");
   }
 
-  if (options.social?.twitterSite && !options.social.twitterSite.startsWith('@')) {
-    errors.push('social.twitterSite should start with @');
+  if (
+    options.social?.twitterSite &&
+    !options.social.twitterSite.startsWith("@")
+  ) {
+    errors.push("social.twitterSite should start with @");
   }
 
   if (options.jsonLd?.organization && !options.jsonLd.organization.name) {
-    errors.push('jsonLd.organization.name is required when organization is specified');
+    errors.push(
+      "jsonLd.organization.name is required when organization is specified",
+    );
   }
 
   return errors;

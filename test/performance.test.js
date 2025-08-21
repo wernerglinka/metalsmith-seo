@@ -1,6 +1,6 @@
 import Metalsmith from 'metalsmith';
-import seo from '../lib/index.js';
-import { resetCache } from './test-utils.js';import assert from 'assert';
+import seo from '../src/index.js';
+import assert from 'assert';
 
 describe('metalsmith-seo performance', function() {
   this.timeout(10000);
@@ -21,9 +21,9 @@ describe('metalsmith-seo performance', function() {
             hostname: 'https://example.com',
             auto: false
           }))
-          .build(function(err, files) {
-            if (err) return reject(err);
-            resolve(files);
+          .build(function(err) {
+            if (err) {return reject(err);}
+            resolve();
           });
       }));
     }
@@ -52,8 +52,8 @@ describe('metalsmith-seo performance', function() {
         hostname: 'https://example.com',
         auto: false
       }))
-      .build(function(err, files) {
-        if (err) return done(err);
+      .build(function(err) {
+        if (err) {return done(err);}
         
         firstBuildTime = Date.now() - firstStart;
         
@@ -65,8 +65,8 @@ describe('metalsmith-seo performance', function() {
             hostname: 'https://example.com',
             auto: false
           }))
-          .build(function(err, files) {
-            if (err) return done(err);
+          .build(function(err) {
+            if (err) {return done(err);}
             
             subsequentBuildsTime = Date.now() - secondStart;
             

@@ -1,8 +1,7 @@
 import { describe, it, beforeEach } from 'mocha';
 import assert from 'assert';
 import Metalsmith from 'metalsmith';
-import seo from '../../lib/index.js';
-import { resetCache } from '../test-utils.js';
+import seo from '../../src/index.js';
 describe('Branch Coverage Tests', function() {
   this.timeout(5000);
   
@@ -17,7 +16,7 @@ describe('Branch Coverage Tests', function() {
         .use(function(files, metalsmith, done) {
           // Add files to test different path depths and content types
           files['blog/recent-post.html'] = {
-            contents: Buffer.from('<html><head><title>Recent Post</title></head><body>' + 'Long content. '.repeat(1000) + '</body></html>'),
+            contents: Buffer.from(`<html><head><title>Recent Post</title></head><body>${'Long content. '.repeat(1000)}</body></html>`),
             title: 'Recent Blog Post',
             lastmod: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000) // 15 days ago
           };
@@ -49,7 +48,7 @@ describe('Branch Coverage Tests', function() {
           sitemap: { auto: true }
         }))
         .build(function(err, files) {
-          if (err) return done(err);
+          if (err) {return done(err);}
           
           assert(files['sitemap.xml'], 'Should generate sitemap');
           const sitemapContent = files['sitemap.xml'].contents.toString();
@@ -68,7 +67,7 @@ describe('Branch Coverage Tests', function() {
         .use(function(files, metalsmith, done) {
           // Add files with different content sizes to test buffer length checks
           files['large-content.html'] = {
-            contents: Buffer.from('<html><head><title>Large Content</title></head><body>' + 'Content. '.repeat(2000) + '</body></html>'),
+            contents: Buffer.from(`<html><head><title>Large Content</title></head><body>${'Content. '.repeat(2000)}</body></html>`),
             title: 'Large Content'
           };
           files['small-content.html'] = {
@@ -82,7 +81,7 @@ describe('Branch Coverage Tests', function() {
           sitemap: { auto: true }
         }))
         .build(function(err, files) {
-          if (err) return done(err);
+          if (err) {return done(err);}
           
           assert(files['sitemap.xml'], 'Should generate sitemap');
           done();
@@ -127,7 +126,7 @@ describe('Branch Coverage Tests', function() {
           }
         }))
         .build(function(err, files) {
-          if (err) return done(err);
+          if (err) {return done(err);}
           
           // Check that content is processed
           const videoHtml = files['video-content.html'].contents.toString();
@@ -169,7 +168,7 @@ describe('Branch Coverage Tests', function() {
           }
         }))
         .build(function(err, files) {
-          if (err) return done(err);
+          if (err) {return done(err);}
           
           // Check that articles are processed
           const fullArticleHtml = files['full-article.html'].contents.toString();
@@ -205,7 +204,7 @@ describe('Branch Coverage Tests', function() {
           hostname: 'http://www.website.com/'
         }))
         .build(function(err, files) {
-          if (err) return done(err);
+          if (err) {return done(err);}
           
           // Check that HTML is processed despite structural issues
           assert(files['no-head.html'].contents.toString().includes('<head>'), 'Should inject head tag');
@@ -242,7 +241,7 @@ describe('Branch Coverage Tests', function() {
           }
         }))
         .build(function(err, files) {
-          if (err) return done(err);
+          if (err) {return done(err);}
           
           const html = files['utility-test.html'].contents.toString();
           assert(html.includes('Nested description value'), 'Should use nested fallback value');
@@ -271,7 +270,7 @@ describe('Branch Coverage Tests', function() {
           }
         }))
         .build(function(err, files) {
-          if (err) return done(err);
+          if (err) {return done(err);}
           
           const robotsContent = files['robots.txt'].contents.toString();
           assert(robotsContent.includes('User-agent: Googlebot'), 'Should use custom user agent');
@@ -296,7 +295,7 @@ describe('Branch Coverage Tests', function() {
           enableRobots: false
         }))
         .build(function(err, files) {
-          if (err) return done(err);
+          if (err) {return done(err);}
           
           // Should not generate sitemap or robots
           assert(!files['sitemap.xml'], 'Should not generate sitemap');

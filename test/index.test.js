@@ -1,7 +1,6 @@
 import equal from 'assert-dir-equal';
 import Metalsmith from 'metalsmith';
-import seo from '../lib/index.js';
-import { resetCache } from './test-utils.js';
+import seo from '../src/index.js';
 
 describe('metalsmith-seo', function(){
   // Set timeout for the entire test suite
@@ -273,7 +272,6 @@ describe('metalsmith-seo', function(){
         // Check that auto-generated elements are present
         const hasPriority = sitemapContent.includes('<priority>');
         const hasChangefreq = sitemapContent.includes('<changefreq>');
-        const hasLastmod = sitemapContent.includes('<lastmod>');
         
         if (!hasPriority) {
           return done(new Error('Auto-generated priority missing from sitemap'));

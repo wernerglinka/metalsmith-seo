@@ -15,7 +15,13 @@ import { get } from "../utils/object-utils.js";
  * @param {string} privateProperty - Property name to check if file should be excluded
  * @returns {boolean} True if file should be processed, false otherwise
  */
-export function checkFile(file, frontmatter, metalsmith, pattern, privateProperty) {
+export function checkFile(
+  file,
+  frontmatter,
+  metalsmith,
+  pattern,
+  privateProperty,
+) {
   // Only process files that match the pattern
   const matchResult = metalsmith.match(pattern, file);
   if (!matchResult || matchResult.length === 0) {

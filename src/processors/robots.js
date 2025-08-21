@@ -18,39 +18,43 @@
  * @param {Object} files - Metalsmith files object
  * @param {Object} metalsmith - Metalsmith instance
  * @param {RobotsOptions} options - Configuration options
- * @returns {Promise<void>}
+ * @returns {void}
  */
-export async function processRobots(files, metalsmith, options) {
+export function processRobots(files, metalsmith, options) {
   const {
     hostname,
-    sitemapFile = 'sitemap.xml',
+    sitemapFile = "sitemap.xml",
     generateRobots = true,
     addSitemapReference = true,
     disallowPaths = [],
-    userAgent = '*'
+    userAgent = "*",
   } = options;
 
-  const robotsFile = 'robots.txt';
+  const robotsFile = "robots.txt";
   const existingRobots = files[robotsFile];
   // Ensure hostname is a string
-  const hostnameStr = String(hostname || '');
-  const sitemapUrl = `${hostnameStr.replace(/\/$/, '')}/${sitemapFile}`;
+  const hostnameStr = String(hostname || "");
+  const sitemapUrl = `${hostnameStr.replace(/\/$/, "")}/${sitemapFile}`;
 
   if (existingRobots) {
     // Handle existing robots.txt file
     if (addSitemapReference) {
       const content = existingRobots.contents.toString();
-      
+
       // Check if sitemap is already referenced
-      if (!content.includes('Sitemap:') && !content.includes('sitemap:')) {
+      if (!content.includes("Sitemap:") && !content.includes("sitemap:")) {
         // Add sitemap reference
-        const updatedContent = content.trim() + `\n\nSitemap: ${sitemapUrl}\n`;
+        const updatedContent = `${content.trim()}\n\nSitemap: ${sitemapUrl}\n`;
         existingRobots.contents = Buffer.from(updatedContent);
-        
+
         // Only log in non-test environments
-        const isTest = process.env.NODE_ENV === 'test' || process.env.METALSMITH_ENV === 'test';
+        const isTest =
+          process.env.NODE_ENV === "test" ||
+          process.env.METALSMITH_ENV === "test";
         if (!isTest) {
-          console.log('[metalsmith-seo] Added sitemap reference to existing robots.txt');
+          console.warn(
+            "[metalsmith-seo] Added sitemap reference to existing robots.txt",
+          );
         }
       }
     }
@@ -59,18 +63,21 @@ export async function processRobots(files, metalsmith, options) {
     const robotsContent = generateBasicRobots({
       userAgent,
       disallowPaths,
-      sitemapUrl
+      sitemapUrl,
     });
 
     files[robotsFile] = {
       contents: Buffer.from(robotsContent),
-      mode: '0644'
+      mode: "0644",
     };
 
     // Only log in non-test environments
-    const isTest = process.env.NODE_ENV === 'test' || process.env.METALSMITH_ENV === 'test';
+    const isTest =
+      process.env.NODE_ENV === "test" || process.env.METALSMITH_ENV === "test";
     if (!isTest) {
-      console.log('[metalsmith-seo] Generated robots.txt with sitemap reference');
+      console.warn(
+        "[metalsmith-seo] Generated robots.txt with sitemap reference",
+      );
     }
   }
 }
@@ -85,25 +92,25 @@ export async function processRobots(files, metalsmith, options) {
  */
 function generateBasicRobots({ userAgent, disallowPaths, sitemapUrl }) {
   const lines = [];
-  
+
   // User agent directive
   lines.push(`User-agent: ${userAgent}`);
-  
+
   // Disallow directives
   if (disallowPaths.length > 0) {
-    disallowPaths.forEach(path => {
+    disallowPaths.forEach((path) => {
       lines.push(`Disallow: ${path}`);
     });
   } else {
     // Default: allow all
-    lines.push('Disallow:');
+    lines.push("Disallow:");
   }
-  
+
   // Empty line before sitemap
-  lines.push('');
-  
+  lines.push("");
+
   // Sitemap reference
   lines.push(`Sitemap: ${sitemapUrl}`);
-  
-  return lines.join('\n') + '\n';
+
+  return `${lines.join("\n")}\n`;
 }

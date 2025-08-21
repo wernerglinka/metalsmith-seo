@@ -1,6 +1,6 @@
 {
   "name": "metalsmith-seo",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A metalsmith plugin for SEO optimization including sitemap generation, meta tags, and more.",
   "type": "module",
   "main": "lib/index.cjs",
@@ -16,7 +16,8 @@
   },
   "files": [
     "lib/",
-    "types/"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "microbundle --target node -f esm,cjs --strict --generateTypes=false --sourcemap",
@@ -25,8 +26,10 @@
     "test:cjs": "npm run build && NODE_ENV=test c8 mocha test/index.test.cjs -t 10000",
     "test:coverage": "npm test",
     "lint": "eslint src test --fix",
+    "lint:check": "eslint src test",
     "format": "prettier --write src",
     "format:check": "prettier --check src",
+    "release:check": "npm run lint:check && npm run build && release-it --dry-run",
     "release:patch": "./scripts/release.sh patch --ci",
     "release:minor": "./scripts/release.sh minor --ci",
     "release:major": "./scripts/release.sh major --ci"

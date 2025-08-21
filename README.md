@@ -1,14 +1,14 @@
 # metalsmith-seo
 
+Inspired by metalsmith-sitemap, the plugin provides comprehensive SEO optimization for Metalsmith with intelligent metadata generation, social media tags, and structured data including Open Graph tags, Twitter Cards, JSON-LD structured data, and sitemap generation.
+
 [![npm version][npm-badge]][npm-url]
 [![metalsmith: plugin][metalsmith-badge]][metalsmith-url]
 [![license: MIT][license-badge]][license-url]
 [![Test Coverage](https://img.shields.io/badge/coverage-70%25-green.svg)](coverage)
 [![ESM/CommonJS][modules-badge]][npm-url]
 
-> Comprehensive SEO optimization for Metalsmith with intelligent metadata generation, social media tags, and structured data
-
-Transform your Metalsmith site into an SEO powerhouse with automated meta tags, Open Graph tags, Twitter Cards, JSON-LD structured data, and sitemap generation - all from minimal configuration.
+> This Metalsmith plugin is under active development. The API is stable, but breaking changes may occur before reaching 1.0.0.
 
 ## Features
 
@@ -103,14 +103,18 @@ Or if your site metadata is nested differently:
 ```javascript
 // If metadata is at metadata().data.site instead of metadata().site
 Metalsmith(__dirname)
-  .use(metadata({ 
-    data: { 
-      site: 'data/site.json' 
-    } 
-  }))
-  .use(seo({ 
-    metadataPath: 'data.site'  // Tell plugin where to find site metadata
-  }))
+  .use(
+    metadata({
+      data: {
+        site: 'data/site.json',
+      },
+    })
+  )
+  .use(
+    seo({
+      metadataPath: 'data.site', // Tell plugin where to find site metadata
+    })
+  )
   .build();
 ```
 
@@ -268,7 +272,7 @@ The plugin uses this priority order:
 
   // Customize where to find site metadata
   metadataPath: 'site',     // Default: 'site' (can be 'data.site' or any path)
-  
+
   // Customize frontmatter property name
   seoProperty: 'seo',        // Default: 'seo'
 
@@ -443,6 +447,7 @@ If robots.txt already exists, the plugin:
 3. **Avoids duplicates** - Won't add multiple sitemap references
 
 **Example - Before:**
+
 ```txt
 User-agent: *
 Disallow: /admin/
@@ -450,6 +455,7 @@ Disallow: /private/
 ```
 
 **Example - After plugin processing:**
+
 ```txt
 User-agent: *
 Disallow: /admin/
@@ -473,6 +479,7 @@ Sitemap: https://example.com/sitemap.xml
 ```
 
 **Generated output:**
+
 ```txt
 User-agent: Googlebot
 Disallow: /admin/
@@ -519,6 +526,7 @@ By default, the plugin automatically calculates optimal values for sitemap entri
   - Only included when dates are reliable
 
 **Example auto-generated sitemap:**
+
 ```xml
 <url>
   <loc>https://example.com/index.html</loc>
@@ -566,20 +574,22 @@ Per-page overrides in frontmatter:
 ---
 title: 'Important Page'
 seo:
-  priority: 1.0          # Override auto-calculated priority
-  changefreq: 'daily'    # Override auto-calculated frequency
-  lastmod: '2024-01-15'  # Override file modification date
+  priority: 1.0 # Override auto-calculated priority
+  changefreq: 'daily' # Override auto-calculated frequency
+  lastmod: '2024-01-15' # Override file modification date
 ---
 ```
 
 #### Benefits of Auto-Calculation
 
 **Better SEO Performance:**
+
 - ✅ **Accurate lastmod dates** that Google trusts and uses
 - ✅ **Realistic priorities** based on actual content importance
 - ✅ **Smart change frequencies** based on content type patterns
 
 **Developer Experience:**
+
 - ✅ **Zero configuration** - works perfectly out of the box
 - ✅ **No manual maintenance** - adapts as your site grows
 - ✅ **Override capability** for special cases

@@ -1,10 +1,9 @@
 import Metalsmith from 'metalsmith';
-import seo from '../lib/index.js';
+import seo from '../src/index.js';
 import assert from 'assert';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+// import { fileURLToPath } from 'url';
+// import { dirname } from 'path';
+// const __dirname = dirname(fileURLToPath(import.meta.url)); // Unused in current tests
 
 describe('metalsmith-seo comprehensive features', function() {
   this.timeout(5000);
@@ -24,7 +23,7 @@ describe('metalsmith-seo comprehensive features', function() {
         }
       }))
       .build(function(err, files) {
-        if (err) return done(err);
+        if (err) {return done(err);}
         
         const html = files['index.html'].contents.toString();
         
@@ -59,7 +58,7 @@ describe('metalsmith-seo comprehensive features', function() {
         defaults: { title: 'Default Title' }
       }))
       .build(function(err, files) {
-        if (err) return done(err);
+        if (err) {return done(err);}
         
         const html = files['index.html'].contents.toString();
         
@@ -90,7 +89,7 @@ describe('metalsmith-seo comprehensive features', function() {
         hostname: 'https://example.com'
       }))
       .build(function(err, files) {
-        if (err) return done(err);
+        if (err) {return done(err);}
         
         const html = files['index.html'].contents.toString();
         
@@ -108,7 +107,7 @@ describe('metalsmith-seo comprehensive features', function() {
         hostname: 'http://www.website.com/'
       }))
       .build(function(err, files) {
-        if (err) return done(err);
+        if (err) {return done(err);}
         
         const html = files['index.html'].contents.toString();
         
@@ -142,7 +141,7 @@ describe('metalsmith-seo comprehensive features', function() {
         }
       }))
       .build(function(err, files) {
-        if (err) return done(err);
+        if (err) {return done(err);}
         
         // Check sitemap has the specified options
         const sitemap = files['sitemap.xml'].contents.toString();
