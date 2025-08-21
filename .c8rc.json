@@ -1,6 +1,6 @@
 {
   "all": true,
-  "include": ["lib/**/*.{js,cjs}"],
+  "include": ["src/**/*.js"],
   "exclude": ["**/*.test.js", "test/**", "**/*.map"],
   "reporter": ["text", "lcov", "html"],
   "report-dir": "./coverage",

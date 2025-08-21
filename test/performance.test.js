@@ -1,5 +1,5 @@
 import Metalsmith from 'metalsmith';
-import seo from '../lib/index.js';
+import seo from '../src/index.js';
 import assert from 'assert';
 
 describe('metalsmith-seo performance', function() {

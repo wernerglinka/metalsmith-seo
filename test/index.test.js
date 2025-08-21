@@ -1,6 +1,6 @@
 import equal from 'assert-dir-equal';
 import Metalsmith from 'metalsmith';
-import seo from '../lib/index.js';
+import seo from '../src/index.js';
 
 describe('metalsmith-seo', function(){
   // Set timeout for the entire test suite

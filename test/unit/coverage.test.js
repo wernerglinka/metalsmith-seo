@@ -1,7 +1,7 @@
 import { describe, it, beforeEach } from 'mocha';
 import assert from 'assert';
 import Metalsmith from 'metalsmith';
-import seo from '../../lib/index.js';
+import seo from '../../src/index.js';
 describe('Coverage Tests - Missing Functionality', function() {
   this.timeout(5000);
   
