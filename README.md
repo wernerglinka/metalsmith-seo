@@ -7,6 +7,7 @@ Inspired by metalsmith-sitemap, the plugin provides comprehensive SEO optimizati
 [![license: MIT][license-badge]][license-url]
 [![Test Coverage](https://img.shields.io/badge/coverage-70%25-green.svg)](coverage)
 [![ESM/CommonJS][modules-badge]][npm-url]
+[![Known Vulnerabilities](https://snyk.io/test/npm/metalsmith-seo/badge.svg)](https://snyk.io/test/npm/metalsmith-seo)
 
 > This Metalsmith plugin is under active development. The API is stable, but breaking changes may occur before reaching 1.0.0.
 
