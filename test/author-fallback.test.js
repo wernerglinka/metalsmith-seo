@@ -35,7 +35,7 @@ describe("Author fallback integration", () => {
       hostname: "https://example.com"
     });
     plugin(files, metalsmith, (err) => {
-      if (err) return done(err);
+      if (err) {return done(err);}
 
       const html = files["test-page.html"].contents.toString();
       const seoMetadata = files["test-page.html"].seoMetadata;
@@ -77,7 +77,7 @@ describe("Author fallback integration", () => {
       hostname: "https://example.com"
     });
     plugin(files, metalsmith, (err) => {
-      if (err) return done(err);
+      if (err) {return done(err);}
 
       const html = files["test-page.html"].contents.toString();
       
@@ -124,7 +124,7 @@ describe("Author fallback integration", () => {
       hostname: "https://example.com"
     });
     plugin(files, metalsmith, (err) => {
-      if (err) return done(err);
+      if (err) {return done(err);}
 
       const html = files["blog-post.html"].contents.toString();
       
@@ -167,7 +167,7 @@ describe("Author fallback integration", () => {
       hostname: "https://example.com"
     });
     plugin(files, metalsmith, (err) => {
-      if (err) return done(err);
+      if (err) {return done(err);}
 
       const html = files["collaboration.html"].contents.toString();
       
@@ -202,7 +202,7 @@ describe("Author fallback integration", () => {
     });
     
     plugin(files, metalsmith, (err) => {
-      if (err) return done(err);
+      if (err) {return done(err);}
 
       const html = files["no-metadata-page.html"].contents.toString();
       

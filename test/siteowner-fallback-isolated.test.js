@@ -53,11 +53,6 @@ describe("SiteOwner Fallback (Isolated)", () => {
         const html = processedFile.contents.toString();
         const seoMetadata = processedFile.seoMetadata;
 
-        // Debug output for this isolated test
-        console.log("\n=== ISOLATED SITEOWNER TEST DEBUG ===");
-        console.log("Site metadata:", metalsmith.metadata().site);
-        console.log("SEO metadata author:", seoMetadata?.author);
-        console.log("HTML contains 'Isolated Test Author':", html.includes('Isolated Test Author'));
         
         // Primary assertion: Check seoMetadata directly
         assert(seoMetadata, "seoMetadata should be generated");
@@ -85,7 +80,6 @@ describe("SiteOwner Fallback (Isolated)", () => {
           "JSON-LD should include author name"
         );
 
-        console.log("✅ All isolated siteOwner fallback tests passed!");
         done();
 
       } catch (assertionError) {
@@ -121,7 +115,7 @@ describe("SiteOwner Fallback (Isolated)", () => {
     });
 
     plugin(testFiles, metalsmith, (err) => {
-      if (err) return done(err);
+      if (err) {return done(err);}
 
       const seoMetadata = testFiles["minimal-unique.html"].seoMetadata;
       
@@ -161,7 +155,7 @@ describe("SiteOwner Fallback (Isolated)", () => {
     });
 
     plugin(testFiles, metalsmith, (err) => {
-      if (err) return done(err);
+      if (err) {return done(err);}
 
       const seoMetadata = testFiles["no-owner-unique.html"].seoMetadata;
       const html = testFiles["no-owner-unique.html"].contents.toString();
