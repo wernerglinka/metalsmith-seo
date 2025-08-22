@@ -21,7 +21,7 @@
   ],
   "scripts": {
     "build": "microbundle --target node -f esm,cjs --strict --generateTypes=false --sourcemap",
-    "test": "npm run build && NODE_ENV=test c8 mocha 'test/index.test.js' 'test/index.test.cjs' 'test/unit/**/*.js' 'test/seo-features.test.js' 'test/robots.test.js' 'test/performance.test.js' -t 10000",
+    "test": "npm run build && NODE_ENV=test c8 mocha 'test/index.test.js' 'test/index.test.cjs' 'test/unit/**/*.js' 'test/seo-features.test.js' 'test/robots.test.js' 'test/performance.test.js' 'test/card-extraction.test.js' 'test/author-fallback.test.js' -t 10000",
     "test:esm": "npm run build && NODE_ENV=test c8 mocha test/index.test.js -t 10000",
     "test:cjs": "npm run build && NODE_ENV=test c8 mocha test/index.test.cjs -t 10000",
     "test:coverage": "npm test",

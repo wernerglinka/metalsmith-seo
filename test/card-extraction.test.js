@@ -127,4 +127,25 @@ describe("Card object metadata extraction", () => {
     assert(metadata.publishDate.includes("2025-01-01"));
     assert.strictEqual(metadata.author, "Root Author");
   });
+
+  it("should fall back to siteOwner when no author is found anywhere", () => {
+    const frontmatter = {
+      title: "Page Without Author",
+      contents: Buffer.from("Some content")
+    };
+
+    const options = {
+      hostname: "https://example.com",
+      seoProperty: "seo",
+      defaults: {
+        siteOwner: "Werner Glinka"
+      },
+      fallbacks: {}
+    };
+
+    const metadata = extractMetadata("test.html", frontmatter, options);
+
+    assert.strictEqual(metadata.title, "Page Without Author");
+    assert.strictEqual(metadata.author, "Werner Glinka");
+  });
 });

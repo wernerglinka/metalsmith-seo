@@ -164,7 +164,11 @@ card:
 2. `card` object (for blog posts and content cards)
 3. Root level properties
 4. Configured defaults
-5. Auto-generated content
+5. Site-wide defaults (from site.json)
+6. Auto-generated content
+
+**Author Fallback Chain:**
+When no author is specified in frontmatter, the plugin uses `siteOwner` from your site.json as a fallback, ensuring all content has proper attribution for SEO and social media.
 
 **Result:** Comprehensive SEO markup automatically generated:
 
@@ -213,6 +217,7 @@ The plugin integrates seamlessly with your existing `site.json` configuration:
   "defaultImage": "/images/default-og.jpg",
   "twitter": "@mysite",
   "facebookAppId": "123456789",
+  "siteOwner": "Your Name",
 
   "organization": {
     "name": "My Company",
@@ -251,6 +256,7 @@ The plugin integrates seamlessly with your existing `site.json` configuration:
 | `locale`           | Content language         | `og:locale`                 |
 | `twitter`          | Twitter site handle      | `twitter:site`              |
 | `facebookAppId`    | Facebook integration     | `fb:app_id`                 |
+| `siteOwner`        | Default author fallback  | `<meta name="author">`      |
 | `organization`     | Company info             | JSON-LD Organization schema |
 
 #### Configuration Precedence

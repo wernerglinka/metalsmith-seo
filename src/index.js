@@ -10,11 +10,7 @@ import { batchOptimizeHeads } from "./processors/head-optimizer.js";
 import { processSitemap } from "./processors/sitemap.js";
 import { processRobots } from "./processors/robots.js";
 
-/**
- * Cache for site metadata checks to avoid repeated expensive operations
- * @type {Object}
- */
-let siteMetadataCache = null;
+// Note: Cache moved to plugin instance level below to avoid test interference
 
 /**
  * Get nested property from an object using dot notation path
@@ -181,6 +177,9 @@ function plugin(options = {}) {
   // We'll merge with site metadata inside the plugin function
   const pluginOptions = opts;
 
+  // Instance-level cache for this plugin instance
+  let siteMetadataCache = null;
+
   /**
    * Main plugin function that processes files for comprehensive SEO optimization.
    * @param {MetalsmithFiles} files - Object containing all files in the build
@@ -245,6 +244,9 @@ function plugin(options = {}) {
           pluginOptions.defaults?.socialImage ||
           siteMetadata.socialImage ||
           siteMetadata.defaultImage,
+        siteOwner:
+          pluginOptions.defaults?.siteOwner ||
+          siteMetadata.siteOwner,
         ...(pluginOptions.defaults || {}),
       },
       social: {

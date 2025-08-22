@@ -132,7 +132,7 @@ export function extractMetadata(filePath, frontmatter, options) {
     modifiedDate: extractModifiedDate(seoData, frontmatter, fallbacks),
 
     // Author and content metadata
-    author: extractAuthor(seoData, frontmatter, fallbacks),
+    author: extractAuthor(seoData, frontmatter, fallbacks, defaults),
     keywords: extractKeywords(seoData, frontmatter, fallbacks),
 
     // Content analysis
@@ -293,7 +293,7 @@ function extractModifiedDate(seoData, frontmatter, fallbacks) {
 /**
  * Extract author information
  */
-function extractAuthor(seoData, frontmatter, fallbacks) {
+function extractAuthor(seoData, frontmatter, fallbacks, defaults) {
   // Try the standard extraction first
   let author = extractWithPriority(
     seoData,
@@ -305,6 +305,11 @@ function extractAuthor(seoData, frontmatter, fallbacks) {
   // If not found and we used author.name as fallback, also try just "author"
   if (!author && (!fallbacks.author || fallbacks.author === "author.name")) {
     author = get(frontmatter, "author");
+  }
+
+  // Final fallback to site-wide default author
+  if (!author) {
+    author = defaults.siteOwner || defaults.author;
   }
 
   // Handle array of authors (join them)
