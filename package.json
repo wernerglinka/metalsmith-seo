@@ -1,6 +1,6 @@
 {
   "name": "metalsmith-seo",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A metalsmith plugin for SEO optimization including sitemap generation, meta tags, and more.",
   "type": "module",
   "main": "lib/index.cjs",
