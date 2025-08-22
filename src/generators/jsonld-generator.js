@@ -305,6 +305,14 @@ function generateWebPageSchema(schemas, metadata, siteConfig) {
     webPageSchema.image = metadata.image;
   }
 
+  // Author (even for regular pages, if available)
+  if (metadata.author) {
+    webPageSchema.author = {
+      "@type": "Person",
+      name: metadata.author,
+    };
+  }
+
   // Part of website
   if (siteConfig.siteName) {
     webPageSchema.isPartOf = {

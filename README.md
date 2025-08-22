@@ -121,7 +121,7 @@ Metalsmith(__dirname)
 
 ### Frontmatter Integration
 
-Add SEO data to any page:
+Add SEO data to any page. The plugin intelligently extracts metadata from multiple locations:
 
 ```yaml
 ---
@@ -134,6 +134,37 @@ seo:
   type: 'article'
 ---
 ```
+
+#### Card Object Support
+
+The plugin also extracts metadata from `card` objects (commonly used for blog post listings):
+
+```yaml
+---
+layout: pages/sections.njk
+draft: false
+
+seo:
+  title: 'Override Title for SEO'  # Highest priority
+  description: 'SEO-specific description'
+
+card:
+  title: 'Architecture Philosophy'  # Used if not in seo object
+  date: '2025-06-02'
+  author:
+    - Albert Einstein
+    - Isaac Newton
+  image: '/assets/images/sample9.jpg'
+  excerpt: 'This starter embodies several key principles...'
+---
+```
+
+**Metadata Extraction Priority:**
+1. `seo` object (highest priority - explicit SEO overrides)
+2. `card` object (for blog posts and content cards)
+3. Root level properties
+4. Configured defaults
+5. Auto-generated content
 
 **Result:** Comprehensive SEO markup automatically generated:
 

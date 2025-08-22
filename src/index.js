@@ -16,7 +16,6 @@ import { processRobots } from "./processors/robots.js";
  */
 let siteMetadataCache = null;
 
-
 /**
  * Get nested property from an object using dot notation path
  * @param {Object} obj - The object to query
@@ -32,7 +31,11 @@ function getNestedProperty(obj, path) {
   let current = obj;
 
   for (const part of parts) {
-    if (current === null || current === undefined || typeof current !== "object") {
+    if (
+      current === null ||
+      current === undefined ||
+      typeof current !== "object"
+    ) {
       return undefined;
     }
     current = current[part];
