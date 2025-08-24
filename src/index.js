@@ -9,36 +9,11 @@
 import { batchOptimizeHeads } from "./processors/head-optimizer.js";
 import { processSitemap } from "./processors/sitemap.js";
 import { processRobots } from "./processors/robots.js";
-
-// Note: Cache moved to plugin instance level below to avoid test interference
-
-/**
- * Get nested property from an object using dot notation path
- * @param {Object} obj - The object to query
- * @param {string} path - The path to the property (e.g., 'site' or 'data.site')
- * @returns {*} The value at the path, or undefined if not found
- */
-function getNestedProperty(obj, path) {
-  if (!path || !obj) {
-    return undefined;
-  }
-
-  const parts = path.split(".");
-  let current = obj;
-
-  for (const part of parts) {
-    if (
-      current === null ||
-      current === undefined ||
-      typeof current !== "object"
-    ) {
-      return undefined;
-    }
-    current = current[part];
-  }
-
-  return current;
-}
+import {
+  buildConfig,
+  validateConfig,
+  getNestedProperty,
+} from "./utils/config-builder.js";
 
 /**
  * @typedef {Object} SeoOptions
@@ -167,18 +142,17 @@ function getNestedProperty(obj, path) {
  * }))
  */
 function plugin(options = {}) {
-  let opts = options;
+  let pluginOptions = options;
 
   // Accept string option to specify the hostname
-  if (typeof opts === "string") {
-    opts = { hostname: opts };
+  if (typeof pluginOptions === "string") {
+    try {
+      new URL(pluginOptions);
+      pluginOptions = { hostname: pluginOptions };
+    } catch {
+      throw new Error(`Invalid URL provided as hostname: ${pluginOptions}`);
+    }
   }
-
-  // We'll merge with site metadata inside the plugin function
-  const pluginOptions = opts;
-
-  // Instance-level cache for this plugin instance
-  let siteMetadataCache = null;
 
   /**
    * Main plugin function that processes files for comprehensive SEO optimization.
@@ -191,282 +165,49 @@ function plugin(options = {}) {
     // Get the metadata path (default to 'site')
     const metadataPath = pluginOptions.metadataPath || "site";
 
-    // Use cached site metadata check if available
-    let siteMetadata, hasSiteMetadata, deducedSiteName, deducedDescription;
+    // Get site metadata from the configured path
+    const siteMetadata =
+      getNestedProperty(metalsmith.metadata(), metadataPath) || {};
 
-    if (siteMetadataCache !== null) {
-      // Use cached values
-      siteMetadata = siteMetadataCache.siteMetadata;
-      hasSiteMetadata = siteMetadataCache.hasSiteMetadata;
-      deducedSiteName = siteMetadataCache.deducedSiteName;
-      deducedDescription = siteMetadataCache.deducedDescription;
-    } else {
-      // First run - check and cache
-      // Try to get site metadata from the configured path
-      siteMetadata =
-        getNestedProperty(metalsmith.metadata(), metadataPath) || {};
-      hasSiteMetadata = Object.keys(siteMetadata).length > 0;
-      deducedSiteName = null;
-      deducedDescription = null;
+    // Get the configurable SEO property name (defaults to "seo")
+    const seoProperty = pluginOptions.seoProperty || "seo";
 
-      if (!hasSiteMetadata && !pluginOptions.defaults?.title) {
-        // Try to deduce site name from index file
-        const indexFile = files["index.html"] || files["index.md"];
-        if (indexFile && indexFile.title) {
-          deducedSiteName = indexFile.title;
-        }
-      }
-
-      // Cache the results
-      siteMetadataCache = {
-        siteMetadata,
-        hasSiteMetadata,
-        deducedSiteName,
-        deducedDescription,
-        hasLoggedConfigSource: false,
-      };
-    }
-
-    // Merge configurations: deduced < site defaults < plugin options
-    const config = {
-      // Site-wide defaults from site.json or deduced
-      hostname: siteMetadata.url || pluginOptions.hostname,
-      defaults: {
-        title:
-          pluginOptions.defaults?.title ||
-          siteMetadata.title ||
-          deducedSiteName,
-        description:
-          pluginOptions.defaults?.description ||
-          siteMetadata.description ||
-          deducedDescription,
-        socialImage:
-          pluginOptions.defaults?.socialImage ||
-          siteMetadata.socialImage ||
-          siteMetadata.defaultImage,
-        siteOwner:
-          pluginOptions.defaults?.siteOwner ||
-          siteMetadata.siteOwner,
-        ...(pluginOptions.defaults || {}),
-      },
-      social: {
-        siteName:
-          pluginOptions.social?.siteName ||
-          siteMetadata.name ||
-          siteMetadata.title ||
-          deducedSiteName,
-        locale: pluginOptions.social?.locale || siteMetadata.locale || "en_US",
-        twitterSite: pluginOptions.social?.twitterSite || siteMetadata.twitter,
-        facebookAppId:
-          pluginOptions.social?.facebookAppId || siteMetadata.facebookAppId,
-        ...(siteMetadata.social || {}),
-        ...(pluginOptions.social || {}),
-      },
-      jsonLd: {
-        organization:
-          pluginOptions.jsonLd?.organization || siteMetadata.organization,
-        ...(siteMetadata.jsonLd || {}),
-        ...(pluginOptions.jsonLd || {}),
-      },
-
-      // Plugin-specific options (not typically in site.json)
-      seoProperty: pluginOptions.seoProperty || "seo",
-      enableSitemap:
-        pluginOptions.enableSitemap !== undefined
-          ? pluginOptions.enableSitemap
-          : true,
-      enableRobots:
-        pluginOptions.enableRobots !== undefined
-          ? pluginOptions.enableRobots
-          : true,
-      batchSize: pluginOptions.batchSize || 10,
-
-      // Fallback mappings
-      fallbacks: pluginOptions.fallbacks || {
-        title: "title",
-        description: "excerpt",
-        image: "featured_image",
-        author: "author",
-      },
-
-      // Sitemap configuration
-      sitemap: {
-        ...(siteMetadata.sitemap || {}),
-        ...(pluginOptions.sitemap || {}),
-      },
-
-      // Robots.txt configuration
-      robots: {
-        ...(siteMetadata.robots || {}),
-        ...(pluginOptions.robots || {}),
-      },
-    };
-
-    // Add legacy sitemap options for compatibility (but don't override hostname!)
-    // Only copy specific legacy options, not everything
-    if (pluginOptions.changefreq !== undefined) {
-      config.changefreq = pluginOptions.changefreq;
-    }
-    if (pluginOptions.priority !== undefined) {
-      config.priority = pluginOptions.priority;
-    }
-    if (pluginOptions.lastmod !== undefined) {
-      config.lastmod = pluginOptions.lastmod;
-    }
-    if (pluginOptions.links !== undefined) {
-      config.links = pluginOptions.links;
-    }
-    if (pluginOptions.urlProperty !== undefined) {
-      config.urlProperty = pluginOptions.urlProperty;
-    }
-    if (pluginOptions.modifiedProperty !== undefined) {
-      config.modifiedProperty = pluginOptions.modifiedProperty;
-    }
-    if (pluginOptions.privateProperty !== undefined) {
-      config.privateProperty = pluginOptions.privateProperty;
-    }
-    if (pluginOptions.priorityProperty !== undefined) {
-      config.priorityProperty = pluginOptions.priorityProperty;
-    }
-    if (pluginOptions.output !== undefined) {
-      config.output = pluginOptions.output;
-    }
-    if (pluginOptions.pattern !== undefined) {
-      config.pattern = pluginOptions.pattern;
-    }
-    if (pluginOptions.omitIndex !== undefined) {
-      config.omitIndex = pluginOptions.omitIndex;
-    }
-    if (pluginOptions.omitExtension !== undefined) {
-      config.omitExtension = pluginOptions.omitExtension;
-    }
-    if (pluginOptions.auto !== undefined) {
-      config.auto = pluginOptions.auto;
-    }
+    /**
+     * Build the complete configuration
+     * Configuration will be merged with site metadata, file frontmatter,
+     * deduced values and defaults in priority order:
+     * pluginOptions > siteMetadata > deduced values > defaults
+     */
+    const config = buildConfig(pluginOptions, siteMetadata, files, seoProperty);
 
     // Validate configuration
-    if (!config.hostname) {
-      const metadataHint =
-        metadataPath === "site" ? "site.url" : `${metadataPath}.url`;
-      throw new Error(
-        `[metalsmith-seo] hostname is required (set in plugin options or ${metadataHint} in metadata)`,
-      );
-    }
+    validateConfig(config, metadataPath);
 
-    // Provide helpful feedback about configuration source (only once and not in test environment)
-    const isTest =
-      process.env.NODE_ENV === "test" || process.env.METALSMITH_ENV === "test";
+    /**
+     * Optimize <head> section
+     * Includes title, description, and social tags
+     */
+    const headOptimization = batchOptimizeHeads(files, config);
 
-    if (
-      !isTest &&
-      siteMetadataCache &&
-      !siteMetadataCache.hasLoggedConfigSource
-    ) {
-      if (!hasSiteMetadata) {
-        console.warn(
-          "[metalsmith-seo] No site metadata found. Using plugin defaults.",
-        );
-        if (deducedSiteName) {
-          console.warn(
-            `[metalsmith-seo] Deduced site name from index: "${deducedSiteName}"`,
-          );
-        }
-        console.warn(
-          "[metalsmith-seo] Tip: Add a site.json to data/ folder for better SEO defaults.",
-        );
-      } else {
-        // Only log if we're using site metadata values
-        const usingSiteValues = [];
-        if (siteMetadata.url && !pluginOptions.hostname) {
-          usingSiteValues.push("hostname");
-        }
-        if (siteMetadata.title && !pluginOptions.defaults?.title) {
-          usingSiteValues.push("title");
-        }
-        if (siteMetadata.description && !pluginOptions.defaults?.description) {
-          usingSiteValues.push("description");
-        }
-
-        if (usingSiteValues.length > 0) {
-          console.warn(
-            `[metalsmith-seo] Using site.json for: ${usingSiteValues.join(", ")}`,
-          );
-        }
-      }
-
-      // Mark that we've logged the config source
-      siteMetadataCache.hasLoggedConfigSource = true;
-    }
-
-    // Always optimize heads - that's the point of an SEO plugin!
-    const headOptimization = batchOptimizeHeads(files, {
-      hostname: config.hostname,
-      seoProperty: config.seoProperty,
-      defaults: config.defaults,
-      fallbacks: config.fallbacks,
-      social: config.social,
-      jsonLd: config.jsonLd,
-      batchSize: config.batchSize,
-    });
-
-    // Sitemap generation (if enabled)
+    // Sitemap generation
     let sitemapGeneration = Promise.resolve();
     if (config.enableSitemap) {
-      // Merge sitemap-specific options
-      const sitemapOptions = {
-        hostname: config.hostname,
-        output: config.sitemap?.output || config.output || "sitemap.xml",
-        pattern: config.sitemap?.pattern || config.pattern || "**/*.html",
-        omitIndex:
-          config.sitemap?.omitIndex !== undefined
-            ? config.sitemap.omitIndex
-            : config.omitIndex || false,
-        omitExtension:
-          config.sitemap?.omitExtension !== undefined
-            ? config.sitemap.omitExtension
-            : config.omitExtension || false,
-        auto:
-          config.sitemap?.auto !== undefined
-            ? config.sitemap.auto
-            : config.auto !== undefined
-              ? config.auto
-              : true,
-        // Legacy options support
-        changefreq: config.changefreq,
-        priority: config.priority,
-        lastmod: config.lastmod,
-        links: config.links,
-        urlProperty: config.urlProperty || "canonical",
-        modifiedProperty: config.modifiedProperty || "lastmod",
-        privateProperty: config.privateProperty || "private",
-        priorityProperty: config.priorityProperty || "priority",
-      };
+      // Add hostname to sitemap config (required by processor)
+      config.sitemap.hostname = config.hostname;
 
-      sitemapGeneration = processSitemap(files, metalsmith, sitemapOptions);
+      sitemapGeneration = processSitemap(files, metalsmith, config.sitemap);
     }
 
     // Execute head optimization and sitemap in parallel
     Promise.all([headOptimization, sitemapGeneration])
       .then(() => {
-        // Robots.txt generation/update (if enabled) - after sitemap is done
+        // Robots.txt generation/update - after sitemap is done
         if (config.enableRobots) {
-          const robotsOptions = {
-            hostname: config.hostname,
-            sitemapFile:
-              config.sitemap?.output || config.output || "sitemap.xml",
-            generateRobots:
-              config.robots?.generateRobots !== undefined
-                ? config.robots.generateRobots
-                : true,
-            addSitemapReference:
-              config.robots?.addSitemapReference !== undefined
-                ? config.robots.addSitemapReference
-                : true,
-            disallowPaths: config.robots?.disallowPaths || [],
-            userAgent: config.robots?.userAgent || "*",
-          };
+          // Add required runtime values to robots config
+          config.robots.hostname = config.hostname;
+          config.robots.sitemapFile = config.sitemap.output;
 
-          return processRobots(files, metalsmith, robotsOptions);
+          return processRobots(files, metalsmith, config.robots);
         }
       })
       .then(() => done())
