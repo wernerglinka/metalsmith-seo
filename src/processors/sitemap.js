@@ -238,7 +238,7 @@ export function processSitemap( files, metalsmith, options ) {
 
       resolve();
     } catch ( error ) {
-      reject( new Error( `Failed to generate sitemap: ${ error.message }` ) );
+      reject( new Error( `Failed to generate sitemap: ${error.message}` ) );
     }
   } );
 }
