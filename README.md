@@ -713,6 +713,6 @@ Contributions welcome! Please read our [contributing guidelines](CONTRIBUTING.md
 [metalsmith-url]: https://metalsmith.io
 [license-badge]: https://img.shields.io/github/license/wernerglinka/metalsmith-seo
 [license-url]: LICENSE
-[coverage-badge]: https://img.shields.io/badge/test%20coverage-70%25-green
+[coverage-badge]: https://img.shields.io/badge/test%20coverage-94%25-brightgreen
 [coverage-url]: #test-coverage
 [modules-badge]: https://img.shields.io/badge/modules-ESM%2FCJS-blue
