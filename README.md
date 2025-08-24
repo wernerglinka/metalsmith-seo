@@ -5,7 +5,7 @@ Inspired by metalsmith-sitemap, the plugin provides comprehensive SEO optimizati
 [![npm version][npm-badge]][npm-url]
 [![metalsmith: plugin][metalsmith-badge]][metalsmith-url]
 [![license: MIT][license-badge]][license-url]
-[![Test Coverage](https://img.shields.io/badge/coverage-70%25-green.svg)](coverage)
+[![Test Coverage][coverage-badge]][coverage-url]
 [![ESM/CommonJS][modules-badge]][npm-url]
 [![Known Vulnerabilities](https://snyk.io/test/npm/metalsmith-seo/badge.svg)](https://snyk.io/test/npm/metalsmith-seo)
 
@@ -713,4 +713,6 @@ Contributions welcome! Please read our [contributing guidelines](CONTRIBUTING.md
 [metalsmith-url]: https://metalsmith.io
 [license-badge]: https://img.shields.io/github/license/wernerglinka/metalsmith-seo
 [license-url]: LICENSE
+[coverage-badge]: https://img.shields.io/badge/test%20coverage-70%25-green
+[coverage-url]: #test-coverage
 [modules-badge]: https://img.shields.io/badge/modules-ESM%2FCJS-blue
