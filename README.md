@@ -33,7 +33,7 @@ Inspired by metalsmith-sitemap, the plugin provides comprehensive SEO optimizati
 
 - **ESM/CommonJS Support** - Works in any Node.js environment
 - **Minimal Configuration** - Works great with just a hostname
-- **Comprehensive Testing** - 70% test coverage with real-world scenarios
+- **Comprehensive Testing** - 94% test coverage with real-world scenarios
 
 ## Installation
 
