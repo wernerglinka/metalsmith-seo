@@ -109,8 +109,8 @@ import { generateSitemapXML } from "../utils/xml-generator.js";
  *   links: 'alternateLinks' // Property name for hreflang links
  * });
  */
-export function processSitemap(files, metalsmith, options) {
-  return new Promise((resolve, reject) => {
+export function processSitemap( files, metalsmith, options ) {
+  return new Promise( ( resolve, reject ) => {
     try {
       const {
         auto = false,
@@ -133,45 +133,45 @@ export function processSitemap(files, metalsmith, options) {
 
       // Custom sorting to ensure consistent output order
       // Files in root directory come first, then subdirectories
-      const sortedFiles = Object.keys(files).sort((a, b) => {
-        const aDepth = a.split(path.sep).length;
-        const bDepth = b.split(path.sep).length;
-        if (aDepth !== bDepth) {
+      const sortedFiles = Object.keys( files ).sort( ( a, b ) => {
+        const aDepth = a.split( path.sep ).length;
+        const bDepth = b.split( path.sep ).length;
+        if ( aDepth !== bDepth ) {
           return aDepth - bDepth; // Shallower paths first
         }
-        return a.localeCompare(b); // Alphabetical within same depth
-      });
+        return a.localeCompare( b ); // Alphabetical within same depth
+      } );
 
-      sortedFiles.forEach(function (file) {
+      sortedFiles.forEach( function( file ) {
         // Get the current file's frontmatter
-        const frontmatter = files[file];
+        const frontmatter = files[ file ];
 
         // Validate file.contents is a Buffer before processing
-        if (!Buffer.isBuffer(frontmatter.contents)) {
+        if ( !Buffer.isBuffer( frontmatter.contents ) ) {
           return;
         }
 
         // Only process files that pass the check
         if (
-          !checkFile(file, frontmatter, metalsmith, pattern, privateProperty)
+          !checkFile( file, frontmatter, metalsmith, pattern, privateProperty )
         ) {
           return;
         }
 
         // Get lastmod value and format it properly
-        let lastmodValue = get(frontmatter, modifiedProperty) || lastmod;
-        if (lastmodValue instanceof Date) {
+        let lastmodValue = get( frontmatter, modifiedProperty ) || lastmod;
+        if ( lastmodValue instanceof Date ) {
           // Format date as ISO string to match old library behavior
           // The old sitemap library normalized times to midnight UTC
-          const d = new Date(lastmodValue);
-          d.setUTCHours(0, 0, 0, 0);
+          const d = new Date( lastmodValue );
+          d.setUTCHours( 0, 0, 0, 0 );
           lastmodValue = d.toISOString();
-        } else if (typeof lastmodValue === "string") {
+        } else if ( typeof lastmodValue === "string" ) {
           // Parse the date string
-          const parsed = new Date(lastmodValue);
-          if (!isNaN(parsed.getTime())) {
+          const parsed = new Date( lastmodValue );
+          if ( !isNaN( parsed.getTime() ) ) {
             // Normalize to midnight UTC like the old library did
-            parsed.setUTCHours(0, 0, 0, 0);
+            parsed.setUTCHours( 0, 0, 0, 0 );
             lastmodValue = parsed.toISOString();
           }
         }
@@ -179,59 +179,56 @@ export function processSitemap(files, metalsmith, options) {
         // Create the sitemap entry (reject keys with falsy values)
         let entryChangefreq, entryPriority;
 
-        if (auto) {
+        if ( auto ) {
           /**
            * Auto mode
            * Calculate values, ignore global and frontmatter settings!
            */
-          entryChangefreq = calculateChangefreq(file, frontmatter, {
+          entryChangefreq = calculateChangefreq( file, frontmatter, {
             modifiedProperty,
             lastmod,
-          });
-          entryPriority = calculatePriority(file, frontmatter, {
-            modifiedProperty,
-            lastmod,
-          });
+          } );
+          entryPriority = calculatePriority( file );
         } else {
           /**
            * Manual mode
            * Use global defaults, allow frontmatter overrides
            */
           entryChangefreq = frontmatter.changefreq || changefreq;
-          entryPriority = get(frontmatter, priorityProperty) || priority;
+          entryPriority = get( frontmatter, priorityProperty ) || priority;
         }
 
         const entry = Object.fromEntries(
-          Object.entries({
+          Object.entries( {
             changefreq: entryChangefreq,
             priority: entryPriority,
             lastmod: lastmodValue,
-            links: linksOption ? get(frontmatter, linksOption) : undefined,
-          }).filter(([_, value]) => value !== undefined)
+            links: linksOption ? get( frontmatter, linksOption ) : undefined,
+          } ).filter( ( [ value ] ) => value !== undefined )
         );
 
         // Add the url (which is allowed to be falsy)
-        entry.url = buildUrl(file, frontmatter, {
+        entry.url = buildUrl( file, frontmatter, {
           urlProperty,
           omitIndex,
           omitExtension,
-        });
+        } );
 
         // Add the entry to the links array
-        links.push(entry);
-      });
+        links.push( entry );
+      } );
 
       // Generate sitemap XML content
-      const sitemapContent = generateSitemapXML(links, hostname);
+      const sitemapContent = generateSitemapXML( links, hostname );
 
       // Add the sitemap file to the files object
-      files[output] = {
-        contents: Buffer.from(sitemapContent, "utf-8"),
+      files[ output ] = {
+        contents: Buffer.from( sitemapContent, "utf-8" ),
       };
 
       resolve();
-    } catch (error) {
-      reject(new Error(`Failed to generate sitemap: ${error.message}`));
+    } catch ( error ) {
+      reject( new Error( `Failed to generate sitemap: ${ error.message }` ) );
     }
-  });
+  } );
 }
