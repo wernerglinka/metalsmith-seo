@@ -1,6 +1,6 @@
 # metalsmith-seo
 
-Inspired by metalsmith-sitemap, the plugin provides comprehensive SEO optimization for Metalsmith with intelligent metadata generation, social media tags, and structured data including Open Graph tags, Twitter Cards, JSON-LD structured data, and sitemap generation.
+Inspired by metalsmith-sitemap, the plugin provides SEO optimization for Metalsmith with metadata generation, social media tags, and structured data including Open Graph tags, Twitter Cards, JSON-LD structured data, and sitemap generation.
 
 [![npm version][npm-badge]][npm-url]
 [![metalsmith: plugin][metalsmith-badge]][metalsmith-url]
@@ -15,19 +15,19 @@ Inspired by metalsmith-sitemap, the plugin provides comprehensive SEO optimizati
 
 **Core SEO Optimization:**
 
-- **HTML Head Optimization** - Comprehensive meta tags, canonical URLs, robots directives
-- **Open Graph Tags** - Perfect social media sharing with Facebook, LinkedIn, etc.
+- **HTML Head Optimization** - Meta tags, canonical URLs, robots directives
+- **Open Graph Tags** - Social media sharing with Facebook, LinkedIn, etc.
 - **Twitter Cards** - Rich Twitter previews with automatic card type detection
 - **JSON-LD Structured Data** - Article, Product, Organization, WebPage schemas
-- **Sitemap Generation** - Complete sitemap.xml with intelligent auto-calculation of priority, changefreq, and lastmod
-- **Robots.txt Management** - Intelligent robots.txt generation and sitemap coordination
+- **Sitemap Generation** - Complete sitemap.xml with auto-calculation of priority, changefreq, and lastmod
+- **Robots.txt Management** - robots.txt generation and sitemap coordination
 
 **Smart Automation:**
 
-- **Intelligent Content Analysis** - Auto-detects content type (article, product, page)
+- **Content Analysis** - Auto-detects content type (article, product, page)
 - **Metadata Derivation** - Single source feeds all formats (title → og:title, twitter:title, JSON-LD headline)
-- **Fallback Chains** - Smart defaults from site.json, frontmatter, or content analysis
-- **Site.json Integration** - Seamless integration with existing Metalsmith site configuration
+- **Fallback Chains** - Defaults from site.json, frontmatter, or content analysis
+- **Site.json Integration** - Integration with existing Metalsmith site configuration
 
 **Developer Experience:**
 
@@ -47,9 +47,30 @@ npm install metalsmith-seo
 
 #### Minimal Setup
 
+**ESM (ES Modules):**
+
 ```javascript
 import Metalsmith from 'metalsmith';
 import seo from 'metalsmith-seo';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+Metalsmith(__dirname)
+  .use(
+    seo({
+      hostname: 'https://example.com',
+    })
+  )
+  .build();
+```
+
+**CommonJS:**
+
+```javascript
+const Metalsmith = require('metalsmith');
+const seo = require('metalsmith-seo');
 
 Metalsmith(__dirname)
   .use(
@@ -91,7 +112,13 @@ Create `data/site.json`:
 Then use the plugin:
 
 ```javascript
+import Metalsmith from 'metalsmith';
 import metadata from '@metalsmith/metadata';
+import seo from 'metalsmith-seo';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 Metalsmith(__dirname)
   .use(metadata({ site: 'data/site.json' }))
@@ -102,6 +129,14 @@ Metalsmith(__dirname)
 Or if your site metadata is nested differently:
 
 ```javascript
+import Metalsmith from 'metalsmith';
+import metadata from '@metalsmith/metadata';
+import seo from 'metalsmith-seo';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 // If metadata is at metadata().data.site instead of metadata().site
 Metalsmith(__dirname)
   .use(
@@ -145,11 +180,11 @@ layout: pages/sections.njk
 draft: false
 
 seo:
-  title: 'Override Title for SEO'  # Highest priority
+  title: 'Override Title for SEO' # Highest priority
   description: 'SEO-specific description'
 
 card:
-  title: 'Architecture Philosophy'  # Used if not in seo object
+  title: 'Architecture Philosophy' # Used if not in seo object
   date: '2025-06-02'
   author:
     - Albert Einstein
@@ -160,6 +195,7 @@ card:
 ```
 
 **Metadata Extraction Priority:**
+
 1. `seo` object (highest priority - explicit SEO overrides)
 2. `card` object (for blog posts and content cards)
 3. Root level properties
@@ -657,38 +693,8 @@ This plugin includes all metalsmith-sitemap functionality:
     changefreq: 'weekly',
     priority: 0.8
   }
-  // Now you also get comprehensive SEO optimization!
+  // Now you also get SEO optimization!
 }))
-```
-
-#### From Multiple SEO Plugins
-
-Replace multiple plugins with one:
-
-**Before:**
-
-```javascript
-.use(metadata())
-.use(sitemap())
-.use(metalsmith_opengraph())
-.use(some_jsonld_plugin())
-```
-
-**After:**
-
-```javascript
-.use(metadata({ site: 'data/site.json' }))
-.use(seo())  // Does it all!
-```
-
-## Testing
-
-Run the comprehensive test suite:
-
-```bash
-npm test              # Run all tests
-npm run test:coverage # Run with coverage report
-npm run lint          # Check code quality
 ```
 
 ## License
@@ -699,11 +705,16 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 Contributions welcome! Please read our [contributing guidelines](CONTRIBUTING.md) first.
 
+## Attribution
+
+The sitemap functionality in this plugin was inspired by and adapted from:
+
+- [metalsmith-sitemap](https://github.com/ExtraHop/metalsmith-sitemap) by ExtraHop (MIT License)
+
 ## Related
 
 - [@metalsmith/metadata](https://github.com/metalsmith/metadata) - For loading site.json
 - [metalsmith](https://github.com/metalsmith/metalsmith) - The static site generator
-- [sitemap](https://github.com/ekalinin/sitemap.js) - Underlying sitemap generation
 
 ---
 

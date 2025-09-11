@@ -29,6 +29,7 @@ import {
  * @property {boolean} [enableSitemap=true] - Whether to generate sitemap.xml
  * @property {boolean} [enableRobots=true] - Whether to generate/update robots.txt
  * @property {number} [batchSize=10] - Number of files to process in parallel
+ * @property {number} [wordsPerMinute=200] - Reading speed for calculating reading time
  */
 
 /**
@@ -39,6 +40,8 @@ import {
  * @property {string} [twitterCreator] - Default Twitter creator handle
  * @property {string} [facebookAppId] - Facebook App ID
  * @property {string|Array<string>} [facebookAdmins] - Facebook admin IDs
+ * @property {string} [viewport] - Viewport meta tag content
+ * @property {number} [twitterDescriptionLength=200] - Max length for Twitter descriptions
  */
 
 /**
@@ -65,29 +68,6 @@ import {
  * @property {string} [userAgent='*'] - User agent for robots directives
  */
 
-/**
- * @typedef {Object} MetalsmithFiles
- * @description Object containing all files in the Metalsmith build, keyed by file path
- * @type {Object<string, {contents: Buffer} & FileMetadata>}
- */
-
-/**
- * @typedef {Object} MetalsmithInstance
- * @property {function(string, string): string[]} match - Match files against a glob pattern
- * @property {function} [metadata] - Get/set global metadata
- * @property {function} [source] - Get/set source directory
- * @property {function} [destination] - Get/set destination directory
- */
-
-/**
- * @typedef {function(Error=): void} MetalsmithCallback
- * @description Callback function to signal completion of plugin processing
- */
-
-/**
- * @typedef {function(MetalsmithFiles, MetalsmithInstance, MetalsmithCallback): void} MetalsmithPlugin
- * @description Function signature for Metalsmith plugins
- */
 
 /**
  * @typedef {string|SeoOptions} Options
@@ -107,7 +87,7 @@ import {
  * @param {Options} options - Plugin configuration options
  *   When passed as a string, it will be treated as the hostname.
  *   When passed as an object, it supports the full configuration.
- * @returns {import('metalsmith').Plugin} Configured plugin function
+ * @returns {Function} Configured plugin function
  * @throws {Error} When hostname is not provided or configuration is invalid
  *
  * @example
@@ -156,9 +136,9 @@ function plugin(options = {}) {
 
   /**
    * Main plugin function that processes files for comprehensive SEO optimization.
-   * @param {MetalsmithFiles} files - Object containing all files in the build
-   * @param {MetalsmithInstance} metalsmith - Metalsmith instance for accessing utilities
-   * @param {MetalsmithCallback} done - Callback to signal completion
+   * @param {Object} files - Object containing all files in the build
+   * @param {Object} metalsmith - Metalsmith instance for accessing utilities
+   * @param {Function} done - Callback to signal completion
    * @returns {void}
    */
   return function (files, metalsmith, done) {
@@ -220,7 +200,7 @@ Object.defineProperty(plugin, "name", { value: "metalsmith-seo" });
 
 /**
  * Metalsmith plugin factory function.
- * @type {function(Options): import('metalsmith').Plugin}
+ * @type {function(Options): Function}
  * @default
  */
 export default plugin;

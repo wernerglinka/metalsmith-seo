@@ -53,10 +53,11 @@ export function generateMetaTags(metadata, siteConfig = {}) {
     });
   }
 
-  // Viewport (always include for mobile optimization)
+  // Viewport (configurable for mobile optimization)
+  const viewportContent = siteConfig.viewport || "width=device-width, initial-scale=1.0";
   metaTags.push({
     name: "viewport",
-    content: "width=device-width, initial-scale=1.0",
+    content: viewportContent,
   });
 
   // Canonical URL

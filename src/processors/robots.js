@@ -83,7 +83,7 @@ export function processRobots(files, metalsmith, options) {
 }
 
 /**
- * Generates basic robots.txt content
+ * Generates basic robots.txt content using a simple template
  * @param {Object} options - Generation options
  * @param {string} options.userAgent - User agent directive
  * @param {Array<string>} options.disallowPaths - Paths to disallow
@@ -91,26 +91,13 @@ export function processRobots(files, metalsmith, options) {
  * @returns {string} Robots.txt content
  */
 function generateBasicRobots({ userAgent, disallowPaths, sitemapUrl }) {
-  const lines = [];
+  const disallowDirectives = disallowPaths.length > 0 
+    ? disallowPaths.map(path => `Disallow: ${path}`).join('\n')
+    : 'Disallow:';
+    
+  return `User-agent: ${userAgent}
+${disallowDirectives}
 
-  // User agent directive
-  lines.push(`User-agent: ${userAgent}`);
-
-  // Disallow directives
-  if (disallowPaths.length > 0) {
-    disallowPaths.forEach((path) => {
-      lines.push(`Disallow: ${path}`);
-    });
-  } else {
-    // Default: allow all
-    lines.push("Disallow:");
-  }
-
-  // Empty line before sitemap
-  lines.push("");
-
-  // Sitemap reference
-  lines.push(`Sitemap: ${sitemapUrl}`);
-
-  return `${lines.join("\n")}\n`;
+Sitemap: ${sitemapUrl}
+`;
 }

@@ -25,6 +25,7 @@ import {
  * @property {Object} [jsonLd] - JSON-LD configuration
  * @property {boolean} [cleanExisting=true] - Remove existing SEO tags before injection
  * @property {boolean} [generateSitemap=true] - Whether to include files in sitemap
+ * @property {number} [wordsPerMinute=200] - Reading speed for calculating reading time
  */
 
 /**
@@ -51,6 +52,7 @@ export async function optimizeHead(filePath, frontmatter, options) {
     jsonLd = {},
     cleanExisting = true,
     generateSitemap = true,
+    wordsPerMinute = 200,
   } = options;
 
   // Skip non-HTML files
@@ -68,6 +70,7 @@ export async function optimizeHead(filePath, frontmatter, options) {
     seoProperty,
     defaults,
     fallbacks,
+    wordsPerMinute,
   });
 
   // Check if file should be excluded from SEO processing

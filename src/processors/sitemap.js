@@ -14,10 +14,16 @@
  * - XML character escaping for security (prevents XXE and other XML attacks)
  * - Support for all standard sitemap elements: loc, lastmod, changefreq, priority
  * - Support for alternate language links (hreflang) via xhtml:link elements
+ * 
+ * ## Attribution
+ * 
+ * Inspired by and adapted from metalsmith-sitemap by Segment.io
+ * Original: https://github.com/segmentio/metalsmith-sitemap
+ * License: MIT
  */
 
 import path from "path";
-import { get, pick, identity } from "../utils/object-utils.js";
+import { get } from "../utils/object-utils.js";
 import { checkFile, buildUrl } from "./url-builder.js";
 import { calculatePriority, calculateChangefreq } from "./auto-calculator.js";
 import { generateSitemapXML } from "../utils/xml-generator.js";
@@ -195,14 +201,13 @@ export function processSitemap(files, metalsmith, options) {
           entryPriority = get(frontmatter, priorityProperty) || priority;
         }
 
-        const entry = pick(
-          {
+        const entry = Object.fromEntries(
+          Object.entries({
             changefreq: entryChangefreq,
             priority: entryPriority,
             lastmod: lastmodValue,
             links: linksOption ? get(frontmatter, linksOption) : undefined,
-          },
-          identity,
+          }).filter(([_, value]) => value !== undefined)
         );
 
         // Add the url (which is allowed to be falsy)

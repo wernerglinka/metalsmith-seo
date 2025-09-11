@@ -2,6 +2,16 @@
  * @fileoverview Generator for Open Graph meta tags.
  */
 
+// Image type mapping for Open Graph images
+const IMAGE_TYPE_MAP = {
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  gif: "image/gif",
+  webp: "image/webp",
+  svg: "image/svg+xml",
+};
+
 /**
  * @typedef {Object} OpenGraphResult
  * @property {Array<Object>} metaTags - Array of Open Graph meta tag objects
@@ -334,17 +344,7 @@ function mapContentTypeToOGType(contentType) {
  */
 function getImageType(imageUrl) {
   const extension = imageUrl.split(".").pop()?.toLowerCase();
-
-  const typeMap = {
-    jpg: "image/jpeg",
-    jpeg: "image/jpeg",
-    png: "image/png",
-    gif: "image/gif",
-    webp: "image/webp",
-    svg: "image/svg+xml",
-  };
-
-  return typeMap[extension] || null;
+  return IMAGE_TYPE_MAP[extension] || null;
 }
 
 /**

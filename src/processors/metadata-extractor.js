@@ -90,7 +90,7 @@ function extractWithPriority(
  * @property {string} [author] - Author name
  * @property {string[]} [keywords] - Keywords/tags
  * @property {number} [wordCount] - Word count from content
- * @property {string} [readingTime] - Estimated reading time
+ * @property {number} [readingTime] - Estimated reading time in minutes
  */
 
 /**
@@ -99,6 +99,7 @@ function extractWithPriority(
  * @property {string} [seoProperty='seo'] - Frontmatter property containing SEO data
  * @property {Object} [defaults] - Default values for missing metadata
  * @property {Object} [fallbacks] - Fallback property mappings
+ * @property {number} [wordsPerMinute=200] - Reading speed for calculating reading time
  */
 
 /**
@@ -114,6 +115,7 @@ export function extractMetadata(filePath, frontmatter, options) {
     seoProperty = "seo",
     defaults = {},
     fallbacks = {},
+    wordsPerMinute = 200,
   } = options;
 
   // Ensure hostname is a string
@@ -148,7 +150,7 @@ export function extractMetadata(filePath, frontmatter, options) {
 
   // Calculate reading time
   if (metadata.wordCount) {
-    metadata.readingTime = calculateReadingTime(metadata.wordCount);
+    metadata.readingTime = calculateReadingTime(metadata.wordCount, wordsPerMinute);
   }
 
   return metadata;
@@ -369,11 +371,12 @@ function extractWordCount(frontmatter) {
 
 /**
  * Calculate reading time from word count
+ * @param {number} wordCount - Number of words in content
+ * @param {number} [wordsPerMinute=200] - Reading speed in words per minute
+ * @returns {number} Reading time in minutes
  */
-function calculateReadingTime(wordCount) {
-  const wordsPerMinute = 200;
-  const minutes = Math.ceil(wordCount / wordsPerMinute);
-  return `${minutes} min read`;
+function calculateReadingTime(wordCount, wordsPerMinute = 200) {
+  return Math.ceil(wordCount / wordsPerMinute);
 }
 
 /**
