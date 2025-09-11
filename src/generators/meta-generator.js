@@ -54,7 +54,8 @@ export function generateMetaTags(metadata, siteConfig = {}) {
   }
 
   // Viewport (configurable for mobile optimization)
-  const viewportContent = siteConfig.viewport || "width=device-width, initial-scale=1.0";
+  const viewportContent =
+    siteConfig.viewport || "width=device-width, initial-scale=1.0";
   metaTags.push({
     name: "viewport",
     content: viewportContent,

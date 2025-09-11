@@ -123,7 +123,10 @@ function addCoreTwitterTags(metaTags, metadata, siteConfig, cardType) {
   if (metadata.description) {
     // Twitter descriptions should be shorter
     const maxLength = siteConfig.twitterDescriptionLength || 200;
-    const twitterDescription = truncateDescription(metadata.description, maxLength);
+    const twitterDescription = truncateDescription(
+      metadata.description,
+      maxLength,
+    );
     metaTags.push({
       name: "twitter:description",
       content: twitterDescription,

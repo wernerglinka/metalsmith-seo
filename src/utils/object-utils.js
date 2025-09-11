@@ -23,5 +23,3 @@ export const get = (obj, pathStr, defaultValue) => {
   }
   return result;
 };
-
-

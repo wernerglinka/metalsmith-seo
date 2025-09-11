@@ -150,7 +150,10 @@ export function extractMetadata(filePath, frontmatter, options) {
 
   // Calculate reading time
   if (metadata.wordCount) {
-    metadata.readingTime = calculateReadingTime(metadata.wordCount, wordsPerMinute);
+    metadata.readingTime = calculateReadingTime(
+      metadata.wordCount,
+      wordsPerMinute,
+    );
   }
 
   return metadata;

@@ -91,10 +91,11 @@ export function processRobots(files, metalsmith, options) {
  * @returns {string} Robots.txt content
  */
 function generateBasicRobots({ userAgent, disallowPaths, sitemapUrl }) {
-  const disallowDirectives = disallowPaths.length > 0 
-    ? disallowPaths.map(path => `Disallow: ${path}`).join('\n')
-    : 'Disallow:';
-    
+  const disallowDirectives =
+    disallowPaths.length > 0
+      ? disallowPaths.map((path) => `Disallow: ${path}`).join("\n")
+      : "Disallow:";
+
   return `User-agent: ${userAgent}
 ${disallowDirectives}
 

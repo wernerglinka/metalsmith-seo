@@ -68,7 +68,6 @@ import {
  * @property {string} [userAgent='*'] - User agent for robots directives
  */
 
-
 /**
  * @typedef {string|SeoOptions} Options
  * @description Plugin configuration - can be a hostname string or full options object
