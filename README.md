@@ -573,6 +573,67 @@ Sitemap: https://example.com/sitemap.xml
 
 ### Sitemap Generation
 
+#### Sitemap Configuration Options
+
+All sitemap options are configured under the `sitemap` property:
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `output` | string | `'sitemap.xml'` | Filename for the generated sitemap |
+| `pattern` | string | `'**/*.html'` | Glob pattern to match files for inclusion |
+| `auto` | boolean | `false` | Enable automatic priority and changefreq calculation |
+| `changefreq` | string | - | Default change frequency (`always`, `hourly`, `daily`, `weekly`, `monthly`, `yearly`, `never`) |
+| `priority` | number | - | Default priority (0.0 to 1.0) |
+| `lastmod` | Date\|string | - | Default last modified date for all files |
+| `omitIndex` | boolean | `false` | Remove `/index.html` from URLs (e.g., `about/index.html` → `about/`) |
+| `urlProperty` | string | `'canonical'` | Frontmatter property name to read canonical URL overrides |
+| `modifiedProperty` | string | `'lastmod'` | Frontmatter property name to read last modified dates |
+| `privateProperty` | string | `'private'` | Frontmatter property to exclude files (if `true`, file is excluded) |
+| `priorityProperty` | string | `'priority'` | Frontmatter property name to read priority values |
+| `links` | string | - | Property name for alternate language links (hreflang) |
+
+**URL Transformation Examples:**
+
+```javascript
+// Example 1: Default behavior (no transformation)
+// File: about/index.html → URL: https://example.com/about/index.html
+.use(seo({ hostname: 'https://example.com' }))
+
+// Example 2: Clean URLs with omitIndex (recommended for permalink-style URLs)
+// File: about/index.html → URL: https://example.com/about/
+.use(seo({
+  hostname: 'https://example.com',
+  sitemap: { omitIndex: true }
+}))
+
+// Example 3: Permalink-style URLs (for use with metalsmith-permalinks)
+// File: blog/my-post/index.html → URL: https://example.com/blog/my-post/
+.use(seo({
+  hostname: 'https://example.com',
+  sitemap: { omitIndex: true }
+}))
+```
+
+**Excluding Files from Sitemap:**
+
+```yaml
+---
+title: 'Draft Page'
+private: true  # This page won't appear in sitemap
+---
+```
+
+Or use a custom property name:
+
+```javascript
+.use(seo({
+  hostname: 'https://example.com',
+  sitemap: {
+    privateProperty: 'draft'  // Exclude files with draft: true
+  }
+}))
+```
+
 #### Intelligent Auto-Calculation (Default)
 
 By default, the plugin automatically calculates optimal values for sitemap entries:

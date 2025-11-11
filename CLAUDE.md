@@ -45,7 +45,6 @@ update-deps .
 ### Common Mistakes to AVOID
 
 **❌ Wrong Approach:**
-
 - Creating custom CLAUDE.md content instead of using `get-template plugin/CLAUDE.md`
 - Scaffolding entire new plugins when you just need a template
 - Making up template content or "simplifying" official templates
@@ -53,7 +52,6 @@ update-deps .
 - Using commands like `npx metalsmith-plugin-mcp-server scaffold ./ CLAUDE.md claude-context`
 
 **✅ Correct Approach:**
-
 - Use `list-templates` to see what's available
 - Use `get-template <template-name>` to get exact content
 - Follow validation recommendations exactly as provided
@@ -63,7 +61,6 @@ update-deps .
 ### Quick Commands
 
 **Quality & Validation:**
-
 ```bash
 npx metalsmith-plugin-mcp-server validate . --functional  # Validate with MCP server
 npm test                                                   # Run tests with coverage
@@ -71,19 +68,18 @@ npm run lint                                              # Lint and fix code
 ```
 
 **Release Process:**
-
 ```bash
 npm run release:patch   # Bug fixes (1.5.4 → 1.5.5)
-npm run release:minor   # New features (1.5.4 → 1.6.0)
+npm run release:minor   # New features (1.5.4 → 1.6.0)  
 npm run release:major   # Breaking changes (1.5.4 → 2.0.0)
 ```
 
 **Development:**
-
 ```bash
 npm run build          # Build ESM/CJS versions
 npm run test:coverage  # Run tests with detailed coverage
 ```
+
 
 ## Pre-Commit and Release Workflow
 
@@ -147,39 +143,23 @@ This plugin supports both ESM and CommonJS:
 metalsmith-seo/
 ├── src/
 │   ├── index.js              # Main plugin entry point
-{%- if features.includes('async-processing') or features.includes('background-processing') %}
-│   ├── processors/           # Processing logic
-{%- endif %}
-{%- if features.includes('metadata-generation') %}
-│   ├── metadata/             # Metadata generation
-{%- endif %}
 │   └── utils/                # Utility functions
 ├── test/
 │   ├── index.test.js         # ESM tests
 │   ├── index.test.cjs        # CommonJS tests
 │   └── fixtures/             # Test data
-├── lib/                      # Built files (auto-generated)
-└── types/                    # TypeScript definitions
+└── lib/                      # Built files (auto-generated)
 ```
 
 ### Plugin Features
 
-{%- if features.length > 0 %}
-This plugin includes these enhanced features:
+This plugin uses standard synchronous processing patterns with the following SEO capabilities:
 
-{%- if features.includes('async-processing') %}
-
-- **Async Processing**: Batch processing with configurable batch sizes and progress tracking
-  {%- endif %}
-  {%- if features.includes('background-processing') %}
-- **Background Processing**: Worker thread support for CPU-intensive operations
-  {%- endif %}
-  {%- if features.includes('metadata-generation') %}
-- **Metadata Generation**: Automatic metadata extraction and enrichment
-  {%- endif %}
-  {%- else %}
-  This plugin uses standard synchronous processing patterns.
-  {%- endif %}
+- **Sitemap Generation**: XML sitemap with configurable priority and change frequency
+- **Meta Tags**: Open Graph and Twitter Card meta tags
+- **Robots.txt**: Configurable robots.txt generation
+- **Reading Time**: Calculate estimated reading time for content
+- **Meta Descriptions**: Auto-generate or use provided descriptions
 
 ## Testing Strategy
 
@@ -284,7 +264,6 @@ Production code should only export the plugin function and any legitimate public
 
 - JSDoc comments for all public functions
 - README with comprehensive usage examples
-- Type definitions in `types/` directory
 
 ## Plugin Development Patterns
 
@@ -320,26 +299,6 @@ function seo(options = {}) {
   };
 }
 ```
-
-{%- if features.includes('async-processing') %}
-
-### Async Processing Pattern
-
-```javascript
-function sitemap(options = {}) {
-  return async function (files, metalsmith) {
-    const batchSize = options.batchSize || 10;
-    const fileList = Object.keys(files);
-
-    for (let i = 0; i < fileList.length; i += batchSize) {
-      const batch = fileList.slice(i, i + batchSize);
-      await processBatch(batch, files, options);
-    }
-  };
-}
-```
-
-{%- endif %}
 
 ## Release Process
 

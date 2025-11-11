@@ -38,17 +38,16 @@ export function checkFile(
 
 /**
  * Constructs the final URL for a file based on configuration options.
- * Handles canonical URL overrides, index file omission, and extension removal.
+ * Handles canonical URL overrides and index file omission.
  * @param {string} file - File path relative to source directory
  * @param {Object} frontmatter - File metadata and frontmatter
  * @param {Object} options - URL building options
  * @param {string} options.urlProperty - Property name to read canonical URL from file metadata
  * @param {boolean} options.omitIndex - Whether to omit index.html from URLs
- * @param {boolean} options.omitExtension - Whether to omit file extensions from URLs
  * @returns {string} Final URL for the sitemap entry
  */
 export function buildUrl(file, frontmatter, options) {
-  const { urlProperty, omitIndex, omitExtension } = options;
+  const { urlProperty, omitIndex } = options;
 
   // Frontmatter settings take precedence
   const canonicalUrl = get(frontmatter, urlProperty);
@@ -60,11 +59,6 @@ export function buildUrl(file, frontmatter, options) {
   const indexFile = "index.html";
   if (omitIndex && path.basename(file) === indexFile) {
     return replaceBackslash(file.slice(0, 0 - indexFile.length));
-  }
-
-  // Remove extension if necessary
-  if (omitExtension) {
-    return replaceBackslash(file.slice(0, 0 - path.extname(file).length));
   }
 
   // Otherwise just use 'file'

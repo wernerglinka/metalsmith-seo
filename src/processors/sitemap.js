@@ -34,7 +34,6 @@ import { generateSitemapXML } from "../utils/xml-generator.js";
  * @property {Date|string} [lastmod] - Default last modified date for all files
  * @property {string} [links] - Property name to read additional links from file metadata
  * @property {'always'|'hourly'|'daily'|'weekly'|'monthly'|'yearly'|'never'} [changefreq] - Default change frequency
- * @property {boolean} [omitExtension] - Whether to omit file extensions from URLs
  * @property {boolean} [omitIndex] - Whether to omit index.html from URLs
  * @property {string} [output='sitemap.xml'] - Output filename for the sitemap
  * @property {string} [pattern] - Glob pattern to match files for inclusion (default: all HTML files)
@@ -105,7 +104,7 @@ import { generateSitemapXML } from "../utils/xml-generator.js";
  *   hostname: 'https://example.com',
  *   auto: true,
  *   output: 'custom-sitemap.xml',
- *   omitExtension: true,
+ *   omitIndex: true,
  *   links: 'alternateLinks' // Property name for hreflang links
  * });
  */
@@ -118,7 +117,6 @@ export function processSitemap(files, metalsmith, options) {
         hostname,
         lastmod,
         links: linksOption,
-        omitExtension,
         omitIndex,
         output = "sitemap.xml",
         pattern = "**/*.html",
@@ -211,7 +209,6 @@ export function processSitemap(files, metalsmith, options) {
         entry.url = buildUrl(file, frontmatter, {
           urlProperty,
           omitIndex,
-          omitExtension,
         });
 
         // Add the entry to the links array

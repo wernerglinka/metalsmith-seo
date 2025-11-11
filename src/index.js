@@ -56,7 +56,6 @@ import {
  * @property {string} [output='sitemap.xml'] - Sitemap output filename
  * @property {string} [pattern] - File pattern for sitemap inclusion (default: all HTML files)
  * @property {boolean} [omitIndex=false] - Omit index.html from URLs
- * @property {boolean} [omitExtension=false] - Omit file extensions
  * @property {boolean} [auto=false] - Auto-calculate priority and changefreq
  */
 

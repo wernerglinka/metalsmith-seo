@@ -166,23 +166,6 @@ describe('metalsmith-seo', function(){
       });
   });
 
-  it('should be able to omit extensions', function(done){
-    Metalsmith('test/fixtures/omitExtension')
-      .destination('build')
-      .use(seo({
-        hostname: 'http://www.website.com/',
-        omitExtension: true,
-        auto: false
-      }))
-      .build(function(err){
-        if (err) {
-          return done(err);
-        }
-        equal('test/fixtures/omitExtension/expected', 'test/fixtures/omitExtension/build');
-        done();
-      });
-  });
-
   it('should be able to omit index.html', function(done){
     Metalsmith('test/fixtures/omitIndex')
       .destination('build')
