@@ -12,6 +12,15 @@ const IMAGE_TYPE_MAP = {
   svg: "image/svg+xml",
 };
 
+// Content type to Open Graph type mapping
+const OG_TYPE_MAP = {
+  article: "article",
+  product: "product",
+  profile: "profile",
+  page: "website",
+  "local-business": "business.business",
+};
+
 /**
  * @typedef {Object} OpenGraphResult
  * @property {Array<Object>} metaTags - Array of Open Graph meta tag objects
@@ -326,15 +335,7 @@ function addSiteOpenGraphTags(metaTags, siteConfig) {
  * @returns {string} Open Graph type
  */
 function mapContentTypeToOGType(contentType) {
-  const typeMap = {
-    article: "article",
-    product: "product",
-    profile: "profile",
-    page: "website",
-    "local-business": "business.business",
-  };
-
-  return typeMap[contentType] || "website";
+  return OG_TYPE_MAP[contentType] || "website";
 }
 
 /**

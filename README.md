@@ -22,7 +22,7 @@ Inspired by metalsmith-sitemap, the plugin provides SEO optimization for Metalsm
 - **Sitemap Generation** - Complete sitemap.xml with auto-calculation of priority, changefreq, and lastmod
 - **Robots.txt Management** - robots.txt generation and sitemap coordination
 
-**Smart Automation:**
+**Automation:**
 
 - **Content Analysis** - Auto-detects content type (article, product, page)
 - **Metadata Derivation** - Single source feeds all formats (title → og:title, twitter:title, JSON-LD headline)
@@ -87,7 +87,7 @@ This simple configuration automatically generates:
 - Open Graph tags for social sharing
 - Twitter Card tags
 - JSON-LD structured data
-- sitemap.xml with intelligent priority/changefreq/lastmod values
+- sitemap.xml with calculated priority/changefreq/lastmod values
 - robots.txt (with sitemap reference)
 
 #### With site.json Integration (Recommended)
@@ -156,7 +156,7 @@ Metalsmith(__dirname)
 
 ### Frontmatter Integration
 
-Add SEO data to any page. The plugin intelligently extracts metadata from multiple locations:
+Add SEO data to any page. The plugin extracts metadata from multiple locations:
 
 ```yaml
 ---
@@ -302,7 +302,7 @@ The plugin uses this priority order:
 1. **Page frontmatter** (`seo` property) - Highest priority
 2. **Plugin options** - Override site defaults
 3. **site.json values** - Site-wide defaults
-4. **Intelligent fallbacks** - Auto-generated from content
+4. **Automatic fallbacks** - Auto-generated from content
 
 ### Plugin Options
 
@@ -361,7 +361,7 @@ The plugin uses this priority order:
   // Sitemap configuration
   sitemap: {
     output: 'sitemap.xml',
-    auto: true,              // Default: true (intelligent auto-calculation)
+    auto: true,              // Default: true (automatic calculation)
     changefreq: 'weekly',    // Override auto-calculation
     priority: 0.8,           // Override auto-calculation
     omitIndex: false
@@ -499,7 +499,7 @@ seo:
 
 ### Robots.txt Management
 
-The plugin intelligently handles robots.txt files:
+The plugin handles robots.txt files:
 
 #### Automatic Generation
 
@@ -512,7 +512,7 @@ Disallow:
 Sitemap: https://example.com/sitemap.xml
 ```
 
-#### Smart Coordination with Existing Files
+#### Coordination with Existing Files
 
 If robots.txt already exists, the plugin:
 
@@ -634,7 +634,7 @@ Or use a custom property name:
 }))
 ```
 
-#### Intelligent Auto-Calculation (Default)
+#### Automatic Calculation (Default)
 
 By default, the plugin automatically calculates optimal values for sitemap entries:
 
@@ -721,7 +721,7 @@ seo:
 
 - ✅ **Accurate lastmod dates** that Google trusts and uses
 - ✅ **Realistic priorities** based on actual content importance
-- ✅ **Smart change frequencies** based on content type patterns
+- ✅ **Calculated change frequencies** based on content type patterns
 
 **Developer Experience:**
 
