@@ -18,9 +18,6 @@ import { get } from "../utils/object-utils.js";
  * @returns {number} Calculated priority between 0.1 and 1.0
  */
 export function calculatePriority(file) {
-  // Start with default priority
-  let priority = 0.5;
-
   // Homepage gets highest priority
   if (file === "index.html" || file === "index.htm") {
     return 1.0;
@@ -28,6 +25,7 @@ export function calculatePriority(file) {
 
   // URL depth - shallower pages are generally more important
   const pathDepth = file.split(path.sep).length;
+  let priority;
   if (pathDepth === 1) {
     priority = 0.8; // Root level pages
   } else if (pathDepth === 2) {
