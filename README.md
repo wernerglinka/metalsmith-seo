@@ -29,6 +29,12 @@ Inspired by metalsmith-sitemap, the plugin provides SEO optimization for Metalsm
 - **Fallback Chains** - Defaults from site.json, frontmatter, or content analysis
 - **Site.json Integration** - Integration with existing Metalsmith site configuration
 
+**Performance:**
+
+- **Head-only Cheerio parsing** - Only the `<head>` section is fed to the HTML parser; the body (often the bulk of the document) is never parsed or serialized
+- **Single-pass processing** - All meta tags, Open Graph, Twitter Cards, JSON-LD, and link tags are injected in one parse/serialize cycle per file
+- **Batch processing** - Files are processed in configurable parallel batches
+
 **Developer Experience:**
 
 - **ESM/CommonJS Support** - Works in any Node.js environment

@@ -8,11 +8,13 @@ import { generateOpenGraphTags } from "../generators/opengraph-generator.js";
 import { generateTwitterCardTags } from "../generators/twitter-generator.js";
 import { generateJsonLd } from "../generators/jsonld-generator.js";
 import {
-  updateTitle,
-  updateMetaTag,
-  updateLinkTag,
-  addScript,
-  removeExistingMetaTags,
+  createDocument,
+  serializeDocument,
+  removeTagsFromDoc,
+  setTitleInDoc,
+  setMetaInDoc,
+  setLinkInDoc,
+  addScriptToDoc,
 } from "../utils/html-injector.js";
 
 /**
@@ -138,7 +140,8 @@ function generateAllSeoContent(metadata, config) {
 }
 
 /**
- * Injects SEO content into HTML head section
+ * Injects SEO content into HTML head section using single-pass processing.
+ * Parses HTML once, performs all DOM mutations, serializes once.
  * @param {string} html - Original HTML content
  * @param {Object} metadata - Extracted metadata
  * @param {Object} generated - Generated SEO content
@@ -148,16 +151,17 @@ function generateAllSeoContent(metadata, config) {
 function injectSeoContent(html, metadata, generated, options = {}) {
   const { cleanExisting = true } = options;
 
-  let modifiedHtml = html;
+  // Parse HTML once
+  const $ = createDocument(html);
 
   // Clean existing SEO tags if requested
   if (cleanExisting) {
-    modifiedHtml = removeExistingMetaTags(modifiedHtml);
+    removeTagsFromDoc($);
   }
 
   // Update title tag
   if (metadata.title) {
-    modifiedHtml = updateTitle(modifiedHtml, metadata.title);
+    setTitleInDoc($, metadata.title);
   }
 
   // Inject meta tags (critical tags first)
@@ -167,21 +171,16 @@ function injectSeoContent(html, metadata, generated, options = {}) {
   // Inject critical meta tags early
   for (const tag of criticalMetaTags) {
     if (tag.name) {
-      modifiedHtml = updateMetaTag(modifiedHtml, tag.name, tag.content, "name");
+      setMetaInDoc($, tag.name, tag.content, "name");
     } else if (tag.httpEquiv) {
-      modifiedHtml = updateMetaTag(
-        modifiedHtml,
-        tag.httpEquiv,
-        tag.content,
-        "http-equiv",
-      );
+      setMetaInDoc($, tag.httpEquiv, tag.content, "http-equiv");
     }
   }
 
   // Inject link tags (after critical meta tags)
   for (const link of generated.meta.linkTags) {
-    modifiedHtml = updateLinkTag(
-      modifiedHtml,
+    setLinkInDoc(
+      $,
       link.rel,
       link.href,
       Object.fromEntries(
@@ -193,23 +192,18 @@ function injectSeoContent(html, metadata, generated, options = {}) {
   // Inject remaining meta tags
   for (const tag of otherMetaTags) {
     if (tag.name) {
-      modifiedHtml = updateMetaTag(modifiedHtml, tag.name, tag.content, "name");
+      setMetaInDoc($, tag.name, tag.content, "name");
     }
   }
 
   // Inject Open Graph tags
   for (const tag of generated.openGraph.metaTags) {
-    modifiedHtml = updateMetaTag(
-      modifiedHtml,
-      tag.property,
-      tag.content,
-      "property",
-    );
+    setMetaInDoc($, tag.property, tag.content, "property");
   }
 
   // Inject Twitter Card tags
   for (const tag of generated.twitter.metaTags) {
-    modifiedHtml = updateMetaTag(modifiedHtml, tag.name, tag.content, "name");
+    setMetaInDoc($, tag.name, tag.content, "name");
   }
 
   // Inject JSON-LD structured data (at the end for optimal loading)
@@ -218,15 +212,11 @@ function injectSeoContent(html, metadata, generated, options = {}) {
       /<script[^>]*>|<\/script>/g,
       "",
     );
-    modifiedHtml = addScript(
-      modifiedHtml,
-      jsonLdContent,
-      "application/ld+json",
-      "end",
-    );
+    addScriptToDoc($, jsonLdContent, "application/ld+json", "end");
   }
 
-  return modifiedHtml;
+  // Serialize once
+  return serializeDocument($);
 }
 
 /**
