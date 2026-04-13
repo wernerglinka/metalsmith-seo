@@ -161,6 +161,12 @@ export function buildConfig(pluginOptions, siteMetadata, files, seoProperty) {
       pluginOptions.enableRobots !== undefined
         ? pluginOptions.enableRobots
         : true,
+    enableLlms:
+      pluginOptions.enableLlms !== undefined
+        ? pluginOptions.enableLlms
+        : Boolean(
+            pluginOptions.llms?.enabled || siteMetadata.llms?.enabled || false,
+          ),
     batchSize: pluginOptions.batchSize || 10,
 
     // Fallback mappings
@@ -205,6 +211,24 @@ export function buildConfig(pluginOptions, siteMetadata, files, seoProperty) {
 
       // Override with explicit sitemap config (highest priority)
       ...(pluginOptions.sitemap || {}),
+    },
+
+    // Complete llms.txt configuration with defaults
+    llms: {
+      // Defaults
+      output: "llms.txt",
+      fullText: false,
+      fullTextOutput: "llms-full.txt",
+      pattern: "**/*.html",
+      privateProperty: "private",
+      perLocale: false,
+      sort: "date-desc",
+
+      // Merge site metadata
+      ...(siteMetadata.llms || {}),
+
+      // Override with explicit llms config
+      ...(pluginOptions.llms || {}),
     },
 
     // Complete robots configuration with defaults

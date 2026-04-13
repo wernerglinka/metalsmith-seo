@@ -21,6 +21,7 @@ Inspired by metalsmith-sitemap, the plugin provides SEO optimization for Metalsm
 - **JSON-LD Structured Data** - Article, Product, Organization, WebPage schemas
 - **Sitemap Generation** - Complete sitemap.xml with auto-calculation of priority, changefreq, and lastmod
 - **Robots.txt Management** - robots.txt generation and sitemap coordination
+- **llms.txt Generation** - Opt-in markdown index (and optional plaintext dump) for large language model consumers, per the [llmstxt.org](https://llmstxt.org) proposal
 
 **Automation:**
 
@@ -381,10 +382,32 @@ The plugin uses this priority order:
     userAgent: '*'             // User agent directive
   },
 
+  // llms.txt configuration (opt-in)
+  llms: {
+    enabled: true,             // Opt in to llms.txt generation
+    output: 'llms.txt',        // Index filename
+    fullText: false,           // Also emit llms-full.txt (concatenated plaintext)
+    fullTextOutput: 'llms-full.txt',
+    title: 'My Site',          // Defaults to social.siteName
+    description: 'Tagline.',   // Defaults to defaults.description
+    details: undefined,        // Extra markdown block under the description
+    pattern: '**/*.html',      // Which files to include
+    privateProperty: 'private',// Frontmatter flag that excludes a file
+    groups: {                  // Optional: named groups by glob pattern
+      Writing: 'writing/**/*.html',
+      Notes:   'studio-notes/**/*.html'
+    },
+    perLocale: false,          // Emit one file pair per locale
+    locales: ['en', 'de'],     // Known locale path prefixes (fallback when
+                               // frontmatter.locale isn't set by a plugin)
+    sort: 'date-desc'          // 'date-desc' | 'date-asc' | 'alpha'
+  },
+
   // Performance options
   batchSize: 10,          // Process files in batches
   enableSitemap: true,    // Generate sitemap.xml
-  enableRobots: true      // Generate/update robots.txt
+  enableRobots: true,     // Generate/update robots.txt
+  enableLlms: true        // Generate llms.txt (also enabled by llms.enabled)
 }))
 ```
 
@@ -576,6 +599,104 @@ Sitemap: https://example.com/sitemap.xml
   enableRobots: false  // Skip robots.txt processing entirely
 }))
 ```
+
+### llms.txt Generation
+
+The plugin can emit [llms.txt](https://llmstxt.org) — a machine-readable index that
+helps large language models discover and summarize your site — and an optional
+`llms-full.txt` containing the concatenated plaintext of every included page.
+Both files are **opt-in**: set `llms.enabled: true` (or `enableLlms: true`) to
+turn them on.
+
+#### Minimal usage
+
+```javascript
+.use(seo({
+  hostname: 'https://example.com',
+  llms: {
+    enabled: true,
+    title: 'My Site',
+    description: 'Short tagline for LLM consumers.'
+  }
+}))
+```
+
+The output is spec-compliant markdown:
+
+```txt
+# My Site
+
+> Short tagline for LLM consumers.
+
+## writing
+
+- [Post Title](https://example.com/writing/post.html): Page description.
+- ...
+```
+
+When `title` or `description` are omitted, they default to the plugin's
+resolved `social.siteName` and `defaults.description` (pulled from site
+metadata).
+
+#### Grouping
+
+Pages are grouped in the output in this priority order:
+
+1. `llms.groups` — an explicit map of `{ 'Group Name': 'glob/pattern' }`.
+   The first pattern a file matches wins.
+2. The first entry of `frontmatter.collection` (as set by
+   `metalsmith-collections`).
+3. The top-level directory of the file path.
+
+```javascript
+llms: {
+  enabled: true,
+  groups: {
+    Writing: 'writing/**/*.html',
+    Art:     'art/**/*.html'
+  }
+}
+```
+
+#### Full-text dump
+
+```javascript
+llms: { enabled: true, fullText: true }
+```
+
+Emits `/llms-full.txt` alongside `/llms.txt`. Each page is rendered as a
+`###` heading, its URL, and the plaintext body (HTML stripped). Good when
+you want to hand an LLM the entire site in one file.
+
+#### Multilingual sites
+
+For sites built with `metalsmith-multilingual` (or any plugin that sets
+`frontmatter.locale`), set `perLocale: true` to emit one file pair per
+locale, rooted under the locale path:
+
+```javascript
+llms: { enabled: true, perLocale: true }
+// → /en_US/llms.txt, /de_DE/llms.txt, ...
+```
+
+If no plugin sets `locale`, provide a `locales` array and the processor
+will detect locale from the leading path segment:
+
+```javascript
+llms: { enabled: true, perLocale: true, locales: ['en', 'de'] }
+// 'de/texte/post.html' → goes into the 'de' bucket
+```
+
+#### Excluding pages
+
+Pages with a truthy `private` frontmatter value are excluded (the default;
+override with `llms.privateProperty`). Use `llms.pattern` to restrict
+which files are considered at all (default: `**/*.html`).
+
+#### Disabling
+
+The feature is off by default. To force-disable even when config is
+present, set `enableLlms: false`.
 
 ### Sitemap Generation
 
