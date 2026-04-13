@@ -44,11 +44,28 @@ import { get } from "../utils/object-utils.js";
  * @returns {string} Normalized plaintext
  */
 function htmlToText(html) {
-  return String(html)
+  // Prefer the <main> / <article> region when present — avoids pulling in
+  // site chrome (header, nav, footer, SVG icon strips, etc.). Fall back to
+  // <body>, then the full document.
+  const source = String(html);
+  const mainMatch = source.match(
+    /<(main|article)\b[^>]*>([\s\S]*?)<\/\1>/i,
+  );
+  const bodyMatch = source.match(/<body\b[^>]*>([\s\S]*?)<\/body>/i);
+  const region = mainMatch
+    ? mainMatch[2]
+    : bodyMatch
+      ? bodyMatch[1]
+      : source;
+
+  return region
+    .replace(/<head\b[^>]*>[\s\S]*?<\/head>/gi, "")
     .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
     .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "")
+    .replace(/<svg\b[^>]*>[\s\S]*?<\/svg>/gi, "")
+    .replace(/<noscript\b[^>]*>[\s\S]*?<\/noscript>/gi, "")
     .replace(/<!--[\s\S]*?-->/g, "")
-    .replace(/<\/(p|div|section|article|h[1-6]|li|br|tr)>/gi, "\n")
+    .replace(/<\/(p|div|section|article|h[1-6]|li|br|tr|blockquote|pre)>/gi, "\n")
     .replace(/<br\s*\/?>/gi, "\n")
     .replace(/<[^>]+>/g, "")
     .replace(/&nbsp;/g, " ")
@@ -58,6 +75,8 @@ function htmlToText(html) {
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/[ \t]+/g, " ")
+    // Drop lines that are only whitespace, then collapse stacked blank lines
+    .replace(/^[ \t]+$/gm, "")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
