@@ -100,8 +100,14 @@ function addCoreTwitterTags(metaTags, metadata, siteConfig, cardType) {
   }
 
   // twitter:creator (optional)
+  // Only fall back to metadata.author if it looks like a Twitter handle.
+  // metadata.author is often populated from siteOwner (a real name like
+  // "Werner Glinka"), which would produce an invalid "@Werner Glinka" handle.
+  const authorCandidate = isLikelyTwitterHandle(metadata.author)
+    ? metadata.author
+    : null;
   const creator =
-    metadata.twitterCreator || metadata.author || siteConfig.twitterCreator;
+    metadata.twitterCreator || authorCandidate || siteConfig.twitterCreator;
   if (creator) {
     metaTags.push({
       name: "twitter:creator",
@@ -267,6 +273,25 @@ function addPlayerTags(metaTags, metadata) {
       content: metadata.image,
     });
   }
+}
+
+/**
+ * Checks whether a value looks like a Twitter handle.
+ * Valid handles are alphanumeric plus underscore (max 15 chars),
+ * optionally prefixed with "@". Full names like "Werner Glinka"
+ * (containing spaces) are rejected so they do not become "@Werner Glinka".
+ * @param {*} value - Candidate handle value
+ * @returns {boolean} True if the value is shaped like a Twitter handle
+ */
+function isLikelyTwitterHandle(value) {
+  if (typeof value !== "string") {
+    return false;
+  }
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return false;
+  }
+  return /^@?[A-Za-z0-9_]{1,15}$/.test(trimmed);
 }
 
 /**

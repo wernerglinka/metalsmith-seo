@@ -148,6 +148,40 @@ describe('Twitter Generator Branch Coverage Tests', function() {
       assert(siteCreatorTag.content === '@site_creator', 'Should fall back to site twitterCreator');
     });
 
+    it('should skip metadata.author when it is a real name (contains spaces)', function() {
+      // Regression: metadata.author populated from siteOwner ("Werner Glinka")
+      // must not produce "@Werner Glinka". Prefer siteConfig.twitterCreator.
+      const result = generateTwitterCardTags({
+        title: 'Test',
+        author: 'Werner Glinka'
+      }, { twitterCreator: 'glinka_werner' });
+
+      const creatorTag = result.metaTags.find(tag => tag.name === 'twitter:creator');
+      assert.strictEqual(creatorTag.content, '@glinka_werner',
+        'Should prefer siteConfig.twitterCreator over a non-handle author');
+    });
+
+    it('should skip metadata.author that is not a valid handle and emit no creator if no other fallback', function() {
+      const result = generateTwitterCardTags({
+        title: 'Test',
+        author: 'Werner Glinka'
+      }, {});
+
+      const creatorTag = result.metaTags.find(tag => tag.name === 'twitter:creator');
+      assert(!creatorTag, 'Should not emit twitter:creator when only fallback is a real name');
+    });
+
+    it('should accept metadata.author that already looks like a handle', function() {
+      const result = generateTwitterCardTags({
+        title: 'Test',
+        author: '@glinka_werner'
+      }, { twitterCreator: 'site_creator' });
+
+      const creatorTag = result.metaTags.find(tag => tag.name === 'twitter:creator');
+      assert.strictEqual(creatorTag.content, '@glinka_werner',
+        'Should use metadata.author when it looks like a handle');
+    });
+
     it('should handle Twitter handle formatting edge cases', function() {
       const testCases = [
         { input: '@already_has_at', expected: '@already_has_at' },
