@@ -34,6 +34,10 @@ import { get } from "../utils/object-utils.js";
  * @property {Object<string,string>} [groups] - Optional group name -> glob pattern
  * @property {boolean} [perLocale=false] - Emit one file pair per locale
  * @property {Array<string>} [locales] - Known locales for path-prefix detection
+ * @property {string} [defaultLocale] - Locale whose files emit at the site
+ *   root (`/llms.txt`) instead of under a locale prefix. Defaults to the
+ *   plugin's resolved `social.locale`. Set to `''` to disable root emission
+ *   and keep every locale under its own prefix.
  * @property {'date-desc'|'date-asc'|'alpha'} [sort='date-desc'] - Entry sort order
  */
 
@@ -385,13 +389,33 @@ function renderFullText(entries, { title, description }) {
 }
 
 /**
+ * Tolerant locale equality: accepts mixed short ('en') and full ('en_US')
+ * forms so config-vs-file-metadata mismatches don't silently misroute output.
+ * @param {string} a - Locale id
+ * @param {string} b - Locale id
+ * @returns {boolean} True if the two refer to the same language
+ */
+function localesMatch(a, b) {
+  if (!a || !b) {
+    return false;
+  }
+  if (a === b) {
+    return true;
+  }
+  return a.split(/[_-]/)[0] === b.split(/[_-]/)[0];
+}
+
+/**
  * Compute an output path rooted under a locale prefix when applicable.
+ * Files whose locale matches `defaultLocale` emit at the site root so the
+ * llmstxt.org convention (`/llms.txt`) resolves for the primary language.
  * @param {string} output - Base filename
- * @param {string} locale - Locale id (empty string = no prefix)
+ * @param {string} locale - Locale id (empty string = no locale)
+ * @param {string} defaultLocale - Locale that emits at root
  * @returns {string} Final file path
  */
-function localizedOutput(output, locale) {
-  if (!locale) {
+function localizedOutput(output, locale, defaultLocale) {
+  if (!locale || localesMatch(locale, defaultLocale)) {
     return output;
   }
   return `${locale}/${output}`;
@@ -421,6 +445,7 @@ export function processLlms(files, metalsmith, options) {
         groups,
         perLocale = false,
         locales,
+        defaultLocale = "",
         sort = "date-desc",
       } = options;
 
@@ -435,21 +460,34 @@ export function processLlms(files, metalsmith, options) {
 
       sortEntries(entries, sort);
 
-      // Bucket entries by locale (empty-string bucket = no locale / default)
+      // Bucket entries by output path. Multiple locales can collide on the
+      // same path — e.g. default-locale entries and unlocalized entries both
+      // emit at root when perLocale is on. Keying by resolved path lets us
+      // merge rather than overwrite.
       const buckets = new Map();
+      const addToBucket = (path, entry) => {
+        if (!buckets.has(path)) {
+          buckets.set(path, []);
+        }
+        buckets.get(path).push(entry);
+      };
       if (perLocale) {
         for (const entry of entries) {
-          const key = entry.locale || "";
-          if (!buckets.has(key)) {
-            buckets.set(key, []);
+          const locale = entry.locale || "";
+          // With no defaultLocale, unlocalized entries have no natural home —
+          // skip them rather than producing an ambiguous root file.
+          if (!locale && !defaultLocale) {
+            continue;
           }
-          buckets.get(key).push(entry);
+          addToBucket(localizedOutput(output, locale, defaultLocale), entry);
         }
       } else {
-        buckets.set("", entries);
+        for (const entry of entries) {
+          addToBucket(output, entry);
+        }
       }
 
-      for (const [locale, bucketEntries] of buckets) {
+      for (const [indexPath, bucketEntries] of buckets) {
         if (bucketEntries.length === 0) {
           continue;
         }
@@ -458,13 +496,16 @@ export function processLlms(files, metalsmith, options) {
           description,
           details,
         };
-        const indexPath = localizedOutput(output, locale);
         files[indexPath] = {
           contents: Buffer.from(renderIndex(bucketEntries, header), "utf-8"),
           mode: "0644",
         };
         if (fullText) {
-          const fullPath = localizedOutput(fullTextOutput, locale);
+          // Mirror the index path to the full-text filename.
+          const fullPath = indexPath.replace(
+            new RegExp(`${output.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`),
+            fullTextOutput,
+          );
           files[fullPath] = {
             contents: Buffer.from(
               renderFullText(bucketEntries, header),

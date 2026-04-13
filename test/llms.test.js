@@ -179,7 +179,7 @@ describe('metalsmith-seo llms.txt functionality', function() {
       });
   });
 
-  it('should emit per-locale files when perLocale:true', function(done) {
+  it('should emit per-locale files under prefixes when defaultLocale is empty', function(done) {
     Metalsmith('test/fixtures/html')
       .use(inject({
         'writing/en-post.html': {
@@ -197,15 +197,57 @@ describe('metalsmith-seo llms.txt functionality', function() {
       }))
       .use(seo({
         hostname: 'https://example.com',
-        llms: { enabled: true, perLocale: true, title: 'Site' }
+        llms: {
+          enabled: true, perLocale: true, defaultLocale: '', title: 'Site'
+        }
       }))
       .build(function(err, files) {
-        if (err) {return done(err);}
-        assert(files['en_US/llms.txt'], 'emits en_US/llms.txt');
-        assert(files['de_DE/llms.txt'], 'emits de_DE/llms.txt');
-        assert(files['en_US/llms.txt'].contents.toString().includes('EN Post'));
-        assert(files['de_DE/llms.txt'].contents.toString().includes('DE Post'));
-        done();
+        try {
+          if (err) {return done(err);}
+          assert(files['en_US/llms.txt'], 'emits en_US/llms.txt');
+          assert(files['de_DE/llms.txt'], 'emits de_DE/llms.txt');
+          assert(!files['llms.txt'], 'no root llms.txt when defaultLocale empty');
+          assert(files['en_US/llms.txt'].contents.toString().includes('EN Post'));
+          assert(files['de_DE/llms.txt'].contents.toString().includes('DE Post'));
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it('should emit default-locale files at root and others under prefix', function(done) {
+    Metalsmith('test/fixtures/html')
+      .metadata({
+        site: { url: 'https://example.com', title: 'Site', social: { locale: 'en_US' } }
+      })
+      .use(inject({
+        'writing/en-post.html': {
+          title: 'EN Post',
+          locale: 'en',
+          date: new Date('2026-01-01'),
+          contents: '<p>en</p>'
+        },
+        'de/texte/de-post.html': {
+          title: 'DE Post',
+          locale: 'de',
+          date: new Date('2026-01-02'),
+          contents: '<p>de</p>'
+        }
+      }))
+      .use(seo({ llms: { enabled: true, perLocale: true } }))
+      .build(function(err, files) {
+        try {
+          if (err) {return done(err);}
+          assert(files['llms.txt'], 'emits root llms.txt for default locale');
+          assert(files['de/llms.txt'], 'emits de/llms.txt for non-default locale');
+          assert(!files['en/llms.txt'], 'should not also emit en/llms.txt');
+          assert(files['llms.txt'].contents.toString().includes('EN Post'));
+          assert(files['de/llms.txt'].contents.toString().includes('DE Post'));
+          done();
+        } catch (e) {
+          done(e);
+        }
       });
   });
 

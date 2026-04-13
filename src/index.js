@@ -204,6 +204,14 @@ function plugin(options = {}) {
           if (!config.llms.description) {
             config.llms.description = config.defaults.description || undefined;
           }
+          // Default locale -> root emission: resolved from social.locale so
+          // multilingual sites put /llms.txt at the root for their primary
+          // language without extra config. The locale matcher is tolerant of
+          // short/full forms ('en' vs 'en_US'). Set defaultLocale: '' to
+          // disable root emission and keep every locale under its prefix.
+          if (config.llms.defaultLocale === undefined) {
+            config.llms.defaultLocale = config.social?.locale || "";
+          }
           return processLlms(files, metalsmith, config.llms);
         }
       })
