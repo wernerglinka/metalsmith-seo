@@ -225,9 +225,13 @@ function extractCanonicalURL(seoData, filePath, hostname) {
   }
 
   // Auto-generate from file path
-  const cleanPath = filePath.replace(/\.html?$/, "").replace(/\/index$/, "");
+  const cleanPath = filePath
+    .replace(/\.html?$/, "")
+    .replace(/\/index$/, "")
+    .replace(/^\/+/, "")
+    .replace(/\/+/g, "/");
 
-  return `${hostname.replace(/\/$/, "")}/${cleanPath}`.replace(/\/+/g, "/");
+  return `${hostname.replace(/\/$/, "")}/${cleanPath}`;
 }
 
 /**
