@@ -9,6 +9,7 @@
 import { batchOptimizeHeads } from "./processors/head-optimizer.js";
 import { processSitemap } from "./processors/sitemap.js";
 import { processRobots } from "./processors/robots.js";
+import { processLlms } from "./processors/llms.js";
 import {
   buildConfig,
   validateConfig,
@@ -28,6 +29,8 @@ import {
  * @property {Object} [robots] - Robots.txt generation options
  * @property {boolean} [enableSitemap=true] - Whether to generate sitemap.xml
  * @property {boolean} [enableRobots=true] - Whether to generate/update robots.txt
+ * @property {boolean} [enableLlms=false] - Whether to generate llms.txt
+ * @property {Object} [llms] - llms.txt generation options
  * @property {number} [batchSize=10] - Number of files to process in parallel
  * @property {number} [wordsPerMinute=200] - Reading speed for calculating reading time
  */
@@ -186,6 +189,30 @@ function plugin(options = {}) {
           config.robots.sitemapFile = config.sitemap.output;
 
           return processRobots(files, metalsmith, config.robots);
+        }
+      })
+      .then(() => {
+        // llms.txt generation - opt-in, runs after robots
+        if (config.enableLlms) {
+          config.llms.hostname = config.hostname;
+          config.llms.seoProperty = config.seoProperty;
+          // Sensible header defaults pulled from site metadata
+          if (!config.llms.title) {
+            config.llms.title =
+              config.social.siteName || config.defaults.title || "Site";
+          }
+          if (!config.llms.description) {
+            config.llms.description = config.defaults.description || undefined;
+          }
+          // Default locale -> root emission: resolved from social.locale so
+          // multilingual sites put /llms.txt at the root for their primary
+          // language without extra config. The locale matcher is tolerant of
+          // short/full forms ('en' vs 'en_US'). Set defaultLocale: '' to
+          // disable root emission and keep every locale under its prefix.
+          if (config.llms.defaultLocale === undefined) {
+            config.llms.defaultLocale = config.social?.locale || "";
+          }
+          return processLlms(files, metalsmith, config.llms);
         }
       })
       .then(() => done())
