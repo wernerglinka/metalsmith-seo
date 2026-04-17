@@ -7,6 +7,8 @@ Inspired by metalsmith-sitemap, the plugin provides SEO optimization for Metalsm
 [![license: MIT][license-badge]][license-url]
 [![Test Coverage][coverage-badge]][coverage-url]
 
+> **v1.0.0 — Breaking change:** CommonJS support has been removed. The package is now ESM-only and requires Node.js >= 22. If you need `require()` compatibility, pin to `metalsmith-seo@^0.8.0`.
+
 ## Features
 
 **Core SEO Optimization:**
