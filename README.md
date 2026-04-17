@@ -7,7 +7,7 @@ Inspired by metalsmith-sitemap, the plugin provides SEO optimization for Metalsm
 [![license: MIT][license-badge]][license-url]
 [![Test Coverage][coverage-badge]][coverage-url]
 
-> **v1.0.0 — Breaking change:** CommonJS support has been removed. The package is now ESM-only and requires Node.js >= 22. If you need `require()` compatibility, pin to `metalsmith-seo@^0.8.0`.
+> **Version 1.0.0** is ESM-only and requires Node.js 22+. The plugin API and output are unchanged — only the packaging was modernized. See the [migration guide](#migration-from-v0x-to-v10) below.
 
 ## Features
 
@@ -831,9 +831,18 @@ seo:
 - ✅ **No manual maintenance** - adapts as your site grows
 - ✅ **Override capability** for special cases
 
-### Migration Guide
+## Migration from v0.x to v1.0
 
-#### From metalsmith-sitemap
+Version 1.0.0 modernizes the toolchain. No plugin API or behavior changed — only the packaging.
+
+### Breaking Changes
+
+1. **ESM only.** The CommonJS build is gone. Use `import seo from 'metalsmith-seo'` from an ESM project. On Node.js 22.12+, `require('metalsmith-seo').default` also works thanks to [`require(esm)`](https://nodejs.org/api/modules.html#loading-ecmascript-modules-using-require) — no separate CJS build is needed.
+2. **Node.js 22+ required.** Earlier versions are unsupported.
+
+No API changes. Plugin options, extraction logic, and generated output are identical to v0.8.x.
+
+## Migration from metalsmith-sitemap
 
 This plugin includes all metalsmith-sitemap functionality:
 
