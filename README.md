@@ -885,5 +885,5 @@ The sitemap functionality in this plugin was inspired by and adapted from:
 [metalsmith-url]: https://metalsmith.io
 [license-badge]: https://img.shields.io/github/license/wernerglinka/metalsmith-seo
 [license-url]: LICENSE
-[coverage-badge]: https://img.shields.io/badge/test%20coverage-94%25-brightgreen
+[coverage-badge]: https://img.shields.io/badge/test%20coverage-96%25-brightgreen
 [coverage-url]: #test-coverage
