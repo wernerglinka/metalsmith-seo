@@ -42,15 +42,15 @@
  * escapeXML(123);  // Returns: ''
  */
 export function escapeXML(str) {
-  if (typeof str !== "string") {
-    return "";
+  if (typeof str !== 'string') {
+    return '';
   }
   return str
-    .replace(/&/g, "&amp;") // Must be first to avoid double-escaping
-    .replace(/</g, "&lt;") // Less-than sign
-    .replace(/>/g, "&gt;") // Greater-than sign
-    .replace(/"/g, "&quot;") // Double quote
-    .replace(/'/g, "&apos;"); // Apostrophe/single quote
+    .replace(/&/g, '&amp;') // Must be first to avoid double-escaping
+    .replace(/</g, '&lt;') // Less-than sign
+    .replace(/>/g, '&gt;') // Greater-than sign
+    .replace(/"/g, '&quot;') // Double quote
+    .replace(/'/g, '&apos;'); // Apostrophe/single quote
 }
 
 /**
@@ -144,12 +144,12 @@ export function generateSitemapXML(links, hostname) {
 
   // Process each URL entry
   for (const link of links) {
-    xml += "<url>";
+    xml += '<url>';
 
     // Build the complete URL with proper hostname handling
-    const fullUrl = link.url.startsWith("http")
+    const fullUrl = link.url.startsWith('http')
       ? link.url
-      : `${hostname.replace(/\/$/, "")}/${link.url.replace(/^\//, "")}`;
+      : `${hostname.replace(/\/$/, '')}/${link.url.replace(/^\//, '')}`;
     xml += `<loc>${escapeXML(fullUrl)}</loc>`;
 
     // Add optional lastmod element
@@ -165,10 +165,7 @@ export function generateSitemapXML(links, hostname) {
     // Add optional priority element with proper decimal formatting
     if (link.priority !== undefined && link.priority !== null) {
       // Ensure priority is formatted with decimal point (e.g., 1.0 not 1)
-      const priorityStr =
-        typeof link.priority === "number"
-          ? link.priority.toFixed(1)
-          : String(link.priority);
+      const priorityStr = typeof link.priority === 'number' ? link.priority.toFixed(1) : String(link.priority);
       xml += `<priority>${escapeXML(priorityStr)}</priority>`;
     }
 
@@ -181,10 +178,10 @@ export function generateSitemapXML(links, hostname) {
       }
     }
 
-    xml += "</url>";
+    xml += '</url>';
   }
 
-  xml += "</urlset>";
+  xml += '</urlset>';
 
   return xml;
 }

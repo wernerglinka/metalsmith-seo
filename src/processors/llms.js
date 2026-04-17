@@ -17,8 +17,8 @@
  * provided). Default output is a single pair at the hostname root.
  */
 
-import path from "path";
-import { get } from "../utils/object-utils.js";
+import path from 'path';
+import { get } from '../utils/object-utils.js';
 
 /**
  * @typedef {Object} LlmsOptions
@@ -52,37 +52,33 @@ function htmlToText(html) {
   // site chrome (header, nav, footer, SVG icon strips, etc.). Fall back to
   // <body>, then the full document.
   const source = String(html);
-  const mainMatch = source.match(
-    /<(main|article)\b[^>]*>([\s\S]*?)<\/\1>/i,
-  );
+  const mainMatch = source.match(/<(main|article)\b[^>]*>([\s\S]*?)<\/\1>/i);
   const bodyMatch = source.match(/<body\b[^>]*>([\s\S]*?)<\/body>/i);
-  const region = mainMatch
-    ? mainMatch[2]
-    : bodyMatch
-      ? bodyMatch[1]
-      : source;
+  const region = mainMatch ? mainMatch[2] : bodyMatch ? bodyMatch[1] : source;
 
-  return region
-    .replace(/<head\b[^>]*>[\s\S]*?<\/head>/gi, "")
-    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
-    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "")
-    .replace(/<svg\b[^>]*>[\s\S]*?<\/svg>/gi, "")
-    .replace(/<noscript\b[^>]*>[\s\S]*?<\/noscript>/gi, "")
-    .replace(/<!--[\s\S]*?-->/g, "")
-    .replace(/<\/(p|div|section|article|h[1-6]|li|br|tr|blockquote|pre)>/gi, "\n")
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/[ \t]+/g, " ")
-    // Drop lines that are only whitespace, then collapse stacked blank lines
-    .replace(/^[ \t]+$/gm, "")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
+  return (
+    region
+      .replace(/<head\b[^>]*>[\s\S]*?<\/head>/gi, '')
+      .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
+      .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '')
+      .replace(/<svg\b[^>]*>[\s\S]*?<\/svg>/gi, '')
+      .replace(/<noscript\b[^>]*>[\s\S]*?<\/noscript>/gi, '')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/<\/(p|div|section|article|h[1-6]|li|br|tr|blockquote|pre)>/gi, '\n')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/[ \t]+/g, ' ')
+      // Drop lines that are only whitespace, then collapse stacked blank lines
+      .replace(/^[ \t]+$/gm, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
+  );
 }
 
 /**
@@ -93,7 +89,7 @@ function htmlToText(html) {
 function firstSentence(text) {
   const trimmed = text.trim();
   if (!trimmed) {
-    return "";
+    return '';
   }
   const match = trimmed.match(/^[^.!?\n]{10,200}[.!?]/);
   if (match) {
@@ -109,12 +105,7 @@ function firstSentence(text) {
  * @returns {string} Title
  */
 function resolveTitle(frontmatter, seoProperty) {
-  return (
-    get(frontmatter, `${seoProperty}.title`) ||
-    get(frontmatter, "card.title") ||
-    frontmatter.title ||
-    ""
-  );
+  return get(frontmatter, `${seoProperty}.title`) || get(frontmatter, 'card.title') || frontmatter.title || '';
 }
 
 /**
@@ -127,10 +118,10 @@ function resolveTitle(frontmatter, seoProperty) {
 function resolveDescription(frontmatter, seoProperty, plaintext) {
   return (
     get(frontmatter, `${seoProperty}.description`) ||
-    get(frontmatter, "card.description") ||
+    get(frontmatter, 'card.description') ||
     frontmatter.description ||
     frontmatter.excerpt ||
-    firstSentence(plaintext || "")
+    firstSentence(plaintext || '')
   );
 }
 
@@ -160,7 +151,7 @@ function toDate(value) {
  * @returns {string} Locale id or empty string if unknown/default
  */
 function detectLocale(file, frontmatter, locales) {
-  if (frontmatter.locale && typeof frontmatter.locale === "string") {
+  if (frontmatter.locale && typeof frontmatter.locale === 'string') {
     return frontmatter.locale;
   }
   if (Array.isArray(locales) && locales.length > 0) {
@@ -169,7 +160,7 @@ function detectLocale(file, frontmatter, locales) {
       return first;
     }
   }
-  return "";
+  return '';
 }
 
 /**
@@ -200,7 +191,7 @@ function pickGroup(file, frontmatter, metalsmith, groupsOption) {
     return String(collections[0]);
   }
   const parts = file.split(/[\\/]/).filter(Boolean);
-  return parts[0] || "Pages";
+  return parts[0] || 'Pages';
 }
 
 /**
@@ -212,13 +203,13 @@ function pickGroup(file, frontmatter, metalsmith, groupsOption) {
  */
 function buildPageUrl(file, frontmatter, hostname) {
   const canonical = frontmatter.canonical;
-  if (typeof canonical === "string" && canonical) {
+  if (typeof canonical === 'string' && canonical) {
     return canonical;
   }
-  const base = String(hostname || "").replace(/\/$/, "");
-  let url = file.replace(/\\/g, "/");
-  if (url.endsWith("/index.html")) {
-    url = url.slice(0, -"index.html".length);
+  const base = String(hostname || '').replace(/\/$/, '');
+  let url = file.replace(/\\/g, '/');
+  if (url.endsWith('/index.html')) {
+    url = url.slice(0, -'index.html'.length);
   }
   return `${base}/${url}`;
 }
@@ -237,8 +228,7 @@ function buildPageUrl(file, frontmatter, hostname) {
  * @returns {Array<Object>} Page entries
  */
 function collectEntries(files, metalsmith, options) {
-  const { pattern, privateProperty, seoProperty, hostname, groups, locales } =
-    options;
+  const { pattern, privateProperty, seoProperty, hostname, groups, locales } = options;
   const entries = [];
   for (const file of Object.keys(files)) {
     const frontmatter = files[file];
@@ -253,7 +243,7 @@ function collectEntries(files, metalsmith, options) {
       continue;
     }
 
-    const html = frontmatter.contents.toString("utf-8");
+    const html = frontmatter.contents.toString('utf-8');
     const plaintext = htmlToText(html);
     const title = resolveTitle(frontmatter, seoProperty) || path.basename(file);
     const description = resolveDescription(frontmatter, seoProperty, plaintext);
@@ -270,7 +260,7 @@ function collectEntries(files, metalsmith, options) {
       group,
       locale,
       date,
-      plaintext,
+      plaintext
     });
   }
   return entries;
@@ -295,9 +285,9 @@ function sortEntries(entries, sort) {
     }
     return a.title.localeCompare(b.title);
   };
-  if (sort === "date-asc") {
+  if (sort === 'date-asc') {
     entries.sort((a, b) => -byDateDesc(a, b));
-  } else if (sort === "alpha") {
+  } else if (sort === 'alpha') {
     entries.sort((a, b) => a.title.localeCompare(b.title));
   } else {
     entries.sort(byDateDesc);
@@ -313,7 +303,7 @@ function sortEntries(entries, sort) {
 function groupEntries(entries) {
   const grouped = new Map();
   for (const entry of entries) {
-    const name = entry.group || "Pages";
+    const name = entry.group || 'Pages';
     if (!grouped.has(name)) {
       grouped.set(name, []);
     }
@@ -334,26 +324,26 @@ function groupEntries(entries) {
 function renderIndex(entries, { title, description, details }) {
   const lines = [];
   lines.push(`# ${title}`);
-  lines.push("");
+  lines.push('');
   if (description) {
     lines.push(`> ${description}`);
-    lines.push("");
+    lines.push('');
   }
   if (details) {
     lines.push(details.trim());
-    lines.push("");
+    lines.push('');
   }
   const grouped = groupEntries(entries);
   for (const [groupName, groupEntriesList] of grouped) {
     lines.push(`## ${groupName}`);
-    lines.push("");
+    lines.push('');
     for (const entry of groupEntriesList) {
-      const desc = entry.description ? `: ${entry.description}` : "";
+      const desc = entry.description ? `: ${entry.description}` : '';
       lines.push(`- [${entry.title}](${entry.url})${desc}`);
     }
-    lines.push("");
+    lines.push('');
   }
-  return `${lines.join("\n").replace(/\n+$/, "")}\n`;
+  return `${lines.join('\n').replace(/\n+$/, '')}\n`;
 }
 
 /**
@@ -370,22 +360,22 @@ function renderFullText(entries, { title, description }) {
   if (description) {
     parts.push(`\n> ${description}`);
   }
-  parts.push("");
+  parts.push('');
   const grouped = groupEntries(entries);
   for (const [groupName, groupEntriesList] of grouped) {
     parts.push(`## ${groupName}`);
-    parts.push("");
+    parts.push('');
     for (const entry of groupEntriesList) {
       parts.push(`### ${entry.title}`);
       parts.push(entry.url);
-      parts.push("");
+      parts.push('');
       parts.push(entry.plaintext);
-      parts.push("");
-      parts.push("---");
-      parts.push("");
+      parts.push('');
+      parts.push('---');
+      parts.push('');
     }
   }
-  return `${parts.join("\n").replace(/\n+$/, "")}\n`;
+  return `${parts.join('\n').replace(/\n+$/, '')}\n`;
 }
 
 /**
@@ -432,21 +422,21 @@ export function processLlms(files, metalsmith, options) {
   return new Promise((resolve, reject) => {
     try {
       const {
-        output = "llms.txt",
+        output = 'llms.txt',
         fullText = false,
-        fullTextOutput = "llms-full.txt",
+        fullTextOutput = 'llms-full.txt',
         title,
         description,
         details,
-        pattern = "**/*.html",
-        privateProperty = "private",
-        seoProperty = "seo",
+        pattern = '**/*.html',
+        privateProperty = 'private',
+        seoProperty = 'seo',
         hostname,
         groups,
         perLocale = false,
         locales,
-        defaultLocale = "",
-        sort = "date-desc",
+        defaultLocale = '',
+        sort = 'date-desc'
       } = options;
 
       const entries = collectEntries(files, metalsmith, {
@@ -455,7 +445,7 @@ export function processLlms(files, metalsmith, options) {
         seoProperty,
         hostname,
         groups,
-        locales,
+        locales
       });
 
       sortEntries(entries, sort);
@@ -473,7 +463,7 @@ export function processLlms(files, metalsmith, options) {
       };
       if (perLocale) {
         for (const entry of entries) {
-          const locale = entry.locale || "";
+          const locale = entry.locale || '';
           // With no defaultLocale, unlocalized entries have no natural home —
           // skip them rather than producing an ambiguous root file.
           if (!locale && !defaultLocale) {
@@ -492,26 +482,23 @@ export function processLlms(files, metalsmith, options) {
           continue;
         }
         const header = {
-          title: title || "Site",
+          title: title || 'Site',
           description,
-          details,
+          details
         };
         files[indexPath] = {
-          contents: Buffer.from(renderIndex(bucketEntries, header), "utf-8"),
-          mode: "0644",
+          contents: Buffer.from(renderIndex(bucketEntries, header), 'utf-8'),
+          mode: '0644'
         };
         if (fullText) {
           // Mirror the index path to the full-text filename.
           const fullPath = indexPath.replace(
-            new RegExp(`${output.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`),
-            fullTextOutput,
+            new RegExp(`${output.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`),
+            fullTextOutput
           );
           files[fullPath] = {
-            contents: Buffer.from(
-              renderFullText(bucketEntries, header),
-              "utf-8",
-            ),
-            mode: "0644",
+            contents: Buffer.from(renderFullText(bucketEntries, header), 'utf-8'),
+            mode: '0644'
           };
         }
       }

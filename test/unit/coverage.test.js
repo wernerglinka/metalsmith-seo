@@ -1,16 +1,14 @@
-import { describe, it, beforeEach } from 'mocha';
-import assert from 'assert';
+import { describe, it, beforeEach } from 'node:test';
+import assert from 'node:assert/strict';
 import Metalsmith from 'metalsmith';
 import seo from '../../src/index.js';
-describe('Coverage Tests - Missing Functionality', function() {
-  this.timeout(5000);
-  
-  beforeEach(function() {
+describe('Coverage Tests - Missing Functionality', () => {
+  beforeEach(() => {
     process.env.NODE_ENV = 'test';
   });
 
-  describe('Auto-calculation features', function() {
-    it('should use auto-calculation for priority and changefreq', function(done) {
+  describe('Auto-calculation features', () => {
+    it('should use auto-calculation for priority and changefreq', (_t, done) => {
       // Use the plugin function directly to avoid file system issues
       const plugin = seo({
         hostname: 'http://www.website.com/',
@@ -21,12 +19,16 @@ describe('Coverage Tests - Missing Functionality', function() {
 
       const files = {
         'blog/recent-post.html': {
-          contents: Buffer.from('<html><head><title>Recent Post</title></head><body>Long content here...</body></html>'),
+          contents: Buffer.from(
+            '<html><head><title>Recent Post</title></head><body>Long content here...</body></html>'
+          ),
           title: 'Recent Blog Post',
           lastmod: new Date()
         },
         'services/consulting.html': {
-          contents: Buffer.from('<html><head><title>Consulting</title></head><body>Our consulting services</body></html>'),
+          contents: Buffer.from(
+            '<html><head><title>Consulting</title></head><body>Our consulting services</body></html>'
+          ),
           title: 'Consulting Services'
         },
         'about/team.html': {
@@ -37,26 +39,28 @@ describe('Coverage Tests - Missing Functionality', function() {
 
       const mockMetalsmith = {
         metadata: () => ({}),
-        match: () => Object.keys(files).filter(f => f.endsWith('.html'))
+        match: () => Object.keys(files).filter((f) => f.endsWith('.html'))
       };
 
-      plugin(files, mockMetalsmith, function(err) {
-        if (err) {return done(err);}
-        
+      plugin(files, mockMetalsmith, (err) => {
+        if (err) {
+          return done(err);
+        }
+
         assert(files['sitemap.xml'], 'Should generate sitemap');
         const sitemapContent = files['sitemap.xml'].contents.toString();
-        
+
         // Should contain the files (at minimum the root files)
         assert(sitemapContent.includes('</url>'), 'Should include URL entries');
         assert(sitemapContent.includes('<loc>'), 'Should include location tags');
-        
+
         done();
       });
     });
   });
 
-  describe('Social media features', function() {
-    it('should generate comprehensive social media tags', function(done) {
+  describe('Social media features', () => {
+    it('should generate comprehensive social media tags', (_t, done) => {
       const plugin = seo({
         hostname: 'http://www.website.com/',
         social: {
@@ -94,23 +98,25 @@ describe('Coverage Tests - Missing Functionality', function() {
         match: () => ['social-test.html']
       };
 
-      plugin(files, mockMetalsmith, function(err) {
-        if (err) {return done(err);}
-        
+      plugin(files, mockMetalsmith, (err) => {
+        if (err) {
+          return done(err);
+        }
+
         const htmlContent = files['social-test.html'].contents.toString();
-        
+
         // Check for various social media tags
         assert(htmlContent.includes('og:title'), 'Should include OpenGraph title');
         assert(htmlContent.includes('twitter:card'), 'Should include Twitter card');
         assert(htmlContent.includes('application/ld+json'), 'Should include JSON-LD');
         assert(htmlContent.includes('Test Site'), 'Should include site name');
         assert(htmlContent.includes('@testsite'), 'Should include Twitter site');
-        
+
         done();
       });
     });
 
-    it('should handle missing social media data gracefully', function(done) {
+    it('should handle missing social media data gracefully', (_t, done) => {
       const plugin = seo({
         hostname: 'http://www.website.com/',
         social: {},
@@ -128,36 +134,42 @@ describe('Coverage Tests - Missing Functionality', function() {
         match: () => ['minimal.html']
       };
 
-      plugin(files, mockMetalsmith, function(err) {
-        if (err) {return done(err);}
-        
+      plugin(files, mockMetalsmith, (err) => {
+        if (err) {
+          return done(err);
+        }
+
         const htmlContent = files['minimal.html'].contents.toString();
         assert(htmlContent.includes('<head>'), 'Should still process HTML');
-        
+
         done();
       });
     });
   });
 
-  describe('Edge cases and error handling', function() {
-    it('should handle files without proper HTML structure', function(done) {
+  describe('Edge cases and error handling', () => {
+    it('should handle files without proper HTML structure', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use(seo({
-          hostname: 'http://www.website.com/'
-        }))
-        .build(function(err, result) {
-          if (err) {return done(err);}
-          
+        .use(
+          seo({
+            hostname: 'http://www.website.com/'
+          })
+        )
+        .build((err, result) => {
+          if (err) {
+            return done(err);
+          }
+
           // Should not crash and should still generate sitemap/robots
           assert(result['sitemap.xml'], 'Should generate sitemap');
           assert(result['robots.txt'], 'Should generate robots.txt');
-          
+
           done();
         });
     });
 
-    it('should handle complex nested metadata', function(done) {
+    it('should handle complex nested metadata', (_t, done) => {
       const plugin = seo({
         hostname: 'http://www.website.com/',
         fallbacks: {
@@ -194,18 +206,20 @@ describe('Coverage Tests - Missing Functionality', function() {
         match: () => ['complex.html']
       };
 
-      plugin(files, mockMetalsmith, function(err) {
-        if (err) {return done(err);}
-        
+      plugin(files, mockMetalsmith, (err) => {
+        if (err) {
+          return done(err);
+        }
+
         const htmlContent = files['complex.html'].contents.toString();
         assert(htmlContent.includes('Custom SEO Title'), 'Should use custom SEO title');
         assert(htmlContent.includes('Custom description'), 'Should use custom description');
-        
+
         done();
       });
     });
 
-    it('should throw error when hostname is missing', function() {
+    it('should throw error when hostname is missing', () => {
       assert.throws(() => {
         const plugin = seo({});
         const mockFiles = {};
@@ -214,7 +228,7 @@ describe('Coverage Tests - Missing Functionality', function() {
       }, /hostname is required/);
     });
 
-    it('should handle disabled sitemap and robots', function(done) {
+    it('should handle disabled sitemap and robots', (_t, done) => {
       const plugin = seo({
         hostname: 'http://www.website.com/',
         enableSitemap: false,
@@ -232,73 +246,83 @@ describe('Coverage Tests - Missing Functionality', function() {
         match: () => ['test.html']
       };
 
-      plugin(files, mockMetalsmith, function(err) {
-        if (err) {return done(err);}
-        
+      plugin(files, mockMetalsmith, (err) => {
+        if (err) {
+          return done(err);
+        }
+
         // Should not generate sitemap or robots
         assert(!files['sitemap.xml'], 'Should not generate sitemap');
         assert(!files['robots.txt'], 'Should not generate robots.txt');
-        
+
         // But should still process HTML
         const htmlContent = files['test.html'].contents.toString();
         assert(htmlContent.includes('<head>'), 'Should still process HTML');
-        
+
         done();
       });
     });
   });
 
-  describe('Robots.txt edge cases', function() {
-    it('should handle existing robots.txt with sitemap reference', function(done) {
+  describe('Robots.txt edge cases', () => {
+    it('should handle existing robots.txt with sitemap reference', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use(seo({
-          hostname: 'http://www.website.com/'
-        }))
-        .build(function(err, result) {
-          if (err) {return done(err);}
-          
+        .use(
+          seo({
+            hostname: 'http://www.website.com/'
+          })
+        )
+        .build((err, result) => {
+          if (err) {
+            return done(err);
+          }
+
           const robotsContent = result['robots.txt'].contents.toString();
           // Should not duplicate sitemap reference
           const sitemapMatches = robotsContent.match(/Sitemap:/gi);
           assert.strictEqual(sitemapMatches.length, 1, 'Should have only one sitemap reference');
-          
+
           done();
         });
     });
 
-    it('should add custom disallow paths', function(done) {
+    it('should add custom disallow paths', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use(seo({
-          hostname: 'http://www.website.com/',
-          robots: {
-            disallowPaths: ['/admin/', '/private/', '/temp/'],
-            userAgent: 'Googlebot'
+        .use(
+          seo({
+            hostname: 'http://www.website.com/',
+            robots: {
+              disallowPaths: ['/admin/', '/private/', '/temp/'],
+              userAgent: 'Googlebot'
+            }
+          })
+        )
+        .build((err, result) => {
+          if (err) {
+            return done(err);
           }
-        }))
-        .build(function(err, result) {
-          if (err) {return done(err);}
-          
+
           const robotsContent = result['robots.txt'].contents.toString();
           assert(robotsContent.includes('User-agent: Googlebot'), 'Should use custom user agent');
           assert(robotsContent.includes('Disallow: /admin/'), 'Should include custom disallow path');
           assert(robotsContent.includes('Disallow: /private/'), 'Should include all disallow paths');
-          
+
           done();
         });
     });
   });
 
-  describe('Batch processing', function() {
-    it('should handle custom batch sizes', function(done) {
+  describe('Batch processing', () => {
+    it('should handle custom batch sizes', (_t, done) => {
       const plugin = seo({
         hostname: 'http://www.website.com/',
-        batchSize: 5  // Custom batch size
+        batchSize: 5 // Custom batch size
       });
 
       const files = {};
-      
+
       // Create multiple files to test batching
       for (let i = 1; i <= 15; i++) {
         files[`page-${i}.html`] = {
@@ -309,15 +333,21 @@ describe('Coverage Tests - Missing Functionality', function() {
 
       const mockMetalsmith = {
         metadata: () => ({}),
-        match: () => Object.keys(files).filter(f => f.endsWith('.html'))
+        match: () => Object.keys(files).filter((f) => f.endsWith('.html'))
       };
 
-      plugin(files, mockMetalsmith, function(err) {
-        if (err) {return done(err);}
-        
+      plugin(files, mockMetalsmith, (err) => {
+        if (err) {
+          return done(err);
+        }
+
         // Should process all files regardless of batch size
-        assert.strictEqual(Object.keys(files).filter(f => f.endsWith('.html')).length, 15, 'Should process all HTML files');
-        
+        assert.strictEqual(
+          Object.keys(files).filter((f) => f.endsWith('.html')).length,
+          15,
+          'Should process all HTML files'
+        );
+
         done();
       });
     });

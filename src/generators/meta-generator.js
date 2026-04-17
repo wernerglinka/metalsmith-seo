@@ -22,17 +22,15 @@ export function generateMetaTags(metadata, siteConfig = {}) {
   // Basic meta tags
   if (metadata.description) {
     metaTags.push({
-      name: "description",
-      content: metadata.description,
+      name: 'description',
+      content: metadata.description
     });
   }
 
   if (metadata.keywords && metadata.keywords.length > 0) {
     metaTags.push({
-      name: "keywords",
-      content: Array.isArray(metadata.keywords)
-        ? metadata.keywords.join(", ")
-        : metadata.keywords,
+      name: 'keywords',
+      content: Array.isArray(metadata.keywords) ? metadata.keywords.join(', ') : metadata.keywords
     });
   }
 
@@ -40,40 +38,39 @@ export function generateMetaTags(metadata, siteConfig = {}) {
   const robots = generateRobotsDirective(metadata, siteConfig);
   if (robots) {
     metaTags.push({
-      name: "robots",
-      content: robots,
+      name: 'robots',
+      content: robots
     });
   }
 
   // Author
   if (metadata.author) {
     metaTags.push({
-      name: "author",
-      content: metadata.author,
+      name: 'author',
+      content: metadata.author
     });
   }
 
   // Viewport (configurable for mobile optimization)
-  const viewportContent =
-    siteConfig.viewport || "width=device-width, initial-scale=1.0";
+  const viewportContent = siteConfig.viewport || 'width=device-width, initial-scale=1.0';
   metaTags.push({
-    name: "viewport",
-    content: viewportContent,
+    name: 'viewport',
+    content: viewportContent
   });
 
   // Canonical URL
   if (metadata.canonicalURL) {
     linkTags.push({
-      rel: "canonical",
-      href: metadata.canonicalURL,
+      rel: 'canonical',
+      href: metadata.canonicalURL
     });
   }
 
   // Theme color (if specified in site config)
   if (siteConfig.themeColor) {
     metaTags.push({
-      name: "theme-color",
-      content: siteConfig.themeColor,
+      name: 'theme-color',
+      content: siteConfig.themeColor
     });
   }
 
@@ -83,7 +80,7 @@ export function generateMetaTags(metadata, siteConfig = {}) {
   return {
     title: metadata.title,
     metaTags,
-    linkTags,
+    linkTags
   };
 }
 
@@ -95,7 +92,7 @@ export function generateMetaTags(metadata, siteConfig = {}) {
  */
 function generateRobotsDirective(metadata, siteConfig) {
   if (metadata.noIndex) {
-    return "noindex,nofollow";
+    return 'noindex,nofollow';
   }
 
   if (metadata.robots) {
@@ -104,14 +101,14 @@ function generateRobotsDirective(metadata, siteConfig) {
 
   // Default based on content type
   switch (metadata.type) {
-    case "article":
-      return "index,follow";
-    case "page":
-      return "index,follow";
-    case "product":
-      return "index,follow";
+    case 'article':
+      return 'index,follow';
+    case 'page':
+      return 'index,follow';
+    case 'product':
+      return 'index,follow';
     default:
-      return siteConfig.defaultRobots || "index,follow";
+      return siteConfig.defaultRobots || 'index,follow';
   }
 }
 
@@ -125,24 +122,24 @@ function addTechnicalMetaTags(metaTags, metadata, siteConfig) {
   // Content language
   if (siteConfig.language) {
     metaTags.push({
-      httpEquiv: "content-language",
-      content: siteConfig.language,
+      httpEquiv: 'content-language',
+      content: siteConfig.language
     });
   }
 
   // Publisher
   if (siteConfig.publisher) {
     metaTags.push({
-      name: "publisher",
-      content: siteConfig.publisher,
+      name: 'publisher',
+      content: siteConfig.publisher
     });
   }
 
   // Copyright
   if (siteConfig.copyright) {
     metaTags.push({
-      name: "copyright",
-      content: siteConfig.copyright,
+      name: 'copyright',
+      content: siteConfig.copyright
     });
   }
 
@@ -163,13 +160,13 @@ function addTechnicalMetaTags(metaTags, metadata, siteConfig) {
 
   if (googlebotDirectives.length > 0) {
     metaTags.push({
-      name: "googlebot",
-      content: googlebotDirectives.join(","),
+      name: 'googlebot',
+      content: googlebotDirectives.join(',')
     });
   }
 
   // Article-specific meta tags
-  if (metadata.type === "article") {
+  if (metadata.type === 'article') {
     addArticleMetaTags(metaTags, metadata);
   }
 }
@@ -183,31 +180,31 @@ function addArticleMetaTags(metaTags, metadata) {
   if (metadata.publishDate) {
     const date = new Date(metadata.publishDate);
     metaTags.push({
-      name: "article:published_time",
-      content: date.toISOString(),
+      name: 'article:published_time',
+      content: date.toISOString()
     });
   }
 
   if (metadata.modifiedDate) {
     const date = new Date(metadata.modifiedDate);
     metaTags.push({
-      name: "article:modified_time",
-      content: date.toISOString(),
+      name: 'article:modified_time',
+      content: date.toISOString()
     });
   }
 
   if (metadata.author) {
     metaTags.push({
-      name: "article:author",
-      content: metadata.author,
+      name: 'article:author',
+      content: metadata.author
     });
   }
 
   if (metadata.keywords && metadata.keywords.length > 0) {
     metadata.keywords.forEach((keyword) => {
       metaTags.push({
-        name: "article:tag",
-        content: keyword,
+        name: 'article:tag',
+        content: keyword
       });
     });
   }
@@ -236,9 +233,9 @@ export function metaTagsToHtml(metaTags) {
         attributes.push(`content="${escapeHtml(tag.content)}"`);
       }
 
-      return `<meta ${attributes.join(" ")}>`;
+      return `<meta ${attributes.join(' ')}>`;
     })
-    .join("\n");
+    .join('\n');
 }
 
 /**
@@ -266,14 +263,14 @@ export function linkTagsToHtml(linkTags) {
 
       // Add any other attributes
       Object.entries(tag).forEach(([key, value]) => {
-        if (!["rel", "href", "type", "sizes"].includes(key)) {
+        if (!['rel', 'href', 'type', 'sizes'].includes(key)) {
           attributes.push(`${key}="${escapeHtml(value)}"`);
         }
       });
 
-      return `<link ${attributes.join(" ")}>`;
+      return `<link ${attributes.join(' ')}>`;
     })
-    .join("\n");
+    .join('\n');
 }
 
 /**
@@ -282,14 +279,14 @@ export function linkTagsToHtml(linkTags) {
  * @returns {string} Escaped string
  */
 function escapeHtml(str) {
-  if (typeof str !== "string") {
+  if (typeof str !== 'string') {
     return String(str);
   }
 
   return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }

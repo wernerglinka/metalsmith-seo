@@ -1,22 +1,22 @@
-import { describe, it, beforeEach } from 'mocha';
-import assert from 'assert';
+import { describe, it, beforeEach } from 'node:test';
+import assert from 'node:assert/strict';
 import Metalsmith from 'metalsmith';
 import seo from '../../src/index.js';
-describe('Branch Coverage Tests', function() {
-  this.timeout(5000);
-  
-  beforeEach(function() {
+describe('Branch Coverage Tests', () => {
+  beforeEach(() => {
     process.env.NODE_ENV = 'test';
   });
 
-  describe('Auto-calculator edge cases', function() {
-    it('should handle different path depths and content types', function(done) {
+  describe('Auto-calculator edge cases', () => {
+    it('should handle different path depths and content types', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use(function(files, metalsmith, done) {
+        .use((files, metalsmith, done) => {
           // Add files to test different path depths and content types
           files['blog/recent-post.html'] = {
-            contents: Buffer.from(`<html><head><title>Recent Post</title></head><body>${'Long content. '.repeat(1000)}</body></html>`),
+            contents: Buffer.from(
+              `<html><head><title>Recent Post</title></head><body>${'Long content. '.repeat(1000)}</body></html>`
+            ),
             title: 'Recent Blog Post',
             lastmod: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000) // 15 days ago
           };
@@ -30,11 +30,15 @@ describe('Branch Coverage Tests', function() {
             title: 'Breaking News'
           };
           files['services/consulting.html'] = {
-            contents: Buffer.from('<html><head><title>Consulting</title></head><body>Consulting services</body></html>'),
+            contents: Buffer.from(
+              '<html><head><title>Consulting</title></head><body>Consulting services</body></html>'
+            ),
             title: 'Consulting Services'
           };
           files['products/software/tool.html'] = {
-            contents: Buffer.from('<html><head><title>Software Tool</title></head><body>Software products</body></html>'),
+            contents: Buffer.from(
+              '<html><head><title>Software Tool</title></head><body>Software products</body></html>'
+            ),
             title: 'Software Tool'
           };
           files['about/contact.html'] = {
@@ -43,31 +47,37 @@ describe('Branch Coverage Tests', function() {
           };
           done();
         })
-        .use(seo({
-          hostname: 'http://www.website.com/',
-          sitemap: { auto: true }
-        }))
-        .build(function(err, files) {
-          if (err) {return done(err);}
-          
+        .use(
+          seo({
+            hostname: 'http://www.website.com/',
+            sitemap: { auto: true }
+          })
+        )
+        .build((err, files) => {
+          if (err) {
+            return done(err);
+          }
+
           assert(files['sitemap.xml'], 'Should generate sitemap');
           const sitemapContent = files['sitemap.xml'].contents.toString();
-          
+
           // Verify various content types are included
           assert(sitemapContent.includes('</url>'), 'Should include URL entries');
           assert(sitemapContent.includes('<loc>'), 'Should include location tags');
-          
+
           done();
         });
     });
 
-    it('should handle files with different content sizes', function(done) {
+    it('should handle files with different content sizes', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use(function(files, metalsmith, done) {
+        .use((files, metalsmith, done) => {
           // Add files with different content sizes to test buffer length checks
           files['large-content.html'] = {
-            contents: Buffer.from(`<html><head><title>Large Content</title></head><body>${'Content. '.repeat(2000)}</body></html>`),
+            contents: Buffer.from(
+              `<html><head><title>Large Content</title></head><body>${'Content. '.repeat(2000)}</body></html>`
+            ),
             title: 'Large Content'
           };
           files['small-content.html'] = {
@@ -76,24 +86,28 @@ describe('Branch Coverage Tests', function() {
           };
           done();
         })
-        .use(seo({
-          hostname: 'http://www.website.com/',
-          sitemap: { auto: true }
-        }))
-        .build(function(err, files) {
-          if (err) {return done(err);}
-          
+        .use(
+          seo({
+            hostname: 'http://www.website.com/',
+            sitemap: { auto: true }
+          })
+        )
+        .build((err, files) => {
+          if (err) {
+            return done(err);
+          }
+
           assert(files['sitemap.xml'], 'Should generate sitemap');
           done();
         });
     });
   });
 
-  describe('Social media and generator edge cases', function() {
-    it('should handle various social media configurations', function(done) {
+  describe('Social media and generator edge cases', () => {
+    it('should handle various social media configurations', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use(function(files, metalsmith, done) {
+        .use((files, metalsmith, done) => {
           // Add files with video, audio, and image content
           files['video-content.html'] = {
             contents: Buffer.from('<html><head><title>Video Content</title></head><body>Video</body></html>'),
@@ -118,28 +132,32 @@ describe('Branch Coverage Tests', function() {
           };
           done();
         })
-        .use(seo({
-          hostname: 'http://www.website.com/',
-          social: {
-            siteName: 'Test Site',
-            twitterSite: '@testsite'
+        .use(
+          seo({
+            hostname: 'http://www.website.com/',
+            social: {
+              siteName: 'Test Site',
+              twitterSite: '@testsite'
+            }
+          })
+        )
+        .build((err, files) => {
+          if (err) {
+            return done(err);
           }
-        }))
-        .build(function(err, files) {
-          if (err) {return done(err);}
-          
+
           // Check that content is processed
           const videoHtml = files['video-content.html'].contents.toString();
           assert(videoHtml.includes('<head>'), 'Should process video content');
-          
+
           done();
         });
     });
 
-    it('should handle complex JSON-LD scenarios', function(done) {
+    it('should handle complex JSON-LD scenarios', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use(function(files, metalsmith, done) {
+        .use((files, metalsmith, done) => {
           // Add article with comprehensive metadata
           files['full-article.html'] = {
             contents: Buffer.from('<html><head><title>Full Article</title></head><body>Article content</body></html>'),
@@ -152,45 +170,53 @@ describe('Branch Coverage Tests', function() {
             category: 'Tech'
           };
           files['minimal-article.html'] = {
-            contents: Buffer.from('<html><head><title>Minimal Article</title></head><body>Minimal content</body></html>'),
+            contents: Buffer.from(
+              '<html><head><title>Minimal Article</title></head><body>Minimal content</body></html>'
+            ),
             title: 'Minimal Article'
           };
           done();
         })
-        .use(seo({
-          hostname: 'http://www.website.com/',
-          jsonLd: {
-            enableSchemas: ['Article', 'WebPage'],
-            organization: {
-              name: 'Test Organization',
-              logo: 'http://www.website.com/logo.png'
+        .use(
+          seo({
+            hostname: 'http://www.website.com/',
+            jsonLd: {
+              enableSchemas: ['Article', 'WebPage'],
+              organization: {
+                name: 'Test Organization',
+                logo: 'http://www.website.com/logo.png'
+              }
             }
+          })
+        )
+        .build((err, files) => {
+          if (err) {
+            return done(err);
           }
-        }))
-        .build(function(err, files) {
-          if (err) {return done(err);}
-          
+
           // Check that articles are processed
           const fullArticleHtml = files['full-article.html'].contents.toString();
           assert(fullArticleHtml.includes('<head>'), 'Should process article content');
-          
+
           done();
         });
     });
   });
 
-  describe('HTML injection and utility edge cases', function() {
-    it('should handle malformed HTML structures', function(done) {
+  describe('HTML injection and utility edge cases', () => {
+    it('should handle malformed HTML structures', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use(function(files, metalsmith, done) {
+        .use((files, metalsmith, done) => {
           // Add files with various HTML structures
           files['no-head.html'] = {
             contents: Buffer.from('<html><body>No head tag</body></html>'),
             title: 'No Head Tag'
           };
           files['existing-meta.html'] = {
-            contents: Buffer.from('<html><head><title>Existing</title><meta name="description" content="existing description"></head><body>Content</body></html>'),
+            contents: Buffer.from(
+              '<html><head><title>Existing</title><meta name="description" content="existing description"></head><body>Content</body></html>'
+            ),
             title: 'New Title',
             description: 'New Description'
           };
@@ -200,24 +226,28 @@ describe('Branch Coverage Tests', function() {
           };
           done();
         })
-        .use(seo({
-          hostname: 'http://www.website.com/'
-        }))
-        .build(function(err, files) {
-          if (err) {return done(err);}
-          
+        .use(
+          seo({
+            hostname: 'http://www.website.com/'
+          })
+        )
+        .build((err, files) => {
+          if (err) {
+            return done(err);
+          }
+
           // Check that HTML is processed despite structural issues
           assert(files['no-head.html'].contents.toString().includes('<head>'), 'Should inject head tag');
           assert(files['existing-meta.html'].contents.toString().includes('New Title'), 'Should update existing meta');
-          
+
           done();
         });
     });
 
-    it('should test object-utils edge cases with complex fallbacks', function(done) {
+    it('should test object-utils edge cases with complex fallbacks', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use(function(files, metalsmith, done) {
+        .use((files, metalsmith, done) => {
           files['utility-test.html'] = {
             contents: Buffer.from('<html><head><title>Utility Test</title></head><body>Content</body></html>'),
             nested: {
@@ -231,80 +261,92 @@ describe('Branch Coverage Tests', function() {
           };
           done();
         })
-        .use(seo({
-          hostname: 'http://www.website.com/',
-          fallbacks: {
-            title: 'invalid.path.does.not.exist',
-            description: 'nested.valid.path',
-            author: 'nullValue',
-            image: 'emptyString'
+        .use(
+          seo({
+            hostname: 'http://www.website.com/',
+            fallbacks: {
+              title: 'invalid.path.does.not.exist',
+              description: 'nested.valid.path',
+              author: 'nullValue',
+              image: 'emptyString'
+            }
+          })
+        )
+        .build((err, files) => {
+          if (err) {
+            return done(err);
           }
-        }))
-        .build(function(err, files) {
-          if (err) {return done(err);}
-          
+
           const html = files['utility-test.html'].contents.toString();
           assert(html.includes('Nested description value'), 'Should use nested fallback value');
-          
+
           done();
         });
     });
   });
 
-  describe('Robots and configuration edge cases', function() {
-    it('should handle custom robots configuration', function(done) {
+  describe('Robots and configuration edge cases', () => {
+    it('should handle custom robots configuration', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use(function(files, metalsmith, done) {
+        .use((files, metalsmith, done) => {
           files['test-page.html'] = {
             contents: Buffer.from('<html><head><title>Test Page</title></head><body>Content</body></html>'),
             title: 'Test Page'
           };
           done();
         })
-        .use(seo({
-          hostname: 'http://www.website.com/',
-          robots: {
-            disallowPaths: ['/admin/', '/private/'],
-            userAgent: 'Googlebot'
+        .use(
+          seo({
+            hostname: 'http://www.website.com/',
+            robots: {
+              disallowPaths: ['/admin/', '/private/'],
+              userAgent: 'Googlebot'
+            }
+          })
+        )
+        .build((err, files) => {
+          if (err) {
+            return done(err);
           }
-        }))
-        .build(function(err, files) {
-          if (err) {return done(err);}
-          
+
           const robotsContent = files['robots.txt'].contents.toString();
           assert(robotsContent.includes('User-agent: Googlebot'), 'Should use custom user agent');
-          
+
           done();
         });
     });
 
-    it('should handle disabled features', function(done) {
+    it('should handle disabled features', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use(function(files, metalsmith, done) {
+        .use((files, metalsmith, done) => {
           files['test.html'] = {
             contents: Buffer.from('<html><head><title>Test</title></head><body>Content</body></html>'),
             title: 'Test'
           };
           done();
         })
-        .use(seo({
-          hostname: 'http://www.website.com/',
-          enableSitemap: false,
-          enableRobots: false
-        }))
-        .build(function(err, files) {
-          if (err) {return done(err);}
-          
+        .use(
+          seo({
+            hostname: 'http://www.website.com/',
+            enableSitemap: false,
+            enableRobots: false
+          })
+        )
+        .build((err, files) => {
+          if (err) {
+            return done(err);
+          }
+
           // Should not generate sitemap or robots
           assert(!files['sitemap.xml'], 'Should not generate sitemap');
           assert(!files['robots.txt'], 'Should not generate robots.txt');
-          
+
           // But should still process HTML
           const htmlContent = files['test.html'].contents.toString();
           assert(htmlContent.includes('<head>'), 'Should still process HTML');
-          
+
           done();
         });
     });

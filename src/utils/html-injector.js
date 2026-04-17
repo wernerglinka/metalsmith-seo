@@ -8,7 +8,7 @@
  *   and serialize per call. Use for isolated single operations.
  */
 
-import { load } from "cheerio";
+import { load } from 'cheerio';
 
 /**
  * @typedef {Object} InjectionOptions
@@ -20,7 +20,7 @@ import { load } from "cheerio";
 /** @type {import('cheerio').CheerioOptions} */
 const CHEERIO_OPTIONS = {
   decodeEntities: false,
-  lowerCaseAttributeNames: false,
+  lowerCaseAttributeNames: false
 };
 
 // ===== Document lifecycle =====
@@ -54,7 +54,7 @@ function extractHeadSection(html) {
     before: html.substring(0, headOpenStart),
     headTag: headOpenMatch[0],
     innerContent: html.substring(headOpenEnd, headCloseStart),
-    after: html.substring(headCloseEnd),
+    after: html.substring(headCloseEnd)
   };
 }
 
@@ -74,16 +74,13 @@ export function createDocument(html) {
   }
 
   // Parse only the head section (much smaller than full document)
-  const $ = load(
-    `${headParts.headTag}${headParts.innerContent}</head>`,
-    CHEERIO_OPTIONS,
-  );
+  const $ = load(`${headParts.headTag}${headParts.innerContent}</head>`, CHEERIO_OPTIONS);
 
   // Attach context for reconstruction in serializeDocument
   $._seoHeadContext = {
     before: headParts.before,
     headTag: headParts.headTag,
-    after: headParts.after,
+    after: headParts.after
   };
 
   return $;
@@ -100,7 +97,7 @@ export function serializeDocument($) {
   const ctx = $._seoHeadContext;
   if (ctx) {
     // Head-only mode: reconstruct from modified head + original body
-    const modifiedHeadContent = $("head").html();
+    const modifiedHeadContent = $('head').html();
     return `${ctx.before}${ctx.headTag}${modifiedHeadContent}</head>${ctx.after}`;
   }
   // Full-document fallback
@@ -115,10 +112,10 @@ export function serializeDocument($) {
  * @returns {import('cheerio').Cheerio} The head element
  */
 function ensureHead($) {
-  let $head = $("head");
+  let $head = $('head');
   if ($head.length === 0) {
-    $("body").before("<head></head>");
-    $head = $("head");
+    $('body').before('<head></head>');
+    $head = $('head');
   }
   return $head;
 }
@@ -129,16 +126,16 @@ function ensureHead($) {
  * @returns {string} Escaped string
  */
 function escapeHtml(str) {
-  if (typeof str !== "string") {
+  if (typeof str !== 'string') {
     return String(str);
   }
 
   return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 // ===== Document-level API (mutate Cheerio instance in place) =====
@@ -149,28 +146,20 @@ function escapeHtml(str) {
  * @param {string[]} [tags] - Specific tags to remove (defaults to all SEO tags)
  */
 export function removeTagsFromDoc($, tags = []) {
-  const defaultTags = ["description", "keywords", "robots", "canonical"];
+  const defaultTags = ['description', 'keywords', 'robots', 'canonical'];
 
-  const ogTags = [
-    "og:title",
-    "og:description",
-    "og:image",
-    "og:url",
-    "og:type",
-    "og:site_name",
-  ];
+  const ogTags = ['og:title', 'og:description', 'og:image', 'og:url', 'og:type', 'og:site_name'];
 
   const twitterTags = [
-    "twitter:card",
-    "twitter:title",
-    "twitter:description",
-    "twitter:image",
-    "twitter:site",
-    "twitter:creator",
+    'twitter:card',
+    'twitter:title',
+    'twitter:description',
+    'twitter:image',
+    'twitter:site',
+    'twitter:creator'
   ];
 
-  const tagsToRemove =
-    tags.length > 0 ? tags : [...defaultTags, ...ogTags, ...twitterTags];
+  const tagsToRemove = tags.length > 0 ? tags : [...defaultTags, ...ogTags, ...twitterTags];
 
   tagsToRemove.forEach((tag) => {
     $(`meta[name="${tag}"]`).remove();
@@ -191,7 +180,7 @@ export function removeTagsFromDoc($, tags = []) {
  */
 export function setTitleInDoc($, title) {
   const $head = ensureHead($);
-  const $title = $head.find("title");
+  const $title = $head.find('title');
   if ($title.length > 0) {
     $title.text(title);
   } else {
@@ -206,7 +195,7 @@ export function setTitleInDoc($, title) {
  * @param {string} content - The meta tag content
  * @param {string} [type='name'] - The attribute type: 'name', 'property', 'http-equiv'
  */
-export function setMetaInDoc($, name, content, type = "name") {
+export function setMetaInDoc($, name, content, type = 'name') {
   const $head = ensureHead($);
 
   // Find existing meta tag
@@ -215,18 +204,18 @@ export function setMetaInDoc($, name, content, type = "name") {
 
   if ($existing.length > 0) {
     // Update existing meta tag
-    $existing.attr("content", content);
+    $existing.attr('content', content);
   } else {
     // Create new meta tag
     const metaTag = `<meta ${type}="${escapeHtml(name)}" content="${escapeHtml(content)}">`;
 
     // Insert after existing meta tags but before other elements
-    const $lastMeta = $head.find("meta").last();
+    const $lastMeta = $head.find('meta').last();
     if ($lastMeta.length > 0) {
       $lastMeta.after(metaTag);
     } else {
       // Insert after title if it exists, otherwise at the start
-      const $title = $head.find("title");
+      const $title = $head.find('title');
       if ($title.length > 0) {
         $title.after(metaTag);
       } else {
@@ -252,21 +241,21 @@ export function setLinkInDoc($, rel, href, attributes = {}) {
   // Build attributes string
   const attrs = Object.entries(attributes)
     .map(([key, value]) => `${key}="${escapeHtml(value)}"`)
-    .join(" ");
+    .join(' ');
 
-  const linkTag = `<link rel="${escapeHtml(rel)}" href="${escapeHtml(href)}"${attrs ? ` ${attrs}` : ""}>`;
+  const linkTag = `<link rel="${escapeHtml(rel)}" href="${escapeHtml(href)}"${attrs ? ` ${attrs}` : ''}>`;
 
   if ($existing.length > 0) {
     // Replace existing link tag
     $existing.replaceWith(linkTag);
   } else {
     // Add new link tag after other links
-    const $lastLink = $head.find("link").last();
+    const $lastLink = $head.find('link').last();
     if ($lastLink.length > 0) {
       $lastLink.after(linkTag);
     } else {
       // Insert after meta tags
-      const $lastMeta = $head.find("meta").last();
+      const $lastMeta = $head.find('meta').last();
       if ($lastMeta.length > 0) {
         $lastMeta.after(linkTag);
       } else {
@@ -283,16 +272,11 @@ export function setLinkInDoc($, rel, href, attributes = {}) {
  * @param {string} [type='application/ld+json'] - The script type
  * @param {string} [position='end'] - Where to place: 'start' or 'end'
  */
-export function addScriptToDoc(
-  $,
-  scriptContent,
-  type = "application/ld+json",
-  position = "end",
-) {
+export function addScriptToDoc($, scriptContent, type = 'application/ld+json', position = 'end') {
   const $head = ensureHead($);
   const scriptTag = `<script type="${escapeHtml(type)}">${scriptContent}</script>`;
 
-  if (position === "end") {
+  if (position === 'end') {
     $head.append(scriptTag);
   } else {
     $head.prepend(scriptTag);
@@ -309,23 +293,23 @@ export function addScriptToDoc(
  * @returns {string} Modified HTML content
  */
 export function injectIntoHead(html, content, options = {}) {
-  const { createHead = true, ensureTitle = true, position = "end" } = options;
+  const { createHead = true, ensureTitle = true, position = 'end' } = options;
 
   // Load HTML with Cheerio
   const $ = load(html, CHEERIO_OPTIONS);
 
   // Ensure head element exists
-  let $head = $("head");
+  let $head = $('head');
   if ($head.length === 0 && createHead) {
     // Create head if it doesn't exist
-    if ($("html").length === 0) {
+    if ($('html').length === 0) {
       // No html element, wrap everything
-      $("body").before("<head></head>");
+      $('body').before('<head></head>');
     } else {
       // Add head to existing html element
-      $("html").prepend("<head></head>");
+      $('html').prepend('<head></head>');
     }
-    $head = $("head");
+    $head = $('head');
   }
 
   if ($head.length === 0) {
@@ -334,18 +318,18 @@ export function injectIntoHead(html, content, options = {}) {
   }
 
   // Ensure title exists if requested
-  if (ensureTitle && $head.find("title").length === 0) {
-    $head.prepend("<title></title>");
+  if (ensureTitle && $head.find('title').length === 0) {
+    $head.prepend('<title></title>');
   }
 
   // Inject content based on position
   switch (position) {
-    case "start":
+    case 'start':
       $head.prepend(content);
       break;
 
-    case "before-title": {
-      const $title = $head.find("title").first();
+    case 'before-title': {
+      const $title = $head.find('title').first();
       if ($title.length > 0) {
         $title.before(content);
       } else {
@@ -354,8 +338,8 @@ export function injectIntoHead(html, content, options = {}) {
       break;
     }
 
-    case "after-title": {
-      const $titleAfter = $head.find("title").first();
+    case 'after-title': {
+      const $titleAfter = $head.find('title').first();
       if ($titleAfter.length > 0) {
         $titleAfter.after(content);
       } else {
@@ -364,7 +348,7 @@ export function injectIntoHead(html, content, options = {}) {
       break;
     }
 
-    case "end":
+    case 'end':
     default:
       $head.append(content);
       break;
@@ -393,7 +377,7 @@ export function updateTitle(html, title) {
  * @param {string} [type='name'] - The attribute type: 'name', 'property', 'http-equiv'
  * @returns {string} Modified HTML content
  */
-export function updateMetaTag(html, name, content, type = "name") {
+export function updateMetaTag(html, name, content, type = 'name') {
   const $ = createDocument(html);
   setMetaInDoc($, name, content, type);
   return serializeDocument($);
@@ -421,12 +405,7 @@ export function updateLinkTag(html, rel, href, attributes = {}) {
  * @param {string} [position='end'] - Where to place the script
  * @returns {string} Modified HTML content
  */
-export function addScript(
-  html,
-  scriptContent,
-  type = "application/ld+json",
-  position = "end",
-) {
+export function addScript(html, scriptContent, type = 'application/ld+json', position = 'end') {
   const $ = createDocument(html);
   addScriptToDoc($, scriptContent, type, position);
   return serializeDocument($);

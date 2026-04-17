@@ -6,8 +6,6 @@ Inspired by metalsmith-sitemap, the plugin provides SEO optimization for Metalsm
 [![metalsmith: plugin][metalsmith-badge]][metalsmith-url]
 [![license: MIT][license-badge]][license-url]
 [![Test Coverage][coverage-badge]][coverage-url]
-[![ESM/CommonJS][modules-badge]][npm-url]
-[![Known Vulnerabilities](https://snyk.io/test/npm/metalsmith-seo/badge.svg)](https://snyk.io/test/npm/metalsmith-seo)
 
 > This Metalsmith plugin is under active development. The API is stable, but breaking changes may occur before reaching 1.0.0.
 
@@ -38,7 +36,7 @@ Inspired by metalsmith-sitemap, the plugin provides SEO optimization for Metalsm
 
 **Developer Experience:**
 
-- **ESM/CommonJS Support** - Works in any Node.js environment
+- **ESM-only** - Modern Node.js (>= 22) with native ESM
 - **Minimal Configuration** - Works great with just a hostname
 - **Comprehensive Testing** - 94% test coverage with real-world scenarios
 
@@ -54,32 +52,11 @@ npm install metalsmith-seo
 
 #### Minimal Setup
 
-**ESM (ES Modules):**
-
 ```javascript
 import Metalsmith from 'metalsmith';
 import seo from 'metalsmith-seo';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-Metalsmith(__dirname)
-  .use(
-    seo({
-      hostname: 'https://example.com',
-    })
-  )
-  .build();
-```
-
-**CommonJS:**
-
-```javascript
-const Metalsmith = require('metalsmith');
-const seo = require('metalsmith-seo');
-
-Metalsmith(__dirname)
+Metalsmith(import.meta.dirname)
   .use(
     seo({
       hostname: 'https://example.com',
@@ -122,12 +99,8 @@ Then use the plugin:
 import Metalsmith from 'metalsmith';
 import metadata from '@metalsmith/metadata';
 import seo from 'metalsmith-seo';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-Metalsmith(__dirname)
+Metalsmith(import.meta.dirname)
   .use(metadata({ site: 'data/site.json' }))
   .use(seo()) // Automatically uses site.json values!
   .build();
@@ -139,13 +112,9 @@ Or if your site metadata is nested differently:
 import Metalsmith from 'metalsmith';
 import metadata from '@metalsmith/metadata';
 import seo from 'metalsmith-seo';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // If metadata is at metadata().data.site instead of metadata().site
-Metalsmith(__dirname)
+Metalsmith(import.meta.dirname)
   .use(
     metadata({
       data: {
@@ -914,4 +883,3 @@ The sitemap functionality in this plugin was inspired by and adapted from:
 [license-url]: LICENSE
 [coverage-badge]: https://img.shields.io/badge/test%20coverage-94%25-brightgreen
 [coverage-url]: #test-coverage
-[modules-badge]: https://img.shields.io/badge/modules-ESM%2FCJS-blue

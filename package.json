@@ -2,50 +2,23 @@
   "name": "metalsmith-seo",
   "version": "0.8.0",
   "description": "A metalsmith plugin for SEO optimization including sitemap generation, meta tags, and more.",
-  "type": "module",
-  "main": "lib/index.cjs",
-  "module": "lib/index.js",
-  "exports": {
-    ".": {
-      "import": "./lib/index.js",
-      "require": "./lib/index.cjs"
-    }
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "files": [
-    "lib/",
-    "README.md",
-    "LICENSE"
-  ],
-  "scripts": {
-    "build": "microbundle --target node -f esm,cjs --strict --generateTypes=false --sourcemap",
-    "prepare": "npm run build",
-    "test": "npm run build && NODE_ENV=test c8 mocha 'test/index.test.js' 'test/index.test.cjs' 'test/unit/**/*.js' 'test/seo-features.test.js' 'test/robots.test.js' 'test/llms.test.js' 'test/performance.test.js' 'test/card-extraction.test.js' 'test/author-fallback.test.js' -t 10000",
-    "test:esm": "npm run build && NODE_ENV=test c8 mocha test/index.test.js -t 10000",
-    "test:cjs": "npm run build && NODE_ENV=test c8 mocha test/index.test.cjs -t 10000",
-    "test:coverage": "npm test",
-    "lint": "eslint src test --fix",
-    "lint:check": "eslint src test",
-    "format": "prettier --write src",
-    "format:check": "prettier --check src",
-    "release:check": "npm run lint:check && npm run build && release-it --dry-run",
-    "release:patch": "./scripts/release.sh patch --ci",
-    "release:minor": "./scripts/release.sh minor --ci",
-    "release:major": "./scripts/release.sh major --ci"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/wernerglinka/metalsmith-seo.git"
-  },
   "keywords": [
     "metalsmith",
+    "metalsmith-plugin",
     "seo",
     "sitemap",
     "meta-tags",
     "open-graph"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wernerglinka/metalsmith-seo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wernerglinka/metalsmith-seo/issues"
+  },
+  "homepage": "https://github.com/wernerglinka/metalsmith-seo",
+  "license": "MIT",
   "author": {
     "name": "ExtraHop Networks",
     "url": "http://www.extrahop.com"
@@ -53,27 +26,50 @@
   "contributors": [
     {
       "name": "Aaron Boushley"
+    },
+    {
+      "name": "Werner Glinka",
+      "email": "werner@glinka.co"
     }
   ],
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/wernerglinka/metalsmith-seo/issues"
+  "type": "module",
+  "exports": "./src/index.js",
+  "files": [
+    "src/**/*.js",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "changelog": "auto-changelog -u --commit-limit false --ignore-commit-pattern '^((dev|chore|ci):|Release)'",
+    "test": "node --test --test-timeout=15000 'test/**/*.test.js'",
+    "coverage": "mkdir -p coverage && node --test --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage/lcov.info --test-timeout=15000 'test/**/*.test.js'",
+    "test:coverage": "npm run coverage",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome check --write .",
+    "lint:check": "biome check .",
+    "pre-release": "npm run lint:check && npm run format:check && npm test && npx metalsmith-plugin-mcp-server validate .",
+    "release:patch": "./scripts/release.sh patch --ci",
+    "release:minor": "./scripts/release.sh minor --ci",
+    "release:major": "./scripts/release.sh major --ci",
+    "release:check": "npm run lint:check && release-it --dry-run",
+    "depcheck": "depcheck"
   },
-  "homepage": "https://github.com/wernerglinka/metalsmith-seo",
   "dependencies": {
     "cheerio": "^1.2.0"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
+    "@biomejs/biome": "^2.4.12",
     "assert-dir-equal": "^1.1.0",
     "auto-changelog": "^2.5.0",
-    "c8": "^11.0.0",
-    "eslint": "^10.2.0",
-    "globals": "^17.5.0",
+    "depcheck": "^1.4.0",
     "metalsmith": "^2.7.0",
-    "microbundle": "^0.15.1",
-    "mocha": "^11.7.5",
-    "prettier": "^3.8.2",
-    "release-it": "^19.2.4"
+    "release-it": "^20.0.0"
+  },
+  "engines": {
+    "node": ">= 22.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

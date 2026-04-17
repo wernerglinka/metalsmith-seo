@@ -2,8 +2,8 @@
  * @fileoverview URL building and validation utilities for sitemap generation.
  */
 
-import path from "path";
-import { get } from "../utils/object-utils.js";
+import path from 'path';
+import { get } from '../utils/object-utils.js';
 
 /**
  * Determines whether a file should be included in the sitemap.
@@ -15,13 +15,7 @@ import { get } from "../utils/object-utils.js";
  * @param {string} privateProperty - Property name to check if file should be excluded
  * @returns {boolean} True if file should be processed, false otherwise
  */
-export function checkFile(
-  file,
-  frontmatter,
-  metalsmith,
-  pattern,
-  privateProperty,
-) {
+export function checkFile(file, frontmatter, metalsmith, pattern, privateProperty) {
   // Only process files that match the pattern
   const matchResult = metalsmith.match(pattern, file);
   if (!matchResult || matchResult.length === 0) {
@@ -51,12 +45,12 @@ export function buildUrl(file, frontmatter, options) {
 
   // Frontmatter settings take precedence
   const canonicalUrl = get(frontmatter, urlProperty);
-  if (typeof canonicalUrl === "string") {
+  if (typeof canonicalUrl === 'string') {
     return canonicalUrl;
   }
 
   // Remove index.html if necessary
-  const indexFile = "index.html";
+  const indexFile = 'index.html';
   if (omitIndex && path.basename(file) === indexFile) {
     return replaceBackslash(file.slice(0, 0 - indexFile.length));
   }
@@ -72,5 +66,5 @@ export function buildUrl(file, frontmatter, options) {
  * @returns {string} Normalized path with forward slashes
  */
 export function replaceBackslash(url) {
-  return url.replace(/\\/g, "/");
+  return url.replace(/\\/g, '/');
 }

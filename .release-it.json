@@ -1,6 +1,6 @@
 {
   "hooks": {
-    "before:init": ["npm test", "npm run lint"],
+    "before:init": ["npm run lint", "npm test"],
     "after:bump": "npx auto-changelog -p --commit-limit false --ignore-commit-pattern '^((dev|chore|ci):|Release)' && git add CHANGELOG.md",
     "after:release": "echo Successfully released ${name} v${version} to ${repo.repository}."
   },

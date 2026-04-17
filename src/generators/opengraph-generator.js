@@ -4,21 +4,21 @@
 
 // Image type mapping for Open Graph images
 const IMAGE_TYPE_MAP = {
-  jpg: "image/jpeg",
-  jpeg: "image/jpeg",
-  png: "image/png",
-  gif: "image/gif",
-  webp: "image/webp",
-  svg: "image/svg+xml",
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  gif: 'image/gif',
+  webp: 'image/webp',
+  svg: 'image/svg+xml'
 };
 
 // Content type to Open Graph type mapping
 const OG_TYPE_MAP = {
-  article: "article",
-  product: "product",
-  profile: "profile",
-  page: "website",
-  "local-business": "business.business",
+  article: 'article',
+  product: 'product',
+  profile: 'profile',
+  page: 'website',
+  'local-business': 'business.business'
 };
 
 /**
@@ -40,13 +40,13 @@ export function generateOpenGraphTags(metadata, siteConfig = {}) {
 
   // Type-specific tags
   switch (metadata.type) {
-    case "article":
+    case 'article':
       addArticleOpenGraphTags(metaTags, metadata);
       break;
-    case "product":
+    case 'product':
       addProductOpenGraphTags(metaTags, metadata);
       break;
-    case "profile":
+    case 'profile':
       addProfileOpenGraphTags(metaTags, metadata);
       break;
     default:
@@ -70,39 +70,39 @@ function addCoreOpenGraphTags(metaTags, metadata, siteConfig) {
   // og:title (required)
   if (metadata.title) {
     metaTags.push({
-      property: "og:title",
-      content: metadata.title,
+      property: 'og:title',
+      content: metadata.title
     });
   }
 
   // og:type (required)
   const ogType = mapContentTypeToOGType(metadata.type);
   metaTags.push({
-    property: "og:type",
-    content: ogType,
+    property: 'og:type',
+    content: ogType
   });
 
   // og:url (required)
   if (metadata.canonicalURL) {
     metaTags.push({
-      property: "og:url",
-      content: metadata.canonicalURL,
+      property: 'og:url',
+      content: metadata.canonicalURL
     });
   }
 
   // og:description
   if (metadata.description) {
     metaTags.push({
-      property: "og:description",
-      content: metadata.description,
+      property: 'og:description',
+      content: metadata.description
     });
   }
 
   // og:image (recommended)
   if (metadata.image) {
     metaTags.push({
-      property: "og:image",
-      content: metadata.image,
+      property: 'og:image',
+      content: metadata.image
     });
 
     // Add image metadata if available
@@ -112,16 +112,16 @@ function addCoreOpenGraphTags(metaTags, metadata, siteConfig) {
   // og:site_name
   if (siteConfig.siteName) {
     metaTags.push({
-      property: "og:site_name",
-      content: siteConfig.siteName,
+      property: 'og:site_name',
+      content: siteConfig.siteName
     });
   }
 
   // og:locale
-  const locale = siteConfig.locale || siteConfig.language || "en_US";
+  const locale = siteConfig.locale || siteConfig.language || 'en_US';
   metaTags.push({
-    property: "og:locale",
-    content: locale,
+    property: 'og:locale',
+    content: locale
   });
 }
 
@@ -137,20 +137,20 @@ function addImageMetadata(metaTags, metadata, siteConfig) {
   const defaultHeight = siteConfig.ogImageHeight || 630;
 
   metaTags.push({
-    property: "og:image:width",
-    content: String(defaultWidth),
+    property: 'og:image:width',
+    content: String(defaultWidth)
   });
 
   metaTags.push({
-    property: "og:image:height",
-    content: String(defaultHeight),
+    property: 'og:image:height',
+    content: String(defaultHeight)
   });
 
   // Image alt text (accessibility)
-  const imageAlt = metadata.imageAlt || metadata.title || "Image";
+  const imageAlt = metadata.imageAlt || metadata.title || 'Image';
   metaTags.push({
-    property: "og:image:alt",
-    content: imageAlt,
+    property: 'og:image:alt',
+    content: imageAlt
   });
 
   // Image type (if known)
@@ -158,8 +158,8 @@ function addImageMetadata(metaTags, metadata, siteConfig) {
     const imageType = getImageType(metadata.image);
     if (imageType) {
       metaTags.push({
-        property: "og:image:type",
-        content: imageType,
+        property: 'og:image:type',
+        content: imageType
       });
     }
   }
@@ -174,32 +174,32 @@ function addArticleOpenGraphTags(metaTags, metadata) {
   // article:published_time
   if (metadata.publishDate) {
     metaTags.push({
-      property: "article:published_time",
-      content: new Date(metadata.publishDate).toISOString(),
+      property: 'article:published_time',
+      content: new Date(metadata.publishDate).toISOString()
     });
   }
 
   // article:modified_time
   if (metadata.modifiedDate) {
     metaTags.push({
-      property: "article:modified_time",
-      content: new Date(metadata.modifiedDate).toISOString(),
+      property: 'article:modified_time',
+      content: new Date(metadata.modifiedDate).toISOString()
     });
   }
 
   // article:author
   if (metadata.author) {
     metaTags.push({
-      property: "article:author",
-      content: metadata.author,
+      property: 'article:author',
+      content: metadata.author
     });
   }
 
   // article:section
   if (metadata.section) {
     metaTags.push({
-      property: "article:section",
-      content: metadata.section,
+      property: 'article:section',
+      content: metadata.section
     });
   }
 
@@ -207,8 +207,8 @@ function addArticleOpenGraphTags(metaTags, metadata) {
   if (metadata.keywords && metadata.keywords.length > 0) {
     metadata.keywords.forEach((tag) => {
       metaTags.push({
-        property: "article:tag",
-        content: tag,
+        property: 'article:tag',
+        content: tag
       });
     });
   }
@@ -216,8 +216,8 @@ function addArticleOpenGraphTags(metaTags, metadata) {
   // Reading time (custom property)
   if (metadata.readingTime) {
     metaTags.push({
-      property: "article:reading_time",
-      content: metadata.readingTime,
+      property: 'article:reading_time',
+      content: metadata.readingTime
     });
   }
 }
@@ -231,40 +231,40 @@ function addProductOpenGraphTags(metaTags, metadata) {
   // product:brand
   if (metadata.brand) {
     metaTags.push({
-      property: "product:brand",
-      content: metadata.brand,
+      property: 'product:brand',
+      content: metadata.brand
     });
   }
 
   // product:availability
   if (metadata.availability) {
     metaTags.push({
-      property: "product:availability",
-      content: metadata.availability,
+      property: 'product:availability',
+      content: metadata.availability
     });
   }
 
   // product:condition
   if (metadata.condition) {
     metaTags.push({
-      property: "product:condition",
-      content: metadata.condition,
+      property: 'product:condition',
+      content: metadata.condition
     });
   }
 
   // product:price
   if (metadata.price) {
     metaTags.push({
-      property: "product:price:amount",
-      content: String(metadata.price),
+      property: 'product:price:amount',
+      content: String(metadata.price)
     });
   }
 
   // product:price:currency
   if (metadata.currency) {
     metaTags.push({
-      property: "product:price:currency",
-      content: metadata.currency,
+      property: 'product:price:currency',
+      content: metadata.currency
     });
   }
 }
@@ -278,24 +278,24 @@ function addProfileOpenGraphTags(metaTags, metadata) {
   // profile:first_name
   if (metadata.firstName) {
     metaTags.push({
-      property: "profile:first_name",
-      content: metadata.firstName,
+      property: 'profile:first_name',
+      content: metadata.firstName
     });
   }
 
   // profile:last_name
   if (metadata.lastName) {
     metaTags.push({
-      property: "profile:last_name",
-      content: metadata.lastName,
+      property: 'profile:last_name',
+      content: metadata.lastName
     });
   }
 
   // profile:username
   if (metadata.username) {
     metaTags.push({
-      property: "profile:username",
-      content: metadata.username,
+      property: 'profile:username',
+      content: metadata.username
     });
   }
 }
@@ -309,21 +309,19 @@ function addSiteOpenGraphTags(metaTags, siteConfig) {
   // Facebook App ID
   if (siteConfig.facebookAppId) {
     metaTags.push({
-      property: "fb:app_id",
-      content: siteConfig.facebookAppId,
+      property: 'fb:app_id',
+      content: siteConfig.facebookAppId
     });
   }
 
   // Facebook Admins
   if (siteConfig.facebookAdmins) {
-    const admins = Array.isArray(siteConfig.facebookAdmins)
-      ? siteConfig.facebookAdmins
-      : [siteConfig.facebookAdmins];
+    const admins = Array.isArray(siteConfig.facebookAdmins) ? siteConfig.facebookAdmins : [siteConfig.facebookAdmins];
 
     admins.forEach((admin) => {
       metaTags.push({
-        property: "fb:admins",
-        content: String(admin),
+        property: 'fb:admins',
+        content: String(admin)
       });
     });
   }
@@ -335,7 +333,7 @@ function addSiteOpenGraphTags(metaTags, siteConfig) {
  * @returns {string} Open Graph type
  */
 function mapContentTypeToOGType(contentType) {
-  return OG_TYPE_MAP[contentType] || "website";
+  return OG_TYPE_MAP[contentType] || 'website';
 }
 
 /**
@@ -344,7 +342,7 @@ function mapContentTypeToOGType(contentType) {
  * @returns {string|null} MIME type
  */
 function getImageType(imageUrl) {
-  const extension = imageUrl.split(".").pop()?.toLowerCase();
+  const extension = imageUrl.split('.').pop()?.toLowerCase();
   return IMAGE_TYPE_MAP[extension] || null;
 }
 
@@ -360,7 +358,7 @@ export function openGraphTagsToHtml(metaTags) {
       const content = escapeHtml(tag.content);
       return `<meta property="${property}" content="${content}">`;
     })
-    .join("\n");
+    .join('\n');
 }
 
 /**
@@ -369,14 +367,14 @@ export function openGraphTagsToHtml(metaTags) {
  * @returns {string} Escaped string
  */
 function escapeHtml(str) {
-  if (typeof str !== "string") {
+  if (typeof str !== 'string') {
     return String(str);
   }
 
   return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }

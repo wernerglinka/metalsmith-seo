@@ -24,16 +24,16 @@ export function generateTwitterCardTags(metadata, siteConfig = {}) {
 
   // Card type-specific tags
   switch (cardType) {
-    case "summary_large_image":
+    case 'summary_large_image':
       addSummaryLargeImageTags(metaTags, metadata);
       break;
-    case "summary":
+    case 'summary':
       addSummaryTags(metaTags, metadata);
       break;
-    case "app":
+    case 'app':
       addAppTags(metaTags, metadata, siteConfig);
       break;
-    case "player":
+    case 'player':
       addPlayerTags(metaTags, metadata);
       break;
     default:
@@ -63,18 +63,18 @@ function determineCardType(metadata, siteConfig) {
 
   // Auto-determine based on content
   if (metadata.image) {
-    return "summary_large_image";
+    return 'summary_large_image';
   }
 
-  if (metadata.type === "video" || metadata.videoUrl) {
-    return "player";
+  if (metadata.type === 'video' || metadata.videoUrl) {
+    return 'player';
   }
 
-  if (metadata.type === "app" || metadata.appId) {
-    return "app";
+  if (metadata.type === 'app' || metadata.appId) {
+    return 'app';
   }
 
-  return "summary";
+  return 'summary';
 }
 
 /**
@@ -87,15 +87,15 @@ function determineCardType(metadata, siteConfig) {
 function addCoreTwitterTags(metaTags, metadata, siteConfig, cardType) {
   // twitter:card (required)
   metaTags.push({
-    name: "twitter:card",
-    content: cardType,
+    name: 'twitter:card',
+    content: cardType
   });
 
   // twitter:site (recommended)
   if (siteConfig.twitterSite) {
     metaTags.push({
-      name: "twitter:site",
-      content: ensureTwitterHandle(siteConfig.twitterSite),
+      name: 'twitter:site',
+      content: ensureTwitterHandle(siteConfig.twitterSite)
     });
   }
 
@@ -103,15 +103,12 @@ function addCoreTwitterTags(metaTags, metadata, siteConfig, cardType) {
   // Only fall back to metadata.author if it looks like a Twitter handle.
   // metadata.author is often populated from siteOwner (a real name like
   // "Werner Glinka"), which would produce an invalid "@Werner Glinka" handle.
-  const authorCandidate = isLikelyTwitterHandle(metadata.author)
-    ? metadata.author
-    : null;
-  const creator =
-    metadata.twitterCreator || authorCandidate || siteConfig.twitterCreator;
+  const authorCandidate = isLikelyTwitterHandle(metadata.author) ? metadata.author : null;
+  const creator = metadata.twitterCreator || authorCandidate || siteConfig.twitterCreator;
   if (creator) {
     metaTags.push({
-      name: "twitter:creator",
-      content: ensureTwitterHandle(creator),
+      name: 'twitter:creator',
+      content: ensureTwitterHandle(creator)
     });
   }
 
@@ -120,8 +117,8 @@ function addCoreTwitterTags(metaTags, metadata, siteConfig, cardType) {
     // Twitter titles should be shorter than OG titles
     const twitterTitle = truncateTitle(metadata.title, 70);
     metaTags.push({
-      name: "twitter:title",
-      content: twitterTitle,
+      name: 'twitter:title',
+      content: twitterTitle
     });
   }
 
@@ -129,13 +126,10 @@ function addCoreTwitterTags(metaTags, metadata, siteConfig, cardType) {
   if (metadata.description) {
     // Twitter descriptions should be shorter
     const maxLength = siteConfig.twitterDescriptionLength || 200;
-    const twitterDescription = truncateDescription(
-      metadata.description,
-      maxLength,
-    );
+    const twitterDescription = truncateDescription(metadata.description, maxLength);
     metaTags.push({
-      name: "twitter:description",
-      content: twitterDescription,
+      name: 'twitter:description',
+      content: twitterDescription
     });
   }
 }
@@ -148,15 +142,15 @@ function addCoreTwitterTags(metaTags, metadata, siteConfig, cardType) {
 function addSummaryLargeImageTags(metaTags, metadata) {
   if (metadata.image) {
     metaTags.push({
-      name: "twitter:image",
-      content: metadata.image,
+      name: 'twitter:image',
+      content: metadata.image
     });
 
     // Image alt text (accessibility)
-    const imageAlt = metadata.imageAlt || metadata.title || "Image";
+    const imageAlt = metadata.imageAlt || metadata.title || 'Image';
     metaTags.push({
-      name: "twitter:image:alt",
-      content: imageAlt,
+      name: 'twitter:image:alt',
+      content: imageAlt
     });
   }
 }
@@ -169,15 +163,15 @@ function addSummaryLargeImageTags(metaTags, metadata) {
 function addSummaryTags(metaTags, metadata) {
   if (metadata.image) {
     metaTags.push({
-      name: "twitter:image",
-      content: metadata.image,
+      name: 'twitter:image',
+      content: metadata.image
     });
 
     // Image alt text (accessibility)
-    const imageAlt = metadata.imageAlt || metadata.title || "Image";
+    const imageAlt = metadata.imageAlt || metadata.title || 'Image';
     metaTags.push({
-      name: "twitter:image:alt",
-      content: imageAlt,
+      name: 'twitter:image:alt',
+      content: imageAlt
     });
   }
 }
@@ -192,42 +186,42 @@ function addAppTags(metaTags, metadata, siteConfig) {
   // iOS app
   if (metadata.iosAppId || siteConfig.iosAppId) {
     metaTags.push({
-      name: "twitter:app:id:iphone",
-      content: metadata.iosAppId || siteConfig.iosAppId,
+      name: 'twitter:app:id:iphone',
+      content: metadata.iosAppId || siteConfig.iosAppId
     });
   }
 
   if (metadata.iosAppUrl || siteConfig.iosAppUrl) {
     metaTags.push({
-      name: "twitter:app:url:iphone",
-      content: metadata.iosAppUrl || siteConfig.iosAppUrl,
+      name: 'twitter:app:url:iphone',
+      content: metadata.iosAppUrl || siteConfig.iosAppUrl
     });
   }
 
   // Android app
   if (metadata.androidAppId || siteConfig.androidAppId) {
     metaTags.push({
-      name: "twitter:app:id:googleplay",
-      content: metadata.androidAppId || siteConfig.androidAppId,
+      name: 'twitter:app:id:googleplay',
+      content: metadata.androidAppId || siteConfig.androidAppId
     });
   }
 
   if (metadata.androidAppUrl || siteConfig.androidAppUrl) {
     metaTags.push({
-      name: "twitter:app:url:googleplay",
-      content: metadata.androidAppUrl || siteConfig.androidAppUrl,
+      name: 'twitter:app:url:googleplay',
+      content: metadata.androidAppUrl || siteConfig.androidAppUrl
     });
   }
 
   // App name
   if (metadata.appName || siteConfig.appName) {
     metaTags.push({
-      name: "twitter:app:name:iphone",
-      content: metadata.appName || siteConfig.appName,
+      name: 'twitter:app:name:iphone',
+      content: metadata.appName || siteConfig.appName
     });
     metaTags.push({
-      name: "twitter:app:name:googleplay",
-      content: metadata.appName || siteConfig.appName,
+      name: 'twitter:app:name:googleplay',
+      content: metadata.appName || siteConfig.appName
     });
   }
 }
@@ -240,37 +234,37 @@ function addAppTags(metaTags, metadata, siteConfig) {
 function addPlayerTags(metaTags, metadata) {
   if (metadata.videoUrl) {
     metaTags.push({
-      name: "twitter:player",
-      content: metadata.videoUrl,
+      name: 'twitter:player',
+      content: metadata.videoUrl
     });
   }
 
   if (metadata.videoWidth) {
     metaTags.push({
-      name: "twitter:player:width",
-      content: String(metadata.videoWidth),
+      name: 'twitter:player:width',
+      content: String(metadata.videoWidth)
     });
   }
 
   if (metadata.videoHeight) {
     metaTags.push({
-      name: "twitter:player:height",
-      content: String(metadata.videoHeight),
+      name: 'twitter:player:height',
+      content: String(metadata.videoHeight)
     });
   }
 
   if (metadata.videoStreamUrl) {
     metaTags.push({
-      name: "twitter:player:stream",
-      content: metadata.videoStreamUrl,
+      name: 'twitter:player:stream',
+      content: metadata.videoStreamUrl
     });
   }
 
   // Player image (thumbnail)
   if (metadata.image) {
     metaTags.push({
-      name: "twitter:image",
-      content: metadata.image,
+      name: 'twitter:image',
+      content: metadata.image
     });
   }
 }
@@ -284,7 +278,7 @@ function addPlayerTags(metaTags, metadata) {
  * @returns {boolean} True if the value is shaped like a Twitter handle
  */
 function isLikelyTwitterHandle(value) {
-  if (typeof value !== "string") {
+  if (typeof value !== 'string') {
     return false;
   }
   const trimmed = value.trim();
@@ -300,12 +294,12 @@ function isLikelyTwitterHandle(value) {
  * @returns {string} Formatted Twitter handle
  */
 function ensureTwitterHandle(handle) {
-  if (typeof handle !== "string") {
+  if (typeof handle !== 'string') {
     return String(handle);
   }
 
   const cleaned = handle.trim();
-  return cleaned.startsWith("@") ? cleaned : `@${cleaned}`;
+  return cleaned.startsWith('@') ? cleaned : `@${cleaned}`;
 }
 
 /**
@@ -321,7 +315,7 @@ function truncateTitle(title, maxLength = 70) {
 
   // Find the last space before the limit
   const truncated = title.substring(0, maxLength);
-  const lastSpace = truncated.lastIndexOf(" ");
+  const lastSpace = truncated.lastIndexOf(' ');
 
   if (lastSpace > maxLength * 0.8) {
     return `${title.substring(0, lastSpace)}...`;
@@ -343,8 +337,8 @@ function truncateDescription(description, maxLength = 200) {
 
   // Find the last complete sentence within the limit
   const truncated = description.substring(0, maxLength);
-  const lastSentence = truncated.lastIndexOf(".");
-  const lastSpace = truncated.lastIndexOf(" ");
+  const lastSentence = truncated.lastIndexOf('.');
+  const lastSpace = truncated.lastIndexOf(' ');
 
   if (lastSentence > maxLength * 0.6) {
     return description.substring(0, lastSentence + 1);
@@ -369,7 +363,7 @@ export function twitterCardTagsToHtml(metaTags) {
       const content = escapeHtml(tag.content);
       return `<meta name="${name}" content="${content}">`;
     })
-    .join("\n");
+    .join('\n');
 }
 
 /**
@@ -378,14 +372,14 @@ export function twitterCardTagsToHtml(metaTags) {
  * @returns {string} Escaped string
  */
 function escapeHtml(str) {
-  if (typeof str !== "string") {
+  if (typeof str !== 'string') {
     return String(str);
   }
 
   return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }

@@ -22,11 +22,11 @@
  * License: MIT
  */
 
-import path from "path";
-import { get } from "../utils/object-utils.js";
-import { checkFile, buildUrl } from "./url-builder.js";
-import { calculatePriority, calculateChangefreq } from "./auto-calculator.js";
-import { generateSitemapXML } from "../utils/xml-generator.js";
+import path from 'path';
+import { get } from '../utils/object-utils.js';
+import { checkFile, buildUrl } from './url-builder.js';
+import { calculatePriority, calculateChangefreq } from './auto-calculator.js';
+import { generateSitemapXML } from '../utils/xml-generator.js';
 
 /**
  * @typedef {Object} SitemapOptions
@@ -118,13 +118,13 @@ export function processSitemap(files, metalsmith, options) {
         lastmod,
         links: linksOption,
         omitIndex,
-        output = "sitemap.xml",
-        pattern = "**/*.html",
+        output = 'sitemap.xml',
+        pattern = '**/*.html',
         priority,
-        urlProperty = "canonical",
-        modifiedProperty = "lastmod",
-        privateProperty = "private",
-        priorityProperty = "priority",
+        urlProperty = 'canonical',
+        modifiedProperty = 'lastmod',
+        privateProperty = 'private',
+        priorityProperty = 'priority'
       } = options;
 
       const links = [];
@@ -150,9 +150,7 @@ export function processSitemap(files, metalsmith, options) {
         }
 
         // Only process files that pass the check
-        if (
-          !checkFile(file, frontmatter, metalsmith, pattern, privateProperty)
-        ) {
+        if (!checkFile(file, frontmatter, metalsmith, pattern, privateProperty)) {
           return;
         }
 
@@ -164,7 +162,7 @@ export function processSitemap(files, metalsmith, options) {
           const d = new Date(lastmodValue);
           d.setUTCHours(0, 0, 0, 0);
           lastmodValue = d.toISOString();
-        } else if (typeof lastmodValue === "string") {
+        } else if (typeof lastmodValue === 'string') {
           // Parse the date string
           const parsed = new Date(lastmodValue);
           if (!isNaN(parsed.getTime())) {
@@ -184,7 +182,7 @@ export function processSitemap(files, metalsmith, options) {
            */
           entryChangefreq = calculateChangefreq(file, frontmatter, {
             modifiedProperty,
-            lastmod,
+            lastmod
           });
           entryPriority = calculatePriority(file);
         } else {
@@ -201,14 +199,14 @@ export function processSitemap(files, metalsmith, options) {
             changefreq: entryChangefreq,
             priority: entryPriority,
             lastmod: lastmodValue,
-            links: linksOption ? get(frontmatter, linksOption) : undefined,
-          }).filter(([value]) => value !== undefined),
+            links: linksOption ? get(frontmatter, linksOption) : undefined
+          }).filter(([value]) => value !== undefined)
         );
 
         // Add the url (which is allowed to be falsy)
         entry.url = buildUrl(file, frontmatter, {
           urlProperty,
-          omitIndex,
+          omitIndex
         });
 
         // Add the entry to the links array
@@ -220,7 +218,7 @@ export function processSitemap(files, metalsmith, options) {
 
       // Add the sitemap file to the files object
       files[output] = {
-        contents: Buffer.from(sitemapContent, "utf-8"),
+        contents: Buffer.from(sitemapContent, 'utf-8')
       };
 
       resolve();

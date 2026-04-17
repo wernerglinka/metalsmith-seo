@@ -15,15 +15,11 @@ function getNestedProperty(obj, path) {
     return undefined;
   }
 
-  const parts = path.split(".");
+  const parts = path.split('.');
   let current = obj;
 
   for (const part of parts) {
-    if (
-      current === null ||
-      current === undefined ||
-      typeof current !== "object"
-    ) {
+    if (current === null || current === undefined || typeof current !== 'object') {
       return undefined;
     }
     current = current[part];
@@ -56,10 +52,10 @@ function pickDefined(source, mapping) {
  * @returns {Object} Object with deduced siteName and description
  */
 function deduceSiteMetadata(files, seoProperty, pluginDefaults) {
-  let deducedSiteName = "";
-  let deducedDescription = "";
+  let deducedSiteName = '';
+  let deducedDescription = '';
 
-  const indexFile = files["index.html"] || files["index.md"];
+  const indexFile = files['index.html'] || files['index.md'];
   if (indexFile) {
     // Deduce site name if no plugin default title exists
     if (!pluginDefaults?.title) {
@@ -75,10 +71,7 @@ function deduceSiteMetadata(files, seoProperty, pluginDefaults) {
       // 1. [seoProperty].description (SEO-specific description, e.g., seo.description)
       // 2. description (root-level description)
       // 3. excerpt (common in blog posts)
-      deducedDescription =
-        indexFile[seoProperty]?.description ||
-        indexFile.description ||
-        indexFile.excerpt;
+      deducedDescription = indexFile[seoProperty]?.description || indexFile.description || indexFile.excerpt;
     }
   }
 
@@ -95,18 +88,14 @@ function deduceSiteMetadata(files, seoProperty, pluginDefaults) {
  */
 export function buildConfig(pluginOptions, siteMetadata, files, seoProperty) {
   const hasSiteMetadata = Object.keys(siteMetadata).length > 0;
-  let deducedSiteName = "";
-  let deducedDescription = "";
+  let deducedSiteName = '';
+  let deducedDescription = '';
 
   // Attempt to deduce site name and description when no site metadata exists
   // and no plugin defaults are provided. These fallbacks help provide reasonable
   // values for social media and SEO tags
   if (!hasSiteMetadata) {
-    const deduced = deduceSiteMetadata(
-      files,
-      seoProperty,
-      pluginOptions.defaults,
-    );
+    const deduced = deduceSiteMetadata(files, seoProperty, pluginOptions.defaults);
     deducedSiteName = deduced.deducedSiteName;
     deducedDescription = deduced.deducedDescription;
   }
@@ -116,78 +105,55 @@ export function buildConfig(pluginOptions, siteMetadata, files, seoProperty) {
     // Site-wide defaults from site.json or deduced
     hostname: siteMetadata.url || pluginOptions.hostname,
     defaults: {
-      title:
-        pluginOptions.defaults?.title || siteMetadata.title || deducedSiteName,
-      description:
-        pluginOptions.defaults?.description ||
-        siteMetadata.description ||
-        deducedDescription,
-      socialImage:
-        pluginOptions.defaults?.socialImage ||
-        siteMetadata.socialImage ||
-        siteMetadata.defaultImage ||
-        "",
-      siteOwner:
-        pluginOptions.defaults?.siteOwner || siteMetadata.siteOwner || "",
-      ...(pluginOptions.defaults || {}),
+      title: pluginOptions.defaults?.title || siteMetadata.title || deducedSiteName,
+      description: pluginOptions.defaults?.description || siteMetadata.description || deducedDescription,
+      socialImage: pluginOptions.defaults?.socialImage || siteMetadata.socialImage || siteMetadata.defaultImage || '',
+      siteOwner: pluginOptions.defaults?.siteOwner || siteMetadata.siteOwner || '',
+      ...(pluginOptions.defaults || {})
     },
     social: {
-      siteName:
-        pluginOptions.social?.siteName ||
-        siteMetadata.name ||
-        siteMetadata.title ||
-        deducedSiteName,
-      locale: pluginOptions.social?.locale || siteMetadata.locale || "en_US",
+      siteName: pluginOptions.social?.siteName || siteMetadata.name || siteMetadata.title || deducedSiteName,
+      locale: pluginOptions.social?.locale || siteMetadata.locale || 'en_US',
       twitterSite: pluginOptions.social?.twitterSite || siteMetadata.twitter,
-      facebookAppId:
-        pluginOptions.social?.facebookAppId || siteMetadata.facebookAppId,
+      facebookAppId: pluginOptions.social?.facebookAppId || siteMetadata.facebookAppId,
       ...(siteMetadata.social || {}),
-      ...(pluginOptions.social || {}),
+      ...(pluginOptions.social || {})
     },
     jsonLd: {
-      organization:
-        pluginOptions.jsonLd?.organization || siteMetadata.organization,
+      organization: pluginOptions.jsonLd?.organization || siteMetadata.organization,
       ...(siteMetadata.jsonLd || {}),
-      ...(pluginOptions.jsonLd || {}),
+      ...(pluginOptions.jsonLd || {})
     },
 
     // Plugin-specific options (not typically in site.json)
     seoProperty,
-    enableSitemap:
-      pluginOptions.enableSitemap !== undefined
-        ? pluginOptions.enableSitemap
-        : true,
-    enableRobots:
-      pluginOptions.enableRobots !== undefined
-        ? pluginOptions.enableRobots
-        : true,
+    enableSitemap: pluginOptions.enableSitemap !== undefined ? pluginOptions.enableSitemap : true,
+    enableRobots: pluginOptions.enableRobots !== undefined ? pluginOptions.enableRobots : true,
     enableLlms:
       pluginOptions.enableLlms !== undefined
         ? pluginOptions.enableLlms
-        : Boolean(
-            pluginOptions.llms?.enabled || siteMetadata.llms?.enabled || false,
-          ),
+        : Boolean(pluginOptions.llms?.enabled || siteMetadata.llms?.enabled || false),
     batchSize: pluginOptions.batchSize || 10,
 
     // Fallback mappings
     fallbacks: pluginOptions.fallbacks || {
-      title: "title",
-      description: "excerpt",
-      image: "featured_image",
-      author: "author",
+      title: 'title',
+      description: 'excerpt',
+      image: 'featured_image',
+      author: 'author'
     },
 
     // Complete sitemap configuration - merge all sources once with defaults
     // Priority: pluginOptions.sitemap > pluginOptions (legacy) > siteMetadata.sitemap > defaults
     sitemap: {
       // Defaults
-      output: "sitemap.xml",
-      pattern: "**/*.html",
+      output: 'sitemap.xml',
+      pattern: '**/*.html',
       omitIndex: false,
-      urlProperty: "canonical",
-      modifiedProperty: "lastmod",
-      privateProperty: "private",
-      priorityProperty: "priority",
+      urlProperty: 'canonical',
+      modifiedProperty: 'lastmod',
+      privateProperty: 'private',
+      priorityProperty: 'priority',
       auto: true,
 
       // Merge site metadata
@@ -195,40 +161,40 @@ export function buildConfig(pluginOptions, siteMetadata, files, seoProperty) {
 
       // Apply legacy root-level options (for backward compatibility)
       ...pickDefined(pluginOptions, {
-        output: "output",
-        pattern: "pattern",
-        omitIndex: "omitIndex",
-        changefreq: "changefreq",
-        priority: "priority",
-        lastmod: "lastmod",
-        links: "links",
-        urlProperty: "urlProperty",
-        modifiedProperty: "modifiedProperty",
-        privateProperty: "privateProperty",
-        priorityProperty: "priorityProperty",
-        auto: "auto",
+        output: 'output',
+        pattern: 'pattern',
+        omitIndex: 'omitIndex',
+        changefreq: 'changefreq',
+        priority: 'priority',
+        lastmod: 'lastmod',
+        links: 'links',
+        urlProperty: 'urlProperty',
+        modifiedProperty: 'modifiedProperty',
+        privateProperty: 'privateProperty',
+        priorityProperty: 'priorityProperty',
+        auto: 'auto'
       }),
 
       // Override with explicit sitemap config (highest priority)
-      ...(pluginOptions.sitemap || {}),
+      ...(pluginOptions.sitemap || {})
     },
 
     // Complete llms.txt configuration with defaults
     llms: {
       // Defaults
-      output: "llms.txt",
+      output: 'llms.txt',
       fullText: false,
-      fullTextOutput: "llms-full.txt",
-      pattern: "**/*.html",
-      privateProperty: "private",
+      fullTextOutput: 'llms-full.txt',
+      pattern: '**/*.html',
+      privateProperty: 'private',
       perLocale: false,
-      sort: "date-desc",
+      sort: 'date-desc',
 
       // Merge site metadata
       ...(siteMetadata.llms || {}),
 
       // Override with explicit llms config
-      ...(pluginOptions.llms || {}),
+      ...(pluginOptions.llms || {})
     },
 
     // Complete robots configuration with defaults
@@ -237,14 +203,14 @@ export function buildConfig(pluginOptions, siteMetadata, files, seoProperty) {
       generateRobots: true,
       addSitemapReference: true,
       disallowPaths: [],
-      userAgent: "*",
+      userAgent: '*',
 
       // Merge site metadata
       ...(siteMetadata.robots || {}),
 
       // Override with explicit robots config
-      ...(pluginOptions.robots || {}),
-    },
+      ...(pluginOptions.robots || {})
+    }
   };
 
   return config;
@@ -258,11 +224,8 @@ export function buildConfig(pluginOptions, siteMetadata, files, seoProperty) {
  */
 export function validateConfig(config, metadataPath) {
   if (!config.hostname) {
-    const metadataHint =
-      metadataPath === "site" ? "site.url" : `${metadataPath}.url`;
-    throw new Error(
-      `[metalsmith-seo] hostname is required (set in plugin options or ${metadataHint} in metadata)`,
-    );
+    const metadataHint = metadataPath === 'site' ? 'site.url' : `${metadataPath}.url`;
+    throw new Error(`[metalsmith-seo] hostname is required (set in plugin options or ${metadataHint} in metadata)`);
   }
 }
 

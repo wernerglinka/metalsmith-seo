@@ -10,10 +10,10 @@
  * @returns {*} The property value or defaultValue
  */
 export const get = (obj, pathStr, defaultValue) => {
-  if (!obj || !pathStr || typeof pathStr !== "string") {
+  if (!obj || !pathStr || typeof pathStr !== 'string') {
     return defaultValue;
   }
-  const keys = pathStr.split(".");
+  const keys = pathStr.split('.');
   let result = obj;
   for (const key of keys) {
     result = result?.[key];

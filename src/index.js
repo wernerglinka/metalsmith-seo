@@ -6,15 +6,11 @@
 /**
  * Dependencies
  */
-import { batchOptimizeHeads } from "./processors/head-optimizer.js";
-import { processSitemap } from "./processors/sitemap.js";
-import { processRobots } from "./processors/robots.js";
-import { processLlms } from "./processors/llms.js";
-import {
-  buildConfig,
-  validateConfig,
-  getNestedProperty,
-} from "./utils/config-builder.js";
+import { batchOptimizeHeads } from './processors/head-optimizer.js';
+import { processSitemap } from './processors/sitemap.js';
+import { processRobots } from './processors/robots.js';
+import { processLlms } from './processors/llms.js';
+import { buildConfig, validateConfig, getNestedProperty } from './utils/config-builder.js';
 
 /**
  * @typedef {Object} SeoOptions
@@ -126,7 +122,7 @@ function plugin(options = {}) {
   let pluginOptions = options;
 
   // Accept string option to specify the hostname
-  if (typeof pluginOptions === "string") {
+  if (typeof pluginOptions === 'string') {
     try {
       new URL(pluginOptions);
       pluginOptions = { hostname: pluginOptions };
@@ -144,14 +140,13 @@ function plugin(options = {}) {
    */
   return function (files, metalsmith, done) {
     // Get the metadata path (default to 'site')
-    const metadataPath = pluginOptions.metadataPath || "site";
+    const metadataPath = pluginOptions.metadataPath || 'site';
 
     // Get site metadata from the configured path
-    const siteMetadata =
-      getNestedProperty(metalsmith.metadata(), metadataPath) || {};
+    const siteMetadata = getNestedProperty(metalsmith.metadata(), metadataPath) || {};
 
     // Get the configurable SEO property name (defaults to "seo")
-    const seoProperty = pluginOptions.seoProperty || "seo";
+    const seoProperty = pluginOptions.seoProperty || 'seo';
 
     /**
      * Build the complete configuration
@@ -198,8 +193,7 @@ function plugin(options = {}) {
           config.llms.seoProperty = config.seoProperty;
           // Sensible header defaults pulled from site metadata
           if (!config.llms.title) {
-            config.llms.title =
-              config.social.siteName || config.defaults.title || "Site";
+            config.llms.title = config.social.siteName || config.defaults.title || 'Site';
           }
           if (!config.llms.description) {
             config.llms.description = config.defaults.description || undefined;
@@ -210,7 +204,7 @@ function plugin(options = {}) {
           // short/full forms ('en' vs 'en_US'). Set defaultLocale: '' to
           // disable root emission and keep every locale under its prefix.
           if (config.llms.defaultLocale === undefined) {
-            config.llms.defaultLocale = config.social?.locale || "";
+            config.llms.defaultLocale = config.social?.locale || '';
           }
           return processLlms(files, metalsmith, config.llms);
         }
@@ -221,7 +215,7 @@ function plugin(options = {}) {
 }
 
 // Set function name for better debugging
-Object.defineProperty(plugin, "name", { value: "metalsmith-seo" });
+Object.defineProperty(plugin, 'name', { value: 'metalsmith-seo' });
 
 /**
  * Metalsmith plugin factory function.

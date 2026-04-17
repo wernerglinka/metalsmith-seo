@@ -1,24 +1,26 @@
+import { describe, it, beforeEach } from 'node:test';
 import equal from 'assert-dir-equal';
 import Metalsmith from 'metalsmith';
 import seo from '../src/index.js';
 
-describe('metalsmith-seo', function(){
+describe('metalsmith-seo', () => {
   // Set timeout for the entire test suite
-  this.timeout(10000);
-  
+
   // These tests verify the comprehensive SEO plugin functionality
-  beforeEach(function() {
+  beforeEach(() => {
     // Set test environment to suppress console logs
     process.env.NODE_ENV = 'test';
     // Reset cache before each test to ensure clean state
   });
-  it('should generate sitemap.xml and optimize HTML for SEO', function(done){
+  it('should generate sitemap.xml and optimize HTML for SEO', (_t, done) => {
     Metalsmith('test/fixtures/html')
-      .use(seo({
-        hostname: 'http://www.website.com/',
-        auto: false
-      }))
-      .build(function(err){
+      .use(
+        seo({
+          hostname: 'http://www.website.com/',
+          auto: false
+        })
+      )
+      .build((err) => {
         if (err) {
           return done(err);
         }
@@ -27,14 +29,16 @@ describe('metalsmith-seo', function(){
       });
   });
 
-  it('should accept a string as the hostname', function(done){
+  it('should accept a string as the hostname', (_t, done) => {
     Metalsmith('test/fixtures/hostname')
       .destination('build')
-      .use(seo({
-        hostname: 'http://www.website.com/',
-        auto: false
-      }))
-      .build(function(err){
+      .use(
+        seo({
+          hostname: 'http://www.website.com/',
+          auto: false
+        })
+      )
+      .build((err) => {
         if (err) {
           return done(err);
         }
@@ -43,16 +47,18 @@ describe('metalsmith-seo', function(){
       });
   });
 
-  it('should accept defaults for changefreq and priority', function(done){
+  it('should accept defaults for changefreq and priority', (_t, done) => {
     Metalsmith('test/fixtures/defaults')
       .destination('build')
-      .use(seo({
-        hostname: 'http://www.website.com/',
-        changefreq: 'never',
-        priority: 0.1,
-        auto: false
-      }))
-      .build(function(err){
+      .use(
+        seo({
+          hostname: 'http://www.website.com/',
+          changefreq: 'never',
+          priority: 0.1,
+          auto: false
+        })
+      )
+      .build((err) => {
         if (err) {
           return done(err);
         }
@@ -61,17 +67,19 @@ describe('metalsmith-seo', function(){
       });
   });
 
-  it('should allow settings to be overridden from the frontmatter', function(done){
+  it('should allow settings to be overridden from the frontmatter', (_t, done) => {
     Metalsmith('test/fixtures/frontmatter')
       .destination('build')
-      .use(seo({
-        hostname: 'http://www.website.com/',
-        changefreq: 'never',
-        priority: 0.1,
-        lastmod: new Date(),
-        auto: false
-      }))
-      .build(function(err){
+      .use(
+        seo({
+          hostname: 'http://www.website.com/',
+          changefreq: 'never',
+          priority: 0.1,
+          lastmod: new Date(),
+          auto: false
+        })
+      )
+      .build((err) => {
         if (err) {
           return done(err);
         }
@@ -80,15 +88,17 @@ describe('metalsmith-seo', function(){
       });
   });
 
-  it('should allow the sitemap\'s location to be changed', function(done){
+  it("should allow the sitemap's location to be changed", (_t, done) => {
     Metalsmith('test/fixtures/output')
       .destination('build')
-      .use(seo({
-        hostname: 'http://www.website.com/',
-        output: 'mapsite.xml',
-        auto: false
-      }))
-      .build(function(err){
+      .use(
+        seo({
+          hostname: 'http://www.website.com/',
+          output: 'mapsite.xml',
+          auto: false
+        })
+      )
+      .build((err) => {
         if (err) {
           return done(err);
         }
@@ -97,15 +107,17 @@ describe('metalsmith-seo', function(){
       });
   });
 
-  it('should accept a pattern', function(done){
+  it('should accept a pattern', (_t, done) => {
     Metalsmith('test/fixtures/pattern')
       .destination('build')
-      .use(seo({
-        hostname: 'http://www.website.com/',
-        pattern: ['**/*.html', '**/*.hbs'],
-        auto: false
-      }))
-      .build(function(err){
+      .use(
+        seo({
+          hostname: 'http://www.website.com/',
+          pattern: ['**/*.html', '**/*.hbs'],
+          auto: false
+        })
+      )
+      .build((err) => {
         if (err) {
           return done(err);
         }
@@ -114,14 +126,16 @@ describe('metalsmith-seo', function(){
       });
   });
 
-  it('should allow a canonical url to be set', function(done){
+  it('should allow a canonical url to be set', (_t, done) => {
     Metalsmith('test/fixtures/canonical')
       .destination('build')
-      .use(seo({
-        hostname: 'http://www.website.com/',
-        auto: false
-      }))
-      .build(function(err){
+      .use(
+        seo({
+          hostname: 'http://www.website.com/',
+          auto: false
+        })
+      )
+      .build((err) => {
         if (err) {
           return done(err);
         }
@@ -130,15 +144,17 @@ describe('metalsmith-seo', function(){
       });
   });
 
-  it('should allow lastmod to be set', function(done){
+  it('should allow lastmod to be set', (_t, done) => {
     Metalsmith('test/fixtures/lastmod')
       .destination('build')
-      .use(seo({
-        hostname: 'http://www.website.com/',
-        lastmod: new Date('1995-12-17T12:24:00'),
-        auto: false
-      }))
-      .build(function(err){
+      .use(
+        seo({
+          hostname: 'http://www.website.com/',
+          lastmod: new Date('1995-12-17T12:24:00'),
+          auto: false
+        })
+      )
+      .build((err) => {
         if (err) {
           return done(err);
         }
@@ -147,17 +163,19 @@ describe('metalsmith-seo', function(){
       });
   });
 
-  it('should allow a canonical url, lastmod and priority to be set from custom property', function(done){
+  it('should allow a canonical url, lastmod and priority to be set from custom property', (_t, done) => {
     Metalsmith('test/fixtures/custom-frontmatter')
       .destination('build')
-      .use(seo({
-        hostname: 'http://www.website.com',
-        modifiedProperty: 'lastModified',
-        urlProperty: 'seo.canonical',
-        priorityProperty: 'order',
-        auto: false
-      }))
-      .build(function(err){
+      .use(
+        seo({
+          hostname: 'http://www.website.com',
+          modifiedProperty: 'lastModified',
+          urlProperty: 'seo.canonical',
+          priorityProperty: 'order',
+          auto: false
+        })
+      )
+      .build((err) => {
         if (err) {
           return done(err);
         }
@@ -166,15 +184,17 @@ describe('metalsmith-seo', function(){
       });
   });
 
-  it('should be able to omit index.html', function(done){
+  it('should be able to omit index.html', (_t, done) => {
     Metalsmith('test/fixtures/omitIndex')
       .destination('build')
-      .use(seo({
-        hostname: 'http://www.website.com/',
-        omitIndex: true,
-        auto: false
-      }))
-      .build(function(err){
+      .use(
+        seo({
+          hostname: 'http://www.website.com/',
+          omitIndex: true,
+          auto: false
+        })
+      )
+      .build((err) => {
         if (err) {
           return done(err);
         }
@@ -183,14 +203,16 @@ describe('metalsmith-seo', function(){
       });
   });
 
-  it('should ignore files marked as private', function(done){
+  it('should ignore files marked as private', (_t, done) => {
     Metalsmith('test/fixtures/private')
       .destination('build')
-      .use(seo({
-        hostname: 'http://www.website.com/',
-        auto: false
-      }))
-      .build(function(err){
+      .use(
+        seo({
+          hostname: 'http://www.website.com/',
+          auto: false
+        })
+      )
+      .build((err) => {
         if (err) {
           return done(err);
         }
@@ -199,15 +221,17 @@ describe('metalsmith-seo', function(){
       });
   });
 
-  it('should handle files with links', function(done){
+  it('should handle files with links', (_t, done) => {
     Metalsmith('test/fixtures/links')
       .destination('build')
-      .use(seo({
-        hostname: 'http://www.website.com/',
-        links: 'links',
-        auto: false
-      }))
-      .build(function(err){
+      .use(
+        seo({
+          hostname: 'http://www.website.com/',
+          links: 'links',
+          auto: false
+        })
+      )
+      .build((err) => {
         if (err) {
           return done(err);
         }
@@ -216,14 +240,16 @@ describe('metalsmith-seo', function(){
       });
   });
 
-  it('should replace win32 backslash by slash', function(done){
+  it('should replace win32 backslash by slash', (_t, done) => {
     Metalsmith('test/fixtures/win32-backslash')
       .destination('build')
-      .use(seo({
-        hostname: 'http://www.website.com/',
-        auto: false
-      }))
-      .build(function(err){
+      .use(
+        seo({
+          hostname: 'http://www.website.com/',
+          auto: false
+        })
+      )
+      .build((err) => {
         if (err) {
           return done(err);
         }
@@ -232,30 +258,32 @@ describe('metalsmith-seo', function(){
       });
   });
 
-  it('should enable auto mode by default and generate priority/changefreq/lastmod', function(done){
+  it('should enable auto mode by default and generate priority/changefreq/lastmod', (_t, done) => {
     Metalsmith('test/fixtures/hostname')
       .destination('build')
-      .use(seo({
-        hostname: 'http://www.website.com/'
-        // No auto: false - testing default behavior
-      }))
-      .build(function(err, files){
+      .use(
+        seo({
+          hostname: 'http://www.website.com/'
+          // No auto: false - testing default behavior
+        })
+      )
+      .build((err, files) => {
         if (err) {
           return done(err);
         }
-        
+
         // Verify sitemap.xml exists and contains auto-generated content
         const sitemapExists = files['sitemap.xml'] !== undefined;
         if (!sitemapExists) {
           return done(new Error('sitemap.xml was not generated'));
         }
-        
+
         const sitemapContent = files['sitemap.xml'].contents.toString();
-        
+
         // Check that auto-generated elements are present
         const hasPriority = sitemapContent.includes('<priority>');
         const hasChangefreq = sitemapContent.includes('<changefreq>');
-        
+
         if (!hasPriority) {
           return done(new Error('Auto-generated priority missing from sitemap'));
         }
@@ -263,7 +291,7 @@ describe('metalsmith-seo', function(){
           return done(new Error('Auto-generated changefreq missing from sitemap'));
         }
         // lastmod is optional and depends on file modification dates
-        
+
         done();
       });
   });

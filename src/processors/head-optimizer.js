@@ -2,11 +2,11 @@
  * @fileoverview Unified head optimizer that orchestrates all SEO metadata generation.
  */
 
-import { extractMetadata } from "./metadata-extractor.js";
-import { generateMetaTags } from "../generators/meta-generator.js";
-import { generateOpenGraphTags } from "../generators/opengraph-generator.js";
-import { generateTwitterCardTags } from "../generators/twitter-generator.js";
-import { generateJsonLd } from "../generators/jsonld-generator.js";
+import { extractMetadata } from './metadata-extractor.js';
+import { generateMetaTags } from '../generators/meta-generator.js';
+import { generateOpenGraphTags } from '../generators/opengraph-generator.js';
+import { generateTwitterCardTags } from '../generators/twitter-generator.js';
+import { generateJsonLd } from '../generators/jsonld-generator.js';
 import {
   createDocument,
   serializeDocument,
@@ -14,8 +14,8 @@ import {
   setTitleInDoc,
   setMetaInDoc,
   setLinkInDoc,
-  addScriptToDoc,
-} from "../utils/html-injector.js";
+  addScriptToDoc
+} from '../utils/html-injector.js';
 
 /**
  * @typedef {Object} HeadOptimizationOptions
@@ -47,14 +47,14 @@ import {
 export async function optimizeHead(filePath, frontmatter, options) {
   const {
     hostname,
-    seoProperty = "seo",
+    seoProperty = 'seo',
     defaults = {},
     fallbacks = {},
     social = {},
     jsonLd = {},
     cleanExisting = true,
     generateSitemap = true,
-    wordsPerMinute = 200,
+    wordsPerMinute = 200
   } = options;
 
   // Skip non-HTML files
@@ -62,7 +62,7 @@ export async function optimizeHead(filePath, frontmatter, options) {
     return {
       html: frontmatter.contents.toString(),
       metadata: null,
-      generated: null,
+      generated: null
     };
   }
 
@@ -72,7 +72,7 @@ export async function optimizeHead(filePath, frontmatter, options) {
     seoProperty,
     defaults,
     fallbacks,
-    wordsPerMinute,
+    wordsPerMinute
   });
 
   // Check if file should be excluded from SEO processing
@@ -80,7 +80,7 @@ export async function optimizeHead(filePath, frontmatter, options) {
     return {
       html: frontmatter.contents.toString(),
       metadata,
-      generated: null,
+      generated: null
     };
   }
 
@@ -89,7 +89,7 @@ export async function optimizeHead(filePath, frontmatter, options) {
     hostname,
     social,
     jsonLd,
-    filePath,
+    filePath
   });
 
   // Inject SEO content into HTML
@@ -99,7 +99,7 @@ export async function optimizeHead(filePath, frontmatter, options) {
   return {
     html,
     metadata,
-    generated,
+    generated
   };
 }
 
@@ -116,7 +116,7 @@ function generateAllSeoContent(metadata, config) {
   const siteConfig = {
     hostname,
     ...social,
-    ...jsonLd,
+    ...jsonLd
   };
 
   // Generate meta tags
@@ -135,7 +135,7 @@ function generateAllSeoContent(metadata, config) {
     meta: metaResult,
     openGraph: ogResult,
     twitter: twitterResult,
-    jsonLd: jsonLdResult,
+    jsonLd: jsonLdResult
   };
 }
 
@@ -171,9 +171,9 @@ function injectSeoContent(html, metadata, generated, options = {}) {
   // Inject critical meta tags early
   for (const tag of criticalMetaTags) {
     if (tag.name) {
-      setMetaInDoc($, tag.name, tag.content, "name");
+      setMetaInDoc($, tag.name, tag.content, 'name');
     } else if (tag.httpEquiv) {
-      setMetaInDoc($, tag.httpEquiv, tag.content, "http-equiv");
+      setMetaInDoc($, tag.httpEquiv, tag.content, 'http-equiv');
     }
   }
 
@@ -183,36 +183,31 @@ function injectSeoContent(html, metadata, generated, options = {}) {
       $,
       link.rel,
       link.href,
-      Object.fromEntries(
-        Object.entries(link).filter(([key]) => !["rel", "href"].includes(key)),
-      ),
+      Object.fromEntries(Object.entries(link).filter(([key]) => !['rel', 'href'].includes(key)))
     );
   }
 
   // Inject remaining meta tags
   for (const tag of otherMetaTags) {
     if (tag.name) {
-      setMetaInDoc($, tag.name, tag.content, "name");
+      setMetaInDoc($, tag.name, tag.content, 'name');
     }
   }
 
   // Inject Open Graph tags
   for (const tag of generated.openGraph.metaTags) {
-    setMetaInDoc($, tag.property, tag.content, "property");
+    setMetaInDoc($, tag.property, tag.content, 'property');
   }
 
   // Inject Twitter Card tags
   for (const tag of generated.twitter.metaTags) {
-    setMetaInDoc($, tag.name, tag.content, "name");
+    setMetaInDoc($, tag.name, tag.content, 'name');
   }
 
   // Inject JSON-LD structured data (at the end for optimal loading)
   if (generated.jsonLd.html) {
-    const jsonLdContent = generated.jsonLd.html.replace(
-      /<script[^>]*>|<\/script>/g,
-      "",
-    );
-    addScriptToDoc($, jsonLdContent, "application/ld+json", "end");
+    const jsonLdContent = generated.jsonLd.html.replace(/<script[^>]*>|<\/script>/g, '');
+    addScriptToDoc($, jsonLdContent, 'application/ld+json', 'end');
   }
 
   // Serialize once
@@ -225,12 +220,9 @@ function injectSeoContent(html, metadata, generated, options = {}) {
  * @returns {Array} Critical meta tags
  */
 function getCriticalMetaTags(metaTags) {
-  const criticalTags = ["viewport", "charset", "description", "robots"];
+  const criticalTags = ['viewport', 'charset', 'description', 'robots'];
 
-  return metaTags.filter(
-    (tag) =>
-      criticalTags.includes(tag.name) || criticalTags.includes(tag.httpEquiv),
-  );
+  return metaTags.filter((tag) => criticalTags.includes(tag.name) || criticalTags.includes(tag.httpEquiv));
 }
 
 /**
@@ -239,12 +231,9 @@ function getCriticalMetaTags(metaTags) {
  * @returns {Array} Non-critical meta tags
  */
 function getOtherMetaTags(metaTags) {
-  const criticalTags = ["viewport", "charset", "description", "robots"];
+  const criticalTags = ['viewport', 'charset', 'description', 'robots'];
 
-  return metaTags.filter(
-    (tag) =>
-      !criticalTags.includes(tag.name) && !criticalTags.includes(tag.httpEquiv),
-  );
+  return metaTags.filter((tag) => !criticalTags.includes(tag.name) && !criticalTags.includes(tag.httpEquiv));
 }
 
 /**
@@ -335,24 +324,19 @@ export function validateSeoConfig(options) {
   const errors = [];
 
   if (!options.hostname) {
-    errors.push("hostname is required");
+    errors.push('hostname is required');
   }
 
   if (options.hostname && !isValidUrl(options.hostname)) {
-    errors.push("hostname must be a valid URL");
+    errors.push('hostname must be a valid URL');
   }
 
-  if (
-    options.social?.twitterSite &&
-    !options.social.twitterSite.startsWith("@")
-  ) {
-    errors.push("social.twitterSite should start with @");
+  if (options.social?.twitterSite && !options.social.twitterSite.startsWith('@')) {
+    errors.push('social.twitterSite should start with @');
   }
 
   if (options.jsonLd?.organization && !options.jsonLd.organization.name) {
-    errors.push(
-      "jsonLd.organization.name is required when organization is specified",
-    );
+    errors.push('jsonLd.organization.name is required when organization is specified');
   }
 
   return errors;
