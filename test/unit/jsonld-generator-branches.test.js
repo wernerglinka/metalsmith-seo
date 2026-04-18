@@ -227,6 +227,33 @@ describe('JSON-LD Generator Branch Coverage Tests', () => {
       assert(result.html.includes('"@context"'), 'Should contain JSON-LD content');
     });
 
+    it('should escape < and --> to prevent script-tag breakout', () => {
+      const result = generateJsonLd(
+        {
+          title: 'Hostile </script><script>alert(1)</script> title',
+          description: 'Comment ender --> here',
+          type: 'article'
+        },
+        { siteName: 'Test </script> Site', hostname: 'https://example.com' }
+      );
+
+      // The only </script> in the output must be the closing tag of the
+      // ld+json block itself (one occurrence). Everything else is escaped.
+      const closingTags = result.html.match(/<\/script>/g) || [];
+      assert.equal(closingTags.length, 1, 'Should contain exactly one </script> (the wrapper)');
+      assert(!result.html.includes('alert(1)</script>'), 'Should not allow script breakout');
+      assert(result.html.includes('\\u003c/script>'), 'Should escape < as \\u003c');
+      assert(result.html.includes('--\\u003e'), 'Should escape --> to prevent comment closure');
+
+      // Round-trip: extract the script body and verify it is still valid JSON
+      // with the original (unescaped) characters intact.
+      const body = result.html.match(/<script[^>]*>\n([\s\S]*?)\n<\/script>/)[1];
+      const parsed = JSON.parse(body);
+      const stringified = JSON.stringify(parsed);
+      assert(stringified.includes('</script>'), 'Decoded JSON should restore the literal </script>');
+      assert(stringified.includes('-->'), 'Decoded JSON should restore the literal -->');
+    });
+
     it('should handle empty schemas array', () => {
       // This might happen if no schema generation conditions are met
       const result = generateJsonLd({ title: 'Test' }, {}); // No site config
