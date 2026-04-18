@@ -11,7 +11,7 @@ describe('Edge Branch Coverage Tests', () => {
     it('should handle HTML without html element', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use((files, metalsmith, done) => {
+        .use((files, _metalsmith, done) => {
           // HTML without html wrapper
           files['no-html-element.html'] = {
             contents: Buffer.from('<head><title>No HTML Element</title></head><body>Content</body>'),
@@ -57,7 +57,7 @@ describe('Edge Branch Coverage Tests', () => {
     it('should handle different injection positions', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use((files, metalsmith, done) => {
+        .use((files, _metalsmith, done) => {
           // HTML with existing title for position testing
           files['with-title.html'] = {
             contents: Buffer.from(
@@ -101,7 +101,7 @@ describe('Edge Branch Coverage Tests', () => {
     it('should handle various robots and meta configurations', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use((files, metalsmith, done) => {
+        .use((files, _metalsmith, done) => {
           // File with specific robots settings
           files['robots-config.html'] = {
             contents: Buffer.from('<html><head><title>Robots Config</title></head><body>Content</body></html>'),
@@ -157,7 +157,7 @@ describe('Edge Branch Coverage Tests', () => {
     it('should handle complex nested metadata scenarios', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use((files, metalsmith, done) => {
+        .use((files, _metalsmith, done) => {
           // File with deeply nested seo configuration
           files['nested-seo.html'] = {
             contents: Buffer.from('<html><head><title>Nested SEO</title></head><body>Content</body></html>'),
@@ -214,7 +214,7 @@ describe('Edge Branch Coverage Tests', () => {
     it('should handle comprehensive social media and OpenGraph scenarios', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use((files, metalsmith, done) => {
+        .use((files, _metalsmith, done) => {
           // Article with comprehensive social media metadata
           files['social-comprehensive.html'] = {
             contents: Buffer.from(
@@ -277,7 +277,7 @@ describe('Edge Branch Coverage Tests', () => {
     it('should handle edge cases in all generators simultaneously', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use((files, metalsmith, done) => {
+        .use((files, _metalsmith, done) => {
           // File that tests multiple generators with edge cases
           files['multi-generator-edge.html'] = {
             contents: Buffer.from('<html><head><title>Multi Generator Edge</title></head><body>Content</body></html>'),

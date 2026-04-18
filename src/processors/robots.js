@@ -20,7 +20,7 @@
  * @param {RobotsOptions} options - Configuration options
  * @returns {void}
  */
-export function processRobots(files, metalsmith, options) {
+export function processRobots(files, _metalsmith, options) {
   const {
     hostname,
     sitemapFile = 'sitemap.xml',

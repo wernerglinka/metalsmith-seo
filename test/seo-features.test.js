@@ -47,7 +47,7 @@ describe('metalsmith-seo comprehensive features', () => {
   it('should use seo frontmatter property when available', (_t, done) => {
     // Use existing fixture and modify files in memory
     Metalsmith('test/fixtures/html')
-      .use((files, metalsmith, done) => {
+      .use((files, _metalsmith, done) => {
         // Add seo property to existing file
         files['index.html'].seo = {
           title: 'Custom SEO Title',
@@ -81,7 +81,7 @@ describe('metalsmith-seo comprehensive features', () => {
   it('should generate appropriate JSON-LD based on content type', (_t, done) => {
     Metalsmith('test/fixtures/html')
       .destination('build')
-      .use((files, metalsmith, done) => {
+      .use((files, _metalsmith, done) => {
         // Modify existing file to be an article
         files['index.html'].title = 'My Article';
         files['index.html'].date = new Date('2024-01-15');

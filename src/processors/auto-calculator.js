@@ -5,7 +5,7 @@
  * while avoiding flawed assumptions about content length or complex patterns.
  */
 
-import path from 'path';
+import path from 'node:path';
 import { get } from '../utils/object-utils.js';
 
 /**

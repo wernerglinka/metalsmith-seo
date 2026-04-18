@@ -5,7 +5,8 @@
 /**
  * @typedef {Object} JsonLdResult
  * @property {Array<Object>} schemas - Array of JSON-LD schema objects
- * @property {string} html - HTML script tag containing JSON-LD
+ * @property {string} json - Serialized JSON, escaped for safe embedding inside <script>
+ * @property {string} html - Full <script type="application/ld+json"> tag containing the JSON
  */
 
 /**
@@ -30,11 +31,12 @@ export function generateJsonLd(metadata, siteConfig = {}, filePath = '') {
     ...schema
   }));
 
-  // Generate HTML script tag
-  const html = generateJsonLdHtml(jsonLdSchemas);
+  const json = generateJsonLdString(jsonLdSchemas);
+  const html = json ? `<script type="application/ld+json">\n${json}\n</script>` : '';
 
   return {
     schemas: jsonLdSchemas,
+    json,
     html
   };
 }
@@ -94,7 +96,6 @@ function generateContentSchema(schemas, metadata, siteConfig) {
     case 'local-business':
       generateLocalBusinessSchema(schemas, metadata, siteConfig);
       break;
-    case 'page':
     default:
       generateWebPageSchema(schemas, metadata, siteConfig);
       break;
@@ -463,16 +464,20 @@ function toIso8601Duration(value) {
 }
 
 /**
- * Converts JSON-LD schemas to HTML script tag
+ * Serializes JSON-LD schemas to a string safe for embedding inside a
+ * <script type="application/ld+json"> element. JSON.stringify does not
+ * escape '<', so a frontmatter value containing '</script>' would terminate
+ * the script element; replacing '<' with its \u003c escape (and '-->' which
+ * can close HTML comments) keeps the JSON semantically identical while
+ * making it safe to embed.
  * @param {Array} schemas - Array of JSON-LD schemas
- * @returns {string} HTML script tag
+ * @returns {string} Escaped JSON string, or '' if there are no schemas
  */
-function generateJsonLdHtml(schemas) {
+function generateJsonLdString(schemas) {
   if (schemas.length === 0) {
     return '';
   }
 
-  // If multiple schemas, use @graph
   const jsonLd =
     schemas.length === 1
       ? schemas[0]
@@ -485,13 +490,7 @@ function generateJsonLdHtml(schemas) {
           })
         };
 
-  // Escape characters that could break out of the <script> tag context.
-  // JSON.stringify does not escape '<', so a frontmatter value containing
-  // '</script>' would terminate the script element. Replacing '<' with its
-  // \u003c escape (and '-->' which can close HTML comments) keeps the JSON
-  // syntactically identical while making it safe to embed in HTML.
-  const jsonString = JSON.stringify(jsonLd, null, 2).replace(/</g, '\\u003c').replace(/-->/g, '--\\u003e');
-  return `<script type="application/ld+json">\n${jsonString}\n</script>`;
+  return JSON.stringify(jsonLd, null, 2).replace(/</g, '\\u003c').replace(/-->/g, '--\\u003e');
 }
 
 /**

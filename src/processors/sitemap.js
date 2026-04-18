@@ -22,7 +22,7 @@
  * License: MIT
  */
 
-import path from 'path';
+import path from 'node:path';
 import { get } from '../utils/object-utils.js';
 import { checkFile, buildUrl } from './url-builder.js';
 import { calculatePriority, calculateChangefreq } from './auto-calculator.js';
@@ -165,7 +165,7 @@ export function processSitemap(files, metalsmith, options) {
         } else if (typeof lastmodValue === 'string') {
           // Parse the date string
           const parsed = new Date(lastmodValue);
-          if (!isNaN(parsed.getTime())) {
+          if (!Number.isNaN(parsed.getTime())) {
             // Normalize to midnight UTC like the old library did
             parsed.setUTCHours(0, 0, 0, 0);
             lastmodValue = parsed.toISOString();

@@ -17,7 +17,7 @@
  * provided). Default output is a single pair at the hostname root.
  */
 
-import path from 'path';
+import path from 'node:path';
 import { load } from 'cheerio';
 import { get } from '../utils/object-utils.js';
 
@@ -170,7 +170,7 @@ function toDate(value) {
     return value;
   }
   const d = new Date(value);
-  return isNaN(d.getTime()) ? null : d;
+  return Number.isNaN(d.getTime()) ? null : d;
 }
 
 /**

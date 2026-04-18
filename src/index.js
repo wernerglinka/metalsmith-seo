@@ -10,7 +10,8 @@ import { batchOptimizeHeads } from './processors/head-optimizer.js';
 import { processSitemap } from './processors/sitemap.js';
 import { processRobots } from './processors/robots.js';
 import { processLlms } from './processors/llms.js';
-import { buildConfig, validateConfig, getNestedProperty } from './utils/config-builder.js';
+import { buildConfig, validateConfig } from './utils/config-builder.js';
+import { get } from './utils/object-utils.js';
 
 /**
  * @typedef {Object} SeoOptions
@@ -143,7 +144,7 @@ function plugin(options = {}) {
     const metadataPath = pluginOptions.metadataPath || 'site';
 
     // Get site metadata from the configured path
-    const siteMetadata = getNestedProperty(metalsmith.metadata(), metadataPath) || {};
+    const siteMetadata = get(metalsmith.metadata(), metadataPath, {});
 
     // Get the configurable SEO property name (defaults to "seo")
     const seoProperty = pluginOptions.seoProperty || 'seo';

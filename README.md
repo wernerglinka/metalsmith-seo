@@ -746,21 +746,27 @@ By default, the plugin automatically calculates optimal values for sitemap entri
 
 **What gets auto-calculated:**
 
-- **Priority** (0.1-1.0) based on:
-  - File depth (shallower = higher priority)
-  - Content type (services/products get higher priority)
-  - Content age (recent updates get boost)
-  - Content length (substantial content gets boost)
+- **Priority** (0.1-1.0) is derived from URL hierarchy only — content
+  length and content type are deliberately not used:
+  - `index.html` (the homepage) → `1.0`
+  - Root-level pages → `0.8`
+  - One level deep → `0.6`
+  - Two levels deep → `0.4`
+  - Deeper pages → `0.3`
+  - Any non-root `index.html` (a section landing page) gets `+0.2`
 
-- **Change Frequency** based on:
-  - Content type (`/blog/` = weekly, `/about` = yearly)
-  - File modification patterns
-  - Content freshness analysis
+- **Change Frequency** is derived from URL pattern plus the page's
+  `lastmod`:
+  - `index.html` (homepage) → `weekly`
+  - Other `index.html` pages (section landings) → `monthly`
+  - Pages modified in the last 30 days → `monthly`
+  - Pages modified in the last 365 days → `yearly`
+  - Default → `yearly`
 
-- **Last Modified** using:
-  - Accurate file system modification dates
-  - Frontmatter `date` or `lastmod` properties
-  - Only included when dates are reliable
+- **Last Modified** uses the frontmatter `lastmod` property (or whichever
+  property `modifiedProperty` is set to), then the global `lastmod`
+  option as a fallback. Invalid date strings are skipped rather than
+  emitted as the epoch.
 
 **Example auto-generated sitemap:**
 

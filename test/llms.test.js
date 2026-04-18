@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
  * @returns {Function} Metalsmith plugin
  */
 function inject(pages) {
-  return (files, metalsmith, done) => {
+  return (files, _metalsmith, done) => {
     for (const [file, data] of Object.entries(pages)) {
       const { contents, ...rest } = data;
       files[file] = {

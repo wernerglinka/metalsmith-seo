@@ -330,8 +330,6 @@ export function injectIntoHead(html, content, options = {}) {
       }
       break;
     }
-
-    case 'end':
     default:
       $head.append(content);
       break;

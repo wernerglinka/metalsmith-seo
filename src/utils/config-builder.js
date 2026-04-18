@@ -5,30 +5,6 @@
  */
 
 /**
- * Get nested property from an object using dot notation path
- * @param {Object} obj - The object to query
- * @param {string} path - The path to the property (e.g., 'site' or 'data.site')
- * @returns {*} The value at the path, or undefined if not found
- */
-function getNestedProperty(obj, path) {
-  if (!path || !obj) {
-    return undefined;
-  }
-
-  const parts = path.split('.');
-  let current = obj;
-
-  for (const part of parts) {
-    if (current === null || current === undefined || typeof current !== 'object') {
-      return undefined;
-    }
-    current = current[part];
-  }
-
-  return current;
-}
-
-/**
  * Helper to conditionally add properties to an object
  * @param {Object} source - Source object to read from
  * @param {Object} mapping - Mapping of source keys to target keys
@@ -228,5 +204,3 @@ export function validateConfig(config, metadataPath) {
     throw new Error(`[metalsmith-seo] hostname is required (set in plugin options or ${metadataHint} in metadata)`);
   }
 }
-
-export { getNestedProperty };

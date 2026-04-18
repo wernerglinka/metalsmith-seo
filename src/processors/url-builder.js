@@ -2,7 +2,7 @@
  * @fileoverview URL building and validation utilities for sitemap generation.
  */
 
-import path from 'path';
+import path from 'node:path';
 import { get } from '../utils/object-utils.js';
 
 /**

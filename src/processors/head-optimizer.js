@@ -204,10 +204,12 @@ function injectSeoContent(html, metadata, generated, options = {}) {
     setMetaInDoc($, tag.name, tag.content, 'name');
   }
 
-  // Inject JSON-LD structured data (at the end for optimal loading)
-  if (generated.jsonLd.html) {
-    const jsonLdContent = generated.jsonLd.html.replace(/<script[^>]*>|<\/script>/g, '');
-    addScriptToDoc($, jsonLdContent, 'application/ld+json', 'end');
+  // Inject JSON-LD structured data (at the end for optimal loading).
+  // The generator returns the already-escaped JSON in `json`; the injector
+  // wraps it in <script type="application/ld+json">. Surrounding newlines
+  // keep the rendered HTML readable when the script is appended in-line.
+  if (generated.jsonLd.json) {
+    addScriptToDoc($, `\n${generated.jsonLd.json}\n`, 'application/ld+json', 'end');
   }
 
   // Serialize once
@@ -253,6 +255,7 @@ function isHtmlFile(filePath) {
  */
 export async function batchOptimizeHeads(files, options) {
   const results = {};
+  const errors = [];
   const fileList = Object.keys(files);
 
   // Process files in parallel batches
@@ -277,20 +280,54 @@ export async function batchOptimizeHeads(files, options) {
 
         return { filePath, result };
       } catch (error) {
-        console.error(`SEO optimization failed for ${filePath}:`, error);
         return { filePath, error };
       }
     });
 
     const batchResults = await Promise.all(batchPromises);
 
-    // Collect results
     batchResults.forEach(({ filePath, result, error }) => {
-      results[filePath] = error ? { error } : result;
+      if (error) {
+        errors.push({ filePath, error });
+        results[filePath] = { error };
+      } else {
+        results[filePath] = result;
+      }
     });
   }
 
+  // Surface failures to Metalsmith instead of silently logging — a build
+  // that produces broken SEO output should not be reported as successful.
+  // We collect across the whole pass so the user sees every failing file
+  // in one go rather than fixing one and discovering the next on rebuild.
+  if (errors.length > 0) {
+    throw aggregateOptimizationError(errors, 'SEO optimization');
+  }
+
   return results;
+}
+
+/**
+ * Builds a single Error summarizing per-file failures. Uses AggregateError
+ * when more than one file failed so callers can introspect the originals.
+ * @param {Array<{filePath: string, error: Error}>} errors - Per-file errors
+ * @param {string} stage - Human-readable stage name for the message
+ * @returns {Error} Aggregate error suitable for Metalsmith's done callback
+ */
+function aggregateOptimizationError(errors, stage) {
+  const summary = errors.map(({ filePath, error }) => `  - ${filePath}: ${error.message}`).join('\n');
+  const message = `[metalsmith-seo] ${stage} failed for ${errors.length} file(s):\n${summary}`;
+
+  if (errors.length === 1) {
+    const wrapped = new Error(message);
+    wrapped.cause = errors[0].error;
+    return wrapped;
+  }
+
+  return new AggregateError(
+    errors.map((e) => e.error),
+    message
+  );
 }
 
 /**
@@ -301,16 +338,20 @@ export async function batchOptimizeHeads(files, options) {
  */
 export function extractAllMetadata(files, options) {
   const metadata = {};
+  const errors = [];
 
   Object.keys(files).forEach((filePath) => {
     try {
-      const extracted = extractMetadata(filePath, files[filePath], options);
-      metadata[filePath] = extracted;
+      metadata[filePath] = extractMetadata(filePath, files[filePath], options);
     } catch (error) {
-      console.error(`Metadata extraction failed for ${filePath}:`, error);
+      errors.push({ filePath, error });
       metadata[filePath] = { error };
     }
   });
+
+  if (errors.length > 0) {
+    throw aggregateOptimizationError(errors, 'Metadata extraction');
+  }
 
   return metadata;
 }

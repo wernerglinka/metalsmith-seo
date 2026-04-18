@@ -11,7 +11,7 @@ describe('Branch Coverage Tests', () => {
     it('should handle different path depths and content types', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use((files, metalsmith, done) => {
+        .use((files, _metalsmith, done) => {
           // Add files to test different path depths and content types
           files['blog/recent-post.html'] = {
             contents: Buffer.from(
@@ -72,7 +72,7 @@ describe('Branch Coverage Tests', () => {
     it('should handle files with different content sizes', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use((files, metalsmith, done) => {
+        .use((files, _metalsmith, done) => {
           // Add files with different content sizes to test buffer length checks
           files['large-content.html'] = {
             contents: Buffer.from(
@@ -107,7 +107,7 @@ describe('Branch Coverage Tests', () => {
     it('should handle various social media configurations', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use((files, metalsmith, done) => {
+        .use((files, _metalsmith, done) => {
           // Add files with video, audio, and image content
           files['video-content.html'] = {
             contents: Buffer.from('<html><head><title>Video Content</title></head><body>Video</body></html>'),
@@ -157,7 +157,7 @@ describe('Branch Coverage Tests', () => {
     it('should handle complex JSON-LD scenarios', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use((files, metalsmith, done) => {
+        .use((files, _metalsmith, done) => {
           // Add article with comprehensive metadata
           files['full-article.html'] = {
             contents: Buffer.from('<html><head><title>Full Article</title></head><body>Article content</body></html>'),
@@ -207,7 +207,7 @@ describe('Branch Coverage Tests', () => {
     it('should handle malformed HTML structures', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use((files, metalsmith, done) => {
+        .use((files, _metalsmith, done) => {
           // Add files with various HTML structures
           files['no-head.html'] = {
             contents: Buffer.from('<html><body>No head tag</body></html>'),
@@ -247,7 +247,7 @@ describe('Branch Coverage Tests', () => {
     it('should test object-utils edge cases with complex fallbacks', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use((files, metalsmith, done) => {
+        .use((files, _metalsmith, done) => {
           files['utility-test.html'] = {
             contents: Buffer.from('<html><head><title>Utility Test</title></head><body>Content</body></html>'),
             nested: {
@@ -289,7 +289,7 @@ describe('Branch Coverage Tests', () => {
     it('should handle custom robots configuration', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use((files, metalsmith, done) => {
+        .use((files, _metalsmith, done) => {
           files['test-page.html'] = {
             contents: Buffer.from('<html><head><title>Test Page</title></head><body>Content</body></html>'),
             title: 'Test Page'
@@ -320,7 +320,7 @@ describe('Branch Coverage Tests', () => {
     it('should handle disabled features', (_t, done) => {
       Metalsmith('test/fixtures/hostname')
         .destination('build')
-        .use((files, metalsmith, done) => {
+        .use((files, _metalsmith, done) => {
           files['test.html'] = {
             contents: Buffer.from('<html><head><title>Test</title></head><body>Content</body></html>'),
             title: 'Test'

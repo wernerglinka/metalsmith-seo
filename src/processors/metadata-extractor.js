@@ -398,7 +398,7 @@ function normalizeDate(date) {
 
   if (typeof date === 'string') {
     const parsed = new Date(date);
-    if (!isNaN(parsed.getTime())) {
+    if (!Number.isNaN(parsed.getTime())) {
       return parsed.toISOString();
     }
   }

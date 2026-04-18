@@ -39,7 +39,7 @@ describe('metalsmith-seo robots.txt functionality', () => {
 
   it('should add sitemap reference to existing robots.txt', (_t, done) => {
     Metalsmith('test/fixtures/html')
-      .use((files, metalsmith, done) => {
+      .use((files, _metalsmith, done) => {
         // Add existing robots.txt without sitemap reference
         files['robots.txt'] = {
           contents: Buffer.from('User-agent: *\nDisallow: /private/\n'),
@@ -73,7 +73,7 @@ describe('metalsmith-seo robots.txt functionality', () => {
     const existingContent = 'User-agent: *\nDisallow: /admin/\nSitemap: https://example.com/custom-sitemap.xml\n';
 
     Metalsmith('test/fixtures/html')
-      .use((files, metalsmith, done) => {
+      .use((files, _metalsmith, done) => {
         // Add existing robots.txt with sitemap reference
         files['robots.txt'] = {
           contents: Buffer.from(existingContent),
