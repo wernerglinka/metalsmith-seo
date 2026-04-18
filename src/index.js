@@ -175,7 +175,11 @@ function plugin(options = {}) {
       sitemapGeneration = processSitemap(files, metalsmith, config.sitemap);
     }
 
-    // Execute head optimization and sitemap in parallel
+    // Execute head optimization and sitemap in parallel.
+    // Safe because head optimization mutates file.contents while the
+    // sitemap reads only frontmatter. If you change the head pass to
+    // write back into frontmatter, this parallelism becomes unsound.
+    // See docs/THEORY.md §7 ("Parallel head pass + sitemap").
     Promise.all([headOptimization, sitemapGeneration])
       .then(() => {
         // Robots.txt generation/update - after sitemap is done

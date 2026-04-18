@@ -7,7 +7,7 @@ Inspired by metalsmith-sitemap, the plugin provides SEO optimization for Metalsm
 [![license: MIT][license-badge]][license-url]
 [![Test Coverage][coverage-badge]][coverage-url]
 
-> **Version 1.0.0** is ESM-only and requires Node.js 22+. The plugin API and output are unchanged — only the packaging was modernized. See the [migration guide](#migration-from-v0x-to-v10) below.
+> **Version 1.x** is ESM-only and requires Node.js 22+. The plugin API and output are unchanged from v0.8.x — only the packaging was modernized in 1.0.0. See the [migration guide](#migration-from-v0x-to-v10) below.
 
 ## Features
 
@@ -38,7 +38,17 @@ Inspired by metalsmith-sitemap, the plugin provides SEO optimization for Metalsm
 
 - **ESM-only** - Modern Node.js (>= 22) with native ESM
 - **Minimal Configuration** - Works great with just a hostname
-- **Comprehensive Testing** - 94% test coverage with real-world scenarios
+- **Comprehensive Testing** - High test coverage with real-world scenarios (see badge above)
+
+## What this plugin won't do
+
+Scope boundaries that come up often enough to be worth stating up front. Each is a deliberate design decision — see [docs/THEORY.md §5](docs/THEORY.md#5-deliberate-non-features) for the reasoning.
+
+- **Score pages by content length.** Sitemap priority is derived from URL hierarchy, not word count. Long privacy policies don't outrank the homepage.
+- **Ship any client-side JavaScript.** Output is static HTML. SEO that depends on runtime execution is invisible to crawlers that don't run JS.
+- **Parse markdown.** HTML in, HTML out. Run `@metalsmith/markdown` (or similar) before this plugin.
+- **Modify anything outside `<head>`.** No body-content rewriting, no mid-page schema injection, no image-tag manipulation.
+- **Make network requests.** No og:image dimension fetching, no live sitemap validation. Builds are hermetic.
 
 ## Requirements
 
@@ -332,12 +342,12 @@ The plugin uses this priority order:
   // Customize frontmatter property name
   seoProperty: 'seo',        // Default: 'seo'
 
-  // Fallback property mappings
+  // Fallback property mappings (dotted paths like 'author.name' are supported)
   fallbacks: {
-    title: 'title',
-    description: 'excerpt',
-    image: 'featured_image',
-    author: 'author.name'
+    title: 'title',            // Default: 'title'
+    description: 'excerpt',    // Default: 'excerpt'
+    image: 'featured_image',   // Default: 'featured_image'
+    author: 'author'           // Default: 'author'
   },
 
   // Sitemap configuration
@@ -378,11 +388,14 @@ The plugin uses this priority order:
     sort: 'date-desc'          // 'date-desc' | 'date-asc' | 'alpha'
   },
 
+  // Reading time calculation
+  wordsPerMinute: 200,    // Default: 200 (reading speed for reading-time metadata)
+
   // Performance options
   batchSize: 10,          // Process files in batches
   enableSitemap: true,    // Generate sitemap.xml
   enableRobots: true,     // Generate/update robots.txt
-  enableLlms: true        // Generate llms.txt (also enabled by llms.enabled)
+  enableLlms: true        // Generate llms.txt (or set llms.enabled: true)
 }))
 ```
 
@@ -683,7 +696,7 @@ All sitemap options are configured under the `sitemap` property:
 |--------|------|---------|-------------|
 | `output` | string | `'sitemap.xml'` | Filename for the generated sitemap |
 | `pattern` | string | `'**/*.html'` | Glob pattern to match files for inclusion |
-| `auto` | boolean | `false` | Enable automatic priority and changefreq calculation |
+| `auto` | boolean | `true` | Enable automatic priority and changefreq calculation |
 | `changefreq` | string | - | Default change frequency (`always`, `hourly`, `daily`, `weekly`, `monthly`, `yearly`, `never`) |
 | `priority` | number | - | Default priority (0.0 to 1.0) |
 | `lastmod` | Date\|string | - | Default last modified date for all files |
@@ -774,13 +787,13 @@ By default, the plugin automatically calculates optimal values for sitemap entri
 <url>
   <loc>https://example.com/index.html</loc>
   <lastmod>2024-01-15</lastmod>
-  <changefreq>monthly</changefreq>
-  <priority>0.8</priority>
+  <changefreq>weekly</changefreq>
+  <priority>1.0</priority>
 </url>
 <url>
   <loc>https://example.com/blog/seo-guide/index.html</loc>
   <lastmod>2024-01-10</lastmod>
-  <changefreq>weekly</changefreq>
+  <changefreq>monthly</changefreq>
   <priority>0.6</priority>
 </url>
 ```
