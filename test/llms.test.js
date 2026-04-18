@@ -119,6 +119,57 @@ describe('metalsmith-seo llms.txt functionality', () => {
       });
   });
 
+  it('should extract clean plaintext via cheerio (handles malformed HTML safely)', (_t, done) => {
+    // Missing closing </main>, plus chrome that should be excluded, plus a
+    // <script> that previously survived if its closer was lowercase-only.
+    // The cheerio path tolerates this; the old regex path could backtrack.
+    const malformed = `
+      <html>
+        <head><title>X</title></head>
+        <body>
+          <header>NAV LINKS HERE</header>
+          <main>
+            <h1>Real Heading</h1>
+            <p>Body sentence.</p>
+            <svg><circle/></svg>
+            <script>alert('nope')</script>
+            <!-- comment -->
+            <p>Second paragraph.
+        </body>
+      </html>`;
+
+    Metalsmith('test/fixtures/html')
+      .use(
+        inject({
+          'page.html': {
+            title: 'Malformed page',
+            seo: { description: 'desc.' },
+            contents: malformed
+          }
+        })
+      )
+      .use(
+        seo({
+          hostname: 'https://example.com',
+          llms: { enabled: true, fullText: true, title: 'Site' }
+        })
+      )
+      .build((err, files) => {
+        if (err) {
+          return done(err);
+        }
+        const full = files['llms-full.txt'].contents.toString();
+        assert(full.includes('Real Heading'), 'should keep main-region heading text');
+        assert(full.includes('Body sentence.'), 'should keep main-region body text');
+        assert(full.includes('Second paragraph'), 'should keep text from unclosed paragraph');
+        assert(!full.includes('NAV LINKS HERE'), 'should drop header chrome outside main');
+        assert(!full.includes("alert('nope')"), 'should strip script content');
+        assert(!full.includes('comment'), 'should strip HTML comments');
+        assert(!full.includes('<'), 'output should be plain text');
+        done();
+      });
+  });
+
   it('should skip files with private:true', (_t, done) => {
     Metalsmith('test/fixtures/html')
       .use(

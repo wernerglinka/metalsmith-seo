@@ -84,12 +84,25 @@ export function processRobots(files, metalsmith, options) {
  * @returns {string} Robots.txt content
  */
 function generateBasicRobots({ userAgent, disallowPaths, sitemapUrl }) {
-  const disallowDirectives =
-    disallowPaths.length > 0 ? disallowPaths.map((path) => `Disallow: ${path}`).join('\n') : 'Disallow:';
+  // Strip CR/LF from each path so a value like "/foo\nDisallow: /" cannot
+  // smuggle additional directives into the generated file. userAgent gets
+  // the same treatment for the same reason.
+  const safeUserAgent = sanitizeRobotsValue(userAgent);
+  const safePaths = disallowPaths.map(sanitizeRobotsValue).filter((p) => p !== '');
+  const disallowDirectives = safePaths.length > 0 ? safePaths.map((p) => `Disallow: ${p}`).join('\n') : 'Disallow:';
 
-  return `User-agent: ${userAgent}
+  return `User-agent: ${safeUserAgent}
 ${disallowDirectives}
 
 Sitemap: ${sitemapUrl}
 `;
+}
+
+/**
+ * Removes characters that would break the line-oriented robots.txt format.
+ * @param {*} value - Raw value (will be coerced to string)
+ * @returns {string} Sanitized single-line value
+ */
+function sanitizeRobotsValue(value) {
+  return String(value ?? '').replace(/[\r\n]+/g, '');
 }

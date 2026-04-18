@@ -2,6 +2,8 @@
  * @fileoverview Generator for Open Graph meta tags.
  */
 
+import { escapeHtml } from '../utils/escape.js';
+
 // Image type mapping for Open Graph images
 const IMAGE_TYPE_MAP = {
   jpg: 'image/jpeg',
@@ -359,22 +361,4 @@ export function openGraphTagsToHtml(metaTags) {
       return `<meta property="${property}" content="${content}">`;
     })
     .join('\n');
-}
-
-/**
- * Escapes HTML special characters
- * @param {string} str - String to escape
- * @returns {string} Escaped string
- */
-function escapeHtml(str) {
-  if (typeof str !== 'string') {
-    return String(str);
-  }
-
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
 }

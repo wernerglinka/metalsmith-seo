@@ -131,6 +131,37 @@ describe('metalsmith-seo robots.txt functionality', () => {
       });
   });
 
+  it('should strip CR/LF from disallowPaths and userAgent to prevent injection', (_t, done) => {
+    Metalsmith('test/fixtures/html')
+      .use(
+        seo({
+          hostname: 'https://example.com',
+          robots: {
+            disallowPaths: ['/safe/', '/oops\nDisallow: /', '/with\rcarriage'],
+            userAgent: 'Bot\nDisallow: /'
+          }
+        })
+      )
+      .build((err, files) => {
+        if (err) {
+          return done(err);
+        }
+
+        const content = files['robots.txt'].contents.toString();
+        const lines = content.split('\n');
+
+        // The injected newline should be gone — directive lines should match
+        // the original count, not be inflated by smuggled directives.
+        const disallowLines = lines.filter((l) => l.startsWith('Disallow:'));
+        assert.equal(disallowLines.length, 3, 'Should preserve exactly the configured disallow count');
+        assert(content.includes('Disallow: /oopsDisallow: /'), 'Newline in path should be stripped, not honored');
+        assert(content.includes('Disallow: /withcarriage'), 'Carriage return in path should be stripped');
+        assert(content.includes('User-agent: BotDisallow: /'), 'Newline in user agent should be stripped');
+
+        done();
+      });
+  });
+
   it('should respect enableRobots=false option', (_t, done) => {
     Metalsmith('test/fixtures/html')
       .use(

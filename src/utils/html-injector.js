@@ -9,6 +9,7 @@
  */
 
 import { load } from 'cheerio';
+import { escapeHtml } from './escape.js';
 
 /**
  * @typedef {Object} InjectionOptions
@@ -118,24 +119,6 @@ function ensureHead($) {
     $head = $('head');
   }
   return $head;
-}
-
-/**
- * Escapes HTML special characters
- * @param {string} str - String to escape
- * @returns {string} Escaped string
- */
-function escapeHtml(str) {
-  if (typeof str !== 'string') {
-    return String(str);
-  }
-
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
 }
 
 // ===== Document-level API (mutate Cheerio instance in place) =====

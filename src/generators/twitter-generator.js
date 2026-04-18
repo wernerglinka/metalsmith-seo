@@ -2,6 +2,8 @@
  * @fileoverview Generator for Twitter Card meta tags.
  */
 
+import { escapeHtml } from '../utils/escape.js';
+
 /**
  * @typedef {Object} TwitterCardResult
  * @property {Array<Object>} metaTags - Array of Twitter Card meta tag objects
@@ -364,22 +366,4 @@ export function twitterCardTagsToHtml(metaTags) {
       return `<meta name="${name}" content="${content}">`;
     })
     .join('\n');
-}
-
-/**
- * Escapes HTML special characters
- * @param {string} str - String to escape
- * @returns {string} Escaped string
- */
-function escapeHtml(str) {
-  if (typeof str !== 'string') {
-    return String(str);
-  }
-
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
 }

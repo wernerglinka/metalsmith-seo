@@ -18,6 +18,7 @@
  */
 
 import path from 'path';
+import { load } from 'cheerio';
 import { get } from '../utils/object-utils.js';
 
 /**
@@ -41,44 +42,75 @@ import { get } from '../utils/object-utils.js';
  * @property {'date-desc'|'date-asc'|'alpha'} [sort='date-desc'] - Entry sort order
  */
 
+// Tags whose closing produces a line break in the extracted plaintext.
+const BLOCK_TAGS = new Set([
+  'p',
+  'div',
+  'section',
+  'article',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'li',
+  'tr',
+  'blockquote',
+  'pre'
+]);
+
 /**
  * Minimal HTML -> plaintext for llms-full.txt. Not a perfect renderer; the
- * goal is readable prose without scripts, styles, or tag clutter.
+ * goal is readable prose without scripts, styles, or tag clutter. Uses the
+ * cheerio parser already required by the rest of the plugin so we don't have
+ * to maintain a second HTML tokenizer (and don't risk regex backtracking on
+ * malformed input).
  * @param {string} html - HTML input
  * @returns {string} Normalized plaintext
  */
 function htmlToText(html) {
-  // Prefer the <main> / <article> region when present — avoids pulling in
-  // site chrome (header, nav, footer, SVG icon strips, etc.). Fall back to
-  // <body>, then the full document.
-  const source = String(html);
-  const mainMatch = source.match(/<(main|article)\b[^>]*>([\s\S]*?)<\/\1>/i);
-  const bodyMatch = source.match(/<body\b[^>]*>([\s\S]*?)<\/body>/i);
-  const region = mainMatch ? mainMatch[2] : bodyMatch ? bodyMatch[1] : source;
+  if (typeof html !== 'string' || html === '') {
+    return '';
+  }
 
-  return (
-    region
-      .replace(/<head\b[^>]*>[\s\S]*?<\/head>/gi, '')
-      .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
-      .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '')
-      .replace(/<svg\b[^>]*>[\s\S]*?<\/svg>/gi, '')
-      .replace(/<noscript\b[^>]*>[\s\S]*?<\/noscript>/gi, '')
-      .replace(/<!--[\s\S]*?-->/g, '')
-      .replace(/<\/(p|div|section|article|h[1-6]|li|br|tr|blockquote|pre)>/gi, '\n')
-      .replace(/<br\s*\/?>/gi, '\n')
-      .replace(/<[^>]+>/g, '')
-      .replace(/&nbsp;/g, ' ')
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'")
-      .replace(/[ \t]+/g, ' ')
-      // Drop lines that are only whitespace, then collapse stacked blank lines
-      .replace(/^[ \t]+$/gm, '')
-      .replace(/\n{3,}/g, '\n\n')
-      .trim()
-  );
+  const $ = load(html, { decodeEntities: true });
+
+  // Strip site chrome and non-content nodes outright.
+  $('head, script, style, svg, noscript').remove();
+  // Comments are not selectable by tag — walk and drop.
+  $('*')
+    .contents()
+    .each((_, node) => {
+      if (node.type === 'comment') {
+        $(node).remove();
+      }
+    });
+  $('br').replaceWith('\n');
+
+  // Prefer <main>/<article> when present so we skip header/nav/footer.
+  let $region = $('main, article').first();
+  if ($region.length === 0) {
+    $region = $('body');
+  }
+  if ($region.length === 0) {
+    $region = $.root();
+  }
+
+  // Insert a newline after each block-level closing tag so paragraphs and
+  // headings don't collapse into one another when text() concatenates.
+  $region.find('*').each((_, el) => {
+    if (BLOCK_TAGS.has(el.tagName)) {
+      $(el).append('\n');
+    }
+  });
+
+  return $region
+    .text()
+    .replace(/[ \t]+/g, ' ')
+    .replace(/^[ \t]+$/gm, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
 /**

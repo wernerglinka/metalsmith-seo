@@ -254,6 +254,55 @@ describe('JSON-LD Generator Branch Coverage Tests', () => {
       assert(stringified.includes('-->'), 'Decoded JSON should restore the literal -->');
     });
 
+    it('should format Article timeRequired as ISO 8601 duration', () => {
+      const result = generateJsonLd(
+        {
+          title: 'Reading time test',
+          type: 'article',
+          readingTime: 5,
+          author: 'Test Author',
+          publishDate: '2026-01-01'
+        },
+        { siteName: 'Test', hostname: 'https://example.com' }
+      );
+
+      const article = result.schemas.find((s) => s['@type'] === 'Article');
+      assert(article, 'Article schema should exist');
+      assert.equal(article.timeRequired, 'PT5M', 'Should emit ISO 8601 duration string');
+    });
+
+    it('should pass through pre-formatted ISO 8601 readingTime', () => {
+      const result = generateJsonLd(
+        {
+          title: 'Already formatted',
+          type: 'article',
+          readingTime: 'PT12M',
+          author: 'Test Author',
+          publishDate: '2026-01-01'
+        },
+        { siteName: 'Test', hostname: 'https://example.com' }
+      );
+
+      const article = result.schemas.find((s) => s['@type'] === 'Article');
+      assert.equal(article.timeRequired, 'PT12M', 'Should preserve a valid duration string');
+    });
+
+    it('should omit timeRequired when readingTime is invalid', () => {
+      const result = generateJsonLd(
+        {
+          title: 'Bad reading time',
+          type: 'article',
+          readingTime: 'not a duration',
+          author: 'Test Author',
+          publishDate: '2026-01-01'
+        },
+        { siteName: 'Test', hostname: 'https://example.com' }
+      );
+
+      const article = result.schemas.find((s) => s['@type'] === 'Article');
+      assert.equal(article.timeRequired, undefined, 'Should not emit garbage durations');
+    });
+
     it('should handle empty schemas array', () => {
       // This might happen if no schema generation conditions are met
       const result = generateJsonLd({ title: 'Test' }, {}); // No site config

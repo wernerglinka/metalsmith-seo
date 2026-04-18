@@ -164,9 +164,13 @@ function generateArticleSchema(schemas, metadata, siteConfig) {
     articleSchema.wordCount = metadata.wordCount;
   }
 
-  // Reading time
+  // Reading time. schema.org timeRequired expects an ISO 8601 duration
+  // (e.g. "PT5M"); a bare number fails Google's structured-data validator.
   if (metadata.readingTime) {
-    articleSchema.timeRequired = metadata.readingTime;
+    const iso = toIso8601Duration(metadata.readingTime);
+    if (iso) {
+      articleSchema.timeRequired = iso;
+    }
   }
 
   schemas.push(articleSchema);
@@ -439,6 +443,23 @@ function generatePublisherSchema(organization) {
   }
 
   return publisher;
+}
+
+/**
+ * Converts a reading-time value to an ISO 8601 duration string. Accepts a
+ * positive number of minutes or an already-formatted string. Returns null
+ * for anything else so the caller can omit the field cleanly.
+ * @param {*} value - Reading time (minutes) or pre-formatted duration
+ * @returns {string|null} ISO 8601 duration (e.g. "PT5M") or null
+ */
+function toIso8601Duration(value) {
+  if (typeof value === 'string') {
+    return /^P/i.test(value) ? value.toUpperCase() : null;
+  }
+  if (typeof value === 'number' && Number.isFinite(value) && value > 0) {
+    return `PT${Math.round(value)}M`;
+  }
+  return null;
 }
 
 /**

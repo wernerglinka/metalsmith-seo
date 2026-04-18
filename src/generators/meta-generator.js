@@ -2,6 +2,8 @@
  * @fileoverview Generator for basic HTML meta tags.
  */
 
+import { escapeHtml } from '../utils/escape.js';
+
 /**
  * @typedef {Object} MetaTagsResult
  * @property {string} title - Title tag content
@@ -271,22 +273,4 @@ export function linkTagsToHtml(linkTags) {
       return `<link ${attributes.join(' ')}>`;
     })
     .join('\n');
-}
-
-/**
- * Escapes HTML special characters
- * @param {string} str - String to escape
- * @returns {string} Escaped string
- */
-function escapeHtml(str) {
-  if (typeof str !== 'string') {
-    return String(str);
-  }
-
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
 }
