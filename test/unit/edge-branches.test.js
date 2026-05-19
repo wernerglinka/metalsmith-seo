@@ -39,7 +39,7 @@ describe('Edge Branch Coverage Tests', () => {
             hostname: 'http://www.website.com/'
           })
         )
-        .build((err, files) => {
+        .process((err, files) => {
           if (err) {
             return done(err);
           }
@@ -81,7 +81,7 @@ describe('Edge Branch Coverage Tests', () => {
             hostname: 'http://www.website.com/'
           })
         )
-        .build((err, files) => {
+        .process((err, files) => {
           if (err) {
             return done(err);
           }
@@ -137,7 +137,7 @@ describe('Edge Branch Coverage Tests', () => {
             hostname: 'http://www.website.com/'
           })
         )
-        .build((err, files) => {
+        .process((err, files) => {
           if (err) {
             return done(err);
           }
@@ -194,7 +194,7 @@ describe('Edge Branch Coverage Tests', () => {
             seoProperty: 'seo'
           })
         )
-        .build((err, files) => {
+        .process((err, files) => {
           if (err) {
             return done(err);
           }
@@ -260,7 +260,7 @@ describe('Edge Branch Coverage Tests', () => {
             }
           })
         )
-        .build((err, files) => {
+        .process((err, files) => {
           if (err) {
             return done(err);
           }
@@ -316,7 +316,7 @@ describe('Edge Branch Coverage Tests', () => {
             }
           })
         )
-        .build((err, files) => {
+        .process((err, files) => {
           if (err) {
             return done(err);
           }

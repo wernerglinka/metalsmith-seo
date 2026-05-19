@@ -110,6 +110,7 @@ export function buildConfig(pluginOptions, siteMetadata, files, seoProperty) {
         ? pluginOptions.enableLlms
         : Boolean(pluginOptions.llms?.enabled || siteMetadata.llms?.enabled || false),
     batchSize: pluginOptions.batchSize || 10,
+    wordsPerMinute: pluginOptions.wordsPerMinute || 200,
 
     // Fallback mappings
     fallbacks: pluginOptions.fallbacks || {

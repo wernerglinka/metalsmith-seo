@@ -18,7 +18,7 @@ describe('metalsmith-seo robots.txt functionality', () => {
           hostname: 'https://example.com'
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }
@@ -52,7 +52,7 @@ describe('metalsmith-seo robots.txt functionality', () => {
           hostname: 'https://example.com'
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }
@@ -86,7 +86,7 @@ describe('metalsmith-seo robots.txt functionality', () => {
           hostname: 'https://example.com'
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }
@@ -115,7 +115,7 @@ describe('metalsmith-seo robots.txt functionality', () => {
           }
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }
@@ -142,7 +142,7 @@ describe('metalsmith-seo robots.txt functionality', () => {
           }
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }
@@ -170,7 +170,7 @@ describe('metalsmith-seo robots.txt functionality', () => {
           enableRobots: false
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }
@@ -195,7 +195,7 @@ describe('metalsmith-seo robots.txt functionality', () => {
           }
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }

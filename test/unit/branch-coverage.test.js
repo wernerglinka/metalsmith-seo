@@ -53,7 +53,7 @@ describe('Branch Coverage Tests', () => {
             sitemap: { auto: true }
           })
         )
-        .build((err, files) => {
+        .process((err, files) => {
           if (err) {
             return done(err);
           }
@@ -92,7 +92,7 @@ describe('Branch Coverage Tests', () => {
             sitemap: { auto: true }
           })
         )
-        .build((err, files) => {
+        .process((err, files) => {
           if (err) {
             return done(err);
           }
@@ -141,7 +141,7 @@ describe('Branch Coverage Tests', () => {
             }
           })
         )
-        .build((err, files) => {
+        .process((err, files) => {
           if (err) {
             return done(err);
           }
@@ -189,7 +189,7 @@ describe('Branch Coverage Tests', () => {
             }
           })
         )
-        .build((err, files) => {
+        .process((err, files) => {
           if (err) {
             return done(err);
           }
@@ -231,7 +231,7 @@ describe('Branch Coverage Tests', () => {
             hostname: 'http://www.website.com/'
           })
         )
-        .build((err, files) => {
+        .process((err, files) => {
           if (err) {
             return done(err);
           }
@@ -272,7 +272,7 @@ describe('Branch Coverage Tests', () => {
             }
           })
         )
-        .build((err, files) => {
+        .process((err, files) => {
           if (err) {
             return done(err);
           }
@@ -305,7 +305,7 @@ describe('Branch Coverage Tests', () => {
             }
           })
         )
-        .build((err, files) => {
+        .process((err, files) => {
           if (err) {
             return done(err);
           }
@@ -334,7 +334,7 @@ describe('Branch Coverage Tests', () => {
             enableRobots: false
           })
         )
-        .build((err, files) => {
+        .process((err, files) => {
           if (err) {
             return done(err);
           }

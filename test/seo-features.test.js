@@ -23,7 +23,7 @@ describe('metalsmith-seo comprehensive features', () => {
           }
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }
@@ -62,7 +62,7 @@ describe('metalsmith-seo comprehensive features', () => {
           defaults: { title: 'Default Title' }
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }
@@ -97,7 +97,7 @@ describe('metalsmith-seo comprehensive features', () => {
           hostname: 'https://example.com'
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }
@@ -125,7 +125,7 @@ describe('metalsmith-seo comprehensive features', () => {
           hostname: 'http://www.website.com/'
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }
@@ -163,7 +163,7 @@ describe('metalsmith-seo comprehensive features', () => {
           }
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }
@@ -177,6 +177,29 @@ describe('metalsmith-seo comprehensive features', () => {
         assert(html.includes('<title>'), 'Has SEO title');
         assert(html.includes('og:site_name'), 'Has Open Graph site name');
 
+        done();
+      });
+  });
+
+  it('should plumb wordsPerMinute option through to reading time calculation', (_t, done) => {
+    Metalsmith('test/fixtures/html')
+      .use((files, _metalsmith, done) => {
+        // 600 words at 200 wpm = 3 min; at 600 wpm = 1 min
+        files['index.html'] = {
+          contents: Buffer.from(`<html><head></head><body>${'word '.repeat(600)}</body></html>`)
+        };
+        done();
+      })
+      .use(seo({ hostname: 'https://example.com', wordsPerMinute: 600 }))
+      .process((err, files) => {
+        if (err) {
+          return done(err);
+        }
+        assert.equal(
+          files['index.html'].seoMetadata.readingTime,
+          1,
+          'wordsPerMinute: 600 should yield 1-minute reading time for 600 words'
+        );
         done();
       });
   });

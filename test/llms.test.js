@@ -28,7 +28,7 @@ describe('metalsmith-seo llms.txt functionality', () => {
   it('should not emit llms.txt by default', (_t, done) => {
     Metalsmith('test/fixtures/html')
       .use(seo({ hostname: 'https://example.com' }))
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }
@@ -62,7 +62,7 @@ describe('metalsmith-seo llms.txt functionality', () => {
           llms: { enabled: true, title: 'My Site', description: 'A test site.' }
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }
@@ -105,7 +105,7 @@ describe('metalsmith-seo llms.txt functionality', () => {
           llms: { enabled: true, fullText: true, title: 'Site' }
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }
@@ -154,7 +154,7 @@ describe('metalsmith-seo llms.txt functionality', () => {
           llms: { enabled: true, fullText: true, title: 'Site' }
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }
@@ -193,7 +193,7 @@ describe('metalsmith-seo llms.txt functionality', () => {
           llms: { enabled: true, title: 'Site' }
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }
@@ -225,7 +225,7 @@ describe('metalsmith-seo llms.txt functionality', () => {
           }
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         try {
           if (err) {
             return done(err);
@@ -282,7 +282,7 @@ describe('metalsmith-seo llms.txt functionality', () => {
           }
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         try {
           if (err) {
             return done(err);
@@ -321,7 +321,7 @@ describe('metalsmith-seo llms.txt functionality', () => {
         })
       )
       .use(seo({ llms: { enabled: true, perLocale: true } }))
-      .build((err, files) => {
+      .process((err, files) => {
         try {
           if (err) {
             return done(err);
@@ -357,7 +357,7 @@ describe('metalsmith-seo llms.txt functionality', () => {
         })
       )
       .use(seo({ llms: { enabled: true } }))
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }
@@ -386,7 +386,7 @@ describe('metalsmith-seo llms.txt functionality', () => {
           llms: { enabled: true, title: 'Site' }
         })
       )
-      .build((err, files) => {
+      .process((err, files) => {
         if (err) {
           return done(err);
         }

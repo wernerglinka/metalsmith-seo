@@ -156,7 +156,7 @@ describe('Coverage Tests - Missing Functionality', () => {
             hostname: 'http://www.website.com/'
           })
         )
-        .build((err, result) => {
+        .process((err, result) => {
           if (err) {
             return done(err);
           }
@@ -273,7 +273,7 @@ describe('Coverage Tests - Missing Functionality', () => {
             hostname: 'http://www.website.com/'
           })
         )
-        .build((err, result) => {
+        .process((err, result) => {
           if (err) {
             return done(err);
           }
@@ -299,7 +299,7 @@ describe('Coverage Tests - Missing Functionality', () => {
             }
           })
         )
-        .build((err, result) => {
+        .process((err, result) => {
           if (err) {
             return done(err);
           }

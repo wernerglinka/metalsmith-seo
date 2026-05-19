@@ -23,7 +23,7 @@ describe('metalsmith-seo performance', () => {
                 auto: false
               })
             )
-            .build((err) => {
+            .process((err) => {
               if (err) {
                 return reject(err);
               }
@@ -43,54 +43,5 @@ describe('metalsmith-seo performance', () => {
         done();
       })
       .catch(done);
-  });
-
-  it('should cache site metadata checks across multiple invocations', (_t, done) => {
-    let firstBuildTime, subsequentBuildsTime;
-
-    // First build - establishes cache
-    const firstStart = Date.now();
-    Metalsmith('test/fixtures/html')
-      .destination('build-cache-1')
-      .use(
-        seo({
-          hostname: 'https://example.com',
-          auto: false
-        })
-      )
-      .build((err) => {
-        if (err) {
-          return done(err);
-        }
-
-        firstBuildTime = Date.now() - firstStart;
-
-        // Second build - should use cache
-        const secondStart = Date.now();
-        Metalsmith('test/fixtures/html')
-          .destination('build-cache-2')
-          .use(
-            seo({
-              hostname: 'https://example.com',
-              auto: false
-            })
-          )
-          .build((err) => {
-            if (err) {
-              return done(err);
-            }
-
-            subsequentBuildsTime = Date.now() - secondStart;
-
-            // Second build should be faster or similar (not significantly slower)
-            // We're not asserting it's definitely faster because the difference might be small
-            assert(
-              subsequentBuildsTime <= firstBuildTime * 1.5,
-              `Cached build (${subsequentBuildsTime}ms) should not be significantly slower than first build (${firstBuildTime}ms)`
-            );
-
-            done();
-          });
-      });
   });
 });

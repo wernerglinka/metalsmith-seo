@@ -9,12 +9,10 @@ import path from 'node:path';
 import { get } from '../utils/object-utils.js';
 
 /**
- * Calculates SEO-focused priority based on URL hierarchy and content type.
+ * Calculates SEO-focused priority based on URL hierarchy.
  * Avoids flawed assumptions about content length or complex pattern matching.
  *
  * @param {string} file - File path relative to source directory
- * @param {Object} frontmatter - File metadata and frontmatter
- * @param {Object} options - Calculation options
  * @returns {number} Calculated priority between 0.1 and 1.0
  */
 export function calculatePriority(file) {
@@ -68,13 +66,16 @@ export function calculateChangefreq(file, frontmatter, options) {
 
   if (fileLastmod) {
     const modDate = fileLastmod instanceof Date ? fileLastmod : new Date(fileLastmod);
-    const now = new Date();
-    const daysSinceModified = (now - modDate) / (1000 * 60 * 60 * 24);
+    // Skip invalid dates (e.g. malformed frontmatter strings) so they don't
+    // silently coerce to NaN and fall through to the default.
+    if (Number.isFinite(modDate.getTime())) {
+      const daysSinceModified = (Date.now() - modDate.getTime()) / (1000 * 60 * 60 * 24);
 
-    if (daysSinceModified < 30) {
-      return 'monthly'; // Recently modified content
-    } else if (daysSinceModified < 365) {
-      return 'yearly'; // Older content
+      if (daysSinceModified < 30) {
+        return 'monthly'; // Recently modified content
+      } else if (daysSinceModified < 365) {
+        return 'yearly'; // Older content
+      }
     }
   }
 

@@ -20,13 +20,10 @@
   "homepage": "https://github.com/wernerglinka/metalsmith-seo",
   "license": "MIT",
   "author": {
-    "name": "ExtraHop Networks",
-    "url": "http://www.extrahop.com"
+    "name": "Werner Glinka",
+    "url": "http://www.wernerglinka.com"
   },
   "contributors": [
-    {
-      "name": "Aaron Boushley"
-    },
     {
       "name": "Werner Glinka",
       "email": "werner@glinka.co"
@@ -59,12 +56,12 @@
     "cheerio": "^1.2.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.12",
+    "@biomejs/biome": "^2.4.15",
     "assert-dir-equal": "^1.1.0",
-    "auto-changelog": "^2.5.0",
-    "depcheck": "^1.4.0",
+    "auto-changelog": "^2.5.1",
+    "depcheck": "^1.4.7",
     "metalsmith": "^2.7.0",
-    "release-it": "^20.0.0"
+    "release-it": "^20.0.1"
   },
   "engines": {
     "node": ">= 22.0.0"

@@ -77,7 +77,9 @@ export function createDocument(html) {
   // Parse only the head section (much smaller than full document)
   const $ = load(`${headParts.headTag}${headParts.innerContent}</head>`, CHEERIO_OPTIONS);
 
-  // Attach context for reconstruction in serializeDocument
+  // Attach reconstruction context to the $ instance. Safe because the plugin
+  // processes documents one-by-one — each createDocument/serializeDocument
+  // pair owns its own $ and never shares it across files.
   $._seoHeadContext = {
     before: headParts.before,
     headTag: headParts.headTag,
