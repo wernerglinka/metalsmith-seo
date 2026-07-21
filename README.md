@@ -6,6 +6,7 @@ Inspired by metalsmith-sitemap, the plugin provides SEO optimization for Metalsm
 [![metalsmith: plugin][metalsmith-badge]][metalsmith-url]
 [![license: MIT][license-badge]][license-url]
 [![Test Coverage][coverage-badge]][coverage-url]
+[![ESM][modules-badge]][npm-url]
 
 > **Version 1.x** is ESM-only and requires Node.js 22+. The plugin API and output are unchanged from v0.8.x — only the packaging was modernized in 1.0.0. See the [migration guide](#migration-from-v0x-to-v10) below.
 
@@ -917,3 +918,4 @@ The sitemap functionality in this plugin was inspired by and adapted from:
 [license-url]: LICENSE
 [coverage-badge]: https://img.shields.io/badge/test%20coverage-96%25-brightgreen
 [coverage-url]: #test-coverage
+[modules-badge]: https://img.shields.io/badge/module-ESM-blue
