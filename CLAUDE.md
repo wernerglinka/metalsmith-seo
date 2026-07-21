@@ -1,452 +1,160 @@
 # metalsmith-seo - Development Context
 
+This file gives Claude operational context for working in this plugin. Plugin
+behavior is documented in [README.md](README.md); don't duplicate it here.
+
 ## Project Overview
 
-This is a Metalsmith plugin generated using the enhanced standards from `metalsmith-plugin-mcp-server`. It follows modern JavaScript patterns with dual ESM/CommonJS support and comprehensive testing.
+An all-in-one SEO plugin: XML sitemap, robots.txt, meta descriptions, Open
+Graph / Twitter Card / JSON-LD structured data, canonical URLs, reading-time
+calculation, and an `llms.txt` generator. Code is organized into
+`src/processors/` (sitemap, robots, metadata-extractor, url-builder,
+head-optimizer, auto-calculator, llms), `src/generators/` (meta, opengraph,
+twitter, jsonld), and `src/utils/` (config-builder, escape, object-utils,
+html-injector, xml-generator).
+
+ESM-only Metalsmith plugin, published directly from `src/` (no build step),
+targeting Node.js 22+. CommonJS consumers can still load it via Node 22's ESM
+interop.
 
 ## MCP Server Integration (CRITICAL)
 
-**IMPORTANT**: This plugin was created with `metalsmith-plugin-mcp-server`. When working on this plugin, AI assistants (Claude) MUST use the MCP server tools rather than creating their own implementations.
+**IMPORTANT**: This plugin was created with `metalsmith-plugin-mcp-server`.
+When working on this plugin, AI assistants (Claude) MUST use the MCP server
+tools rather than improvising equivalents.
 
 ### Essential MCP Commands
 
 ```bash
-# List all available templates
-list-templates
-
-# Get specific template content (use these exactly as provided)
-get-template plugin/CLAUDE.md
-get-template configs/release-it.json
+list-templates                          # See what's available
+get-template plugin/CLAUDE.md           # Retrieve exact template content
 get-template configs/biome.json
-
-# Validate plugin and get actionable recommendations
-validate .
-
-# Generate configuration files
-configs .
-
-# Show recommended configuration templates
-show-template release-it
-show-template biome
-
-# Update dependencies
-update-deps .
+get-template configs/release-it.json
+validate .                              # Plugin validation + recommendations
+diff-template .                         # Drift check vs current scaffold
+configs .                               # Generate config files
+update-deps .                           # Dependency update
 ```
 
 ### CRITICAL RULES for AI Assistants
 
-1. **ALWAYS use MCP server templates verbatim** - Never create simplified versions
-2. **ALWAYS use `list-templates` first** to see what's available
-3. **ALWAYS use `get-template`** to retrieve exact template content
-4. **NEVER improvise or create custom implementations** when MCP server provides templates
-5. **When validation recommends templates**, use the exact commands provided
-6. **If a command seems unclear**, ask the user for clarification rather than improvising
+1. **Use MCP server templates verbatim** — never paraphrase or "simplify"
+2. **Run `list-templates` before guessing** at template names
+3. **When `validate` produces a recommendation, copy it exactly** — including
+   the exact command suggested
+4. **Ask the user** before modifying `.release-it.json`, `package.json`,
+   `biome.json`, or any other `.json` / `.yml` / `.config.js` file
+5. **Never set `npm.publish` to `true`** in `.release-it.json` — releases
+   here are deliberately manual
 
-### Common Mistakes to AVOID
+## Plugin Development Rules
 
-**❌ Wrong Approach:**
-- Creating custom CLAUDE.md content instead of using `get-template plugin/CLAUDE.md`
-- Scaffolding entire new plugins when you just need a template
-- Making up template content or "simplifying" official templates
-- Ignoring validation recommendations
-- Using commands like `npx metalsmith-plugin-mcp-server scaffold ./ CLAUDE.md claude-context`
+### Use Metalsmith's native methods
 
-**✅ Correct Approach:**
-- Use `list-templates` to see what's available
-- Use `get-template <template-name>` to get exact content
-- Follow validation recommendations exactly as provided
-- Ask for clarification when commands seem confusing
-- Always use official templates verbatim
-
-### Migration from Legacy Toolchain / Dual Build
-
-**IMPORTANT FOR AI ASSISTANTS**: Before working on this plugin, check whether it still uses the pre-v3.0.0 dual ESM/CJS build, or the pre-v2.0.0 mocha/eslint/c8 toolchain. The MCP server now scaffolds **ESM-only** plugins using **Biome**, the **native `node:test` runner**, and **native coverage**. Published directly from `src/` — no build step, no `lib/`, no microbundle.
-
-**Detection — the plugin needs migration if ANY of these are true:**
-
-- `package.json` has `main`, `module`, or dual `exports.import` / `exports.require` fields
-- `package.json` devDeps include `microbundle`, `eslint`, `prettier`, `mocha`, `chai`, `c8`, `nyc`
-- `package.json` scripts include `build`, `test:esm`, `test:cjs`, or `prepublishOnly: npm run build`
-- Files present: `lib/`, `eslint.config.js`, `.eslintrc*`, `prettier.config.js`, `.c8rc.json`, `.mocharc.*`, `test/**/*.test.cjs`
-- `engines.node` is less than `>= 22.0.0`
-
-**Migration steps — execute in order, stopping to confirm with the user before running destructive commands:**
-
-1. **Delete legacy files:**
-
-   ```bash
-   rm -rf lib/
-   rm -f eslint.config.js .eslintrc* prettier.config.js .prettierrc* .c8rc.json .mocharc.*
-   rm -f test/**/*.test.cjs
-   ```
-
-2. **Rewrite `package.json`** — use `get-template plugin/package.json` as the source of truth:
-   - Remove `main`, `module`; set `"exports": "./src/index.js"`
-   - Set `files: ["src/**/*.js", "LICENSE", "README.md"]`
-   - Remove scripts: `build`, `test:esm`, `test:cjs`, `prepublishOnly`
-   - Remove devDeps: `microbundle`, `eslint`, `prettier`, `mocha`, `chai`, `c8`, `nyc`
-   - Add devDep: `@biomejs/biome` (latest `^2.x`)
-   - Bump `engines.node` to `">= 22.0.0"`
-
-3. **Generate the Biome config:**
-
-   ```bash
-   npx metalsmith-plugin-mcp-server configs . --configs biome
-   ```
-
-4. **Rewrite test imports** (manual — cannot be automated safely):
-   - `import { describe, it, before, after, beforeEach, afterEach } from 'mocha'` → `from 'node:test'`
-   - `import { expect } from 'chai'` → `import assert from 'node:assert/strict'`
-   - Convert assertions: `expect(x).to.equal(y)` → `assert.equal(x, y)`, `expect(x).to.deep.equal(y)` → `assert.deepEqual(x, y)`, `expect(x).to.be.true` → `assert.equal(x, true)`, `expect(fn).to.throw()` → `assert.throws(fn)`
-   - Callback-style tests: `it('name', (done) => {...})` → `it('name', (_t, done) => {...})`
-
-5. **Update README examples** — replace `__dirname` with `import.meta.dirname`, remove any `require()` usage of this plugin, drop the ESM/CJS badge
-
-6. **Reinstall and verify:**
-
-   ```bash
-   rm -rf node_modules package-lock.json
-   npm install
-   npm run lint
-   npm test
-   npx metalsmith-plugin-mcp-server validate . --functional
-   ```
-
-**Do NOT proceed with normal development tasks if legacy toolchain files or dual-build artifacts are detected — migrate first so this CLAUDE.md accurately reflects the project.**
-
-### Quick Commands
-
-**Quality & Validation:**
-```bash
-npx metalsmith-plugin-mcp-server validate . --functional  # Validate with MCP server
-npm test                                                   # Run tests with coverage
-npm run lint                                              # Lint and fix code
+```javascript
+// ❌                                    // ✅
+require('debug')('')                     metalsmith.debug('')
+require('minimatch')(file, pattern)      metalsmith.match(pattern, file)
+process.env.NODE_ENV                     metalsmith.env('NODE_ENV')
+path.join(dir, file)                     metalsmith.path(file)
 ```
 
-**Release Process:**
-```bash
-npm run release:patch   # Bug fixes (1.5.4 → 1.5.5)
-npm run release:minor   # New features (1.5.4 → 1.6.0)  
-npm run release:major   # Breaking changes (1.5.4 → 2.0.0)
-```
+### Never mock Metalsmith in tests
 
-**Development:**
-```bash
-npm run test:coverage  # Run tests with detailed coverage
-```
+Use a real `Metalsmith` instance against a fixture directory. Metalsmith is in
+`devDependencies` for exactly this reason. Mocking `metalsmith()`,
+`metalsmith.match`, `metalsmith.debug`, `metalsmith.env`, `metalsmith.path`, or
+plugin invocation has repeatedly hidden integration bugs. Pass `files` directly
+to the plugin function `(files, metalsmith, done)`; never add files to
+`metalsmith.metadata()`.
 
+### Keep tests self-contained
 
-## Pre-Commit and Release Workflow
+Never export test-only helpers (reset functions, cache-clearers) from the
+plugin. Production code exports only the plugin and legitimate public APIs;
+tests create fresh plugin and Metalsmith instances instead.
 
-### CRITICAL: Always Run Pre-Commit Validation
+### Metalsmith goes in devDependencies, never peerDependencies
 
-**Before ANY commit or release, ALWAYS run these commands in order:**
+The plugin code never imports Metalsmith — it receives the instance as a
+parameter. Tests import Metalsmith directly.
+
+## SEO-specific lessons (from the maintainer code review)
+
+This plugin's original review surfaced domain bugs that general programming
+review misses — preserve these fixes:
+
+- **Reading time returns a number, not a string.** Don't return
+  `` `${minutes} min read` `` (breaks i18n); return the numeric value and let
+  templates format it.
+- **Reading speed / description lengths / viewport are options, not
+  hardcoded.** Expose `wordsPerMinute` etc. with sensible defaults.
+- **Priority is not content length.** Auto-priority by content length made
+  privacy policies outrank the homepage; sitemap priority must not use length
+  as importance.
+- **Hoist constant maps to module scope** (e.g. a type map) — never rebuild
+  them per call.
+- **Credit adaptations.** The sitemap work adapts an earlier plugin; keep the
+  attribution.
+
+## Pre-commit workflow
 
 ```bash
-npm run lint          # Fix linting issues
-npm run format        # Format code consistently
-npm test              # Ensure all tests pass
+npm run lint       # Biome: lint + format with autofix
+npm run format     # Format only
+npm test           # node:test runner against src/
 ```
 
-**If any of these commands fail, you MUST fix the issues before proceeding with commits or releases.**
+If any step fails, fix the underlying issue and re-run. Don't skip hooks.
 
-### Common Development Commands
+## Release commands
 
 ```bash
-# Build the plugin (required before testing)
-npm run build
-
-# Run tests for both ESM and CommonJS
-npm test
-
-# Run tests with coverage
-npm run test:coverage
-
-# Run linting and auto-fix issues
-npm run lint
-
-# Format code
-npm run format
-
-# Check formatting without making changes
-npm run format:check
+npm run release:patch   # Bug fix (1.2.3 → 1.2.4)
+npm run release:minor   # New feature (1.2.3 → 1.3.0)
+npm run release:major   # Breaking change (1.2.3 → 2.0.0)
 ```
 
-### Release Commands
+Releases use `./scripts/release.sh` (GitHub token via `gh auth token`); npm
+publishing is intentionally manual.
 
-Only after successful pre-commit validation:
+## Before releasing: re-read the user-facing docs
 
-```bash
-npm run release:patch  # For bug fixes (0.0.X)
-npm run release:minor  # For new features (0.X.0)
-npm run release:major  # For breaking changes (X.0.0)
-```
+Before any `npm run release:*`, read [README.md](README.md) end-to-end and fix
+drift from `src/` — option names/defaults, the generated meta/OG/JSON-LD field
+lists, and examples. If a release has no user-visible surface, say so rather
+than inventing drift.
 
-## Development Architecture
-
-### Dual Module Support
-
-This plugin supports both ESM and CommonJS:
-
-- **Source**: Write in ESM in `src/index.js`
-- **Build**: Creates both `lib/index.js` (ESM) and `lib/index.cjs` (CommonJS)
-- **Testing**: Tests run against built files for both formats
-
-### File Organization
+## File organization
 
 ```
-metalsmith-seo/
+/
 ├── src/
-│   ├── index.js              # Main plugin entry point
-│   └── utils/                # Utility functions
+│   ├── index.js
+│   ├── processors/           # sitemap, robots, metadata-extractor, url-builder,
+│   │                         #   head-optimizer, auto-calculator, llms
+│   ├── generators/           # meta, opengraph, twitter, jsonld
+│   └── utils/                # config-builder, escape, object-utils,
+│                             #   html-injector, xml-generator
 ├── test/
-│   ├── index.test.js         # ESM tests
-│   ├── index.test.cjs        # CommonJS tests
-│   └── fixtures/             # Test data
-└── lib/                      # Built files (auto-generated)
+│   ├── *.test.js             # node:test against src/ (real Metalsmith)
+│   └── fixtures/
+└── .github/
+    ├── workflows/            # test.yml, test-matrix.yml, claude-code.yml
+    └── dependabot.yml
 ```
 
-### Plugin Features
-
-This plugin uses standard synchronous processing patterns with the following SEO capabilities:
-
-- **Sitemap Generation**: XML sitemap with configurable priority and change frequency
-- **Meta Tags**: Open Graph and Twitter Card meta tags
-- **Robots.txt**: Configurable robots.txt generation
-- **Reading Time**: Calculate estimated reading time for content
-- **Meta Descriptions**: Auto-generate or use provided descriptions
-
-## Testing Strategy
-
-### Test Structure
-
-- **ESM Tests**: `test/index.test.js` - Tests the built ESM version
-- **CommonJS Tests**: `test/index.test.cjs` - Tests the built CommonJS version
-- **Fixtures**: `test/fixtures/` - Sample files for testing transformations
-
-### Running Tests
-
-```bash
-# Build first (required!)
-npm run build
-
-# Run all tests
-npm test
-
-# Run specific test format
-npm run test:esm
-npm run test:cjs
-
-# Coverage reporting
-npm run test:coverage
-```
-
-### Important: Build Before Testing
-
-**Always run `npm run build` before running tests** - the tests execute against the built files in `lib/`, not the source files in `src/`.
-
-## CRITICAL TESTING RULES
-
-### 1. NEVER mock Metalsmith instances
-
-**Always use real Metalsmith instances in tests:**
-
-```js
-// ✅ CORRECT - Real Metalsmith instance
-const metalsmith = Metalsmith(fixture('test-directory'));
-
-// ❌ WRONG - Never create mock objects
-const mockMetalsmith = { directory: () => '/fake/path' };
-```
-
-### 2. Use proper plugin function signature
-
-**Plugins receive (files, metalsmith, done) - pass files directly:**
-
-```js
-// ✅ CORRECT - Proper plugin usage
-function runPlugin(files, options = {}) {
-  return new Promise((resolve, reject) => {
-    const metalsmith = Metalsmith(fixture('validation'));
-    const plugin = bundledComponents(options);
-
-    // Plugin receives files directly - this is the standard pattern
-    plugin(files, metalsmith, (error) => {
-      if (error) reject(error);
-      else resolve(files);
-    });
-  });
-}
-
-// ❌ WRONG - Don't add files to metadata
-Object.keys(files).forEach((filename) => {
-  metalsmith.metadata()[filename] = files[filename]; // This is wrong!
-});
-```
-
-### 3. Keep tests self-contained - NO test utilities in production code
-
-**NEVER export test-related functions from the plugin:**
-
-```js
-// ❌ WRONG - Never export test utilities from production code
-export { resetCache };  // This pollutes the production API
-
-// ✅ CORRECT - Tests should be self-contained
-// If tests need to reset state, they should:
-// 1. Create new plugin instances for each test
-// 2. Use fresh Metalsmith instances
-// 3. Work around caching by using different options/data
-```
-
-Production code should only export the plugin function and any legitimate public APIs that users need. Test-specific utilities, reset functions, or debugging helpers should never be part of the production code.
-
-## Code Quality Standards
-
-### ESLint Configuration
-
-- Uses ESLint 9.x flat configuration (`eslint.config.js`)
-- Automatically fixes common issues with `npm run lint`
-- Modern JavaScript patterns enforced
-
-### Formatting
-
-- Prettier configuration for consistent code style
-- Auto-format with `npm run format`
-- Check formatting with `npm run format:check`
-
-### Documentation
-
-- JSDoc comments for all public functions
-- README with comprehensive usage examples
-
-## Plugin Development Patterns
-
-### Basic Plugin Structure
-
-```javascript
-/**
- * A metalsmith plugin for SEO optimization.
- * @param {Object} options - Plugin configuration
- * @returns {Function} Metalsmith plugin function
- */
-function seo(options = {}) {
-  return function (files, metalsmith, callback) {
-    // Plugin logic here
-    callback();
-  };
-}
-
-export default seo;
-```
-
-### Error Handling
-
-```javascript
-function seo(options = {}) {
-  return function (files, metalsmith, callback) {
-    try {
-      // Plugin processing
-      callback();
-    } catch (error) {
-      callback(error);
-    }
-  };
-}
-```
-
-## Release Process
-
-### Prerequisites
-
-- GitHub CLI (`gh`) installed and authenticated
-- All tests passing
-- Code properly linted and formatted
-
-### Automated Release
-
-The release process is fully automated:
-
-```bash
-# Patch release (bug fixes)
-npm run release:patch
-
-# Minor release (new features)
-npm run release:minor
-
-# Major release (breaking changes)
-npm run release:major
-```
-
-This automatically:
-
-- Updates version in package.json
-- Generates changelog
-- Creates git tag
-- Pushes to GitHub
-- Creates GitHub release
-
-## Common Development Tasks
-
-### Adding New Features
-
-1. Write feature in `src/index.js`
-2. Add comprehensive tests in `test/`
-3. Update JSDoc documentation
-4. Run pre-commit validation
-5. Test with real Metalsmith projects
-
-### Debugging
-
-```javascript
-// Add debug logging
-import { debuglog } from 'util';
-const debug = debuglog('metalsmith-seo');
-
-function seo(options = {}) {
-  return function (files, metalsmith, callback) {
-    debug('Processing %d files', Object.keys(files).length);
-    // ... plugin logic
-  };
-}
-```
-
-### Performance Optimization
-
-- Use `metalsmith.match()` for file filtering
-- Avoid unnecessary file system operations
-- Process files in batches for large sites
-- Cache expensive computations
-
-## Integration Testing
-
-Test your plugin with real Metalsmith projects:
-
-```javascript
-import Metalsmith from 'metalsmith';
-import seo from 'metalsmith-seo';
-
-const metalsmith = Metalsmith(__dirname)
-  .source('src')
-  .destination('dist')
-  .use(
-    seo({
-      // your options
-    })
-  )
-  .build((err) => {
-    if (err) throw err;
-    console.log('Build complete!');
-  });
-```
-
-## Communication Style
-
-### When Working on This Plugin
-
-- **Be specific** - Include exact error messages and file paths
-- **Test thoroughly** - Both ESM and CommonJS formats
-- **Follow patterns** - Use existing utilities and conventions
-- **Document changes** - Update JSDoc and README as needed
-
-This plugin follows the enhanced standards from `metalsmith-plugin-mcp-server` and is designed for modern Metalsmith development workflows.
+## Tooling
+
+- **Biome** for lint + format (single tool, single config: `biome.json`)
+- **node:test** + `node:assert/strict`; native coverage
+- **Node >= 22** required. Published ESM-only directly from `src/` — there is
+  **no build step, no `lib/`, no microbundle**. Tests run against `src/`.
+
+## When validation flags something
+
+`validate` returns `failed` (must-fix), `warnings`, and `recommendations`.
+Implement recommendations as written. The validator catches real maintainer
+feedback patterns (marketing language, hardcoded values that should be options,
+CJS examples in ESM-only plugins, performance anti-patterns, English-only
+output strings). Run `validate .` and copy the suggested fixes.
